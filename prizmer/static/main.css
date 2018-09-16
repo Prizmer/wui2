@@ -654,3 +654,7 @@ margin-top: 0.05em;
     word-break: break-all;
 	width: 400px;
 }
+
+.a{width: 33%; height: 500px; background-color: #F5F5DC; float: left; background-position: top left; overflow-y:scroll;}
+.b{width: 33%; height: 500px; background-color: #FAF0E6; float: left; background-position: top left; overflow-y:scroll;}
+.c{width: 33%; height: 500px;  background-color: #F0FFFF; background-position: top; float: right; overflow: hidden; overflow-y:scroll;}

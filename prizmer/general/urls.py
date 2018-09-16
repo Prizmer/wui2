@@ -138,7 +138,7 @@ urlpatterns = patterns('',
     url(r'^88/$', views.heat_digital_res_status),
     url(r'^90/$', views.water_impulse_res_status),
     
-    url(r'^92/$', views.electric_res_status_monthly),
+    url(r'^92/$', views.all_res_status_monthly),
 
     url(r'^87/$', views.balance_period_water_impulse),
     

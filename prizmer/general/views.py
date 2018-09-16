@@ -13489,10 +13489,8 @@ def balance_period_water_impulse(request):
     return render_to_response("data_table/water/87.html", args)
 
     
-def electric_res_status_monthly(request):
-    args = {}
-    is_abonent_level = re.compile(r'abonent')   
-    data_table = []
+def all_res_status_monthly(request):
+    args = {}    
     obj_title = u'Не выбран'
     obj_key = u'Не выбран'
     obj_parent_title = u'Не выбран'
@@ -13515,17 +13513,39 @@ def electric_res_status_monthly(request):
     #print 'print len(dt_objects) ', len(dt_objects)
         
     dt_date=common_sql.get_date_month_range_by_date(electric_data_end)
-    dtAll = []
+    dtAll_el = []
     for dd in dt_date:
         dtAll_statistic=[]
-        for obj in dt_objects:
-            #print obj[0]
+        for obj in dt_objects:            
             dt_statistic= common_sql.get_electric_count(obj[0],  dd[0])           
             dtAll_statistic.append(dt_statistic)
-        dtAll.append( dtAll_statistic)
+        dtAll_el.append( dtAll_statistic)
+
+    #heat
+    dt_objects = common_sql.get_res_objects('heat')
+    dtAll_h=[]
+    for dd in dt_date:
+        dtAll_statistic=[]
+        for obj in dt_objects:        
+            dt_statistic= common_sql.get_heat_count(obj[0],  dd[0])        
+            dtAll_statistic.append(dt_statistic)
+        dtAll_h.append( dtAll_statistic)
+  
+
+    #water
+    dt_objects = common_sql.get_water_impulse_objects()
+    dtAll_w=[]
+    for dd in dt_date:
+        dtAll_statistic=[]   
+        for obj in dt_objects:        
+            dt_statistic= common_sql.get_water_impulse_count(obj[0],  dd[0])       
+            dtAll_statistic.append(dt_statistic)
+        dtAll_w.append(dtAll_statistic)
 
         
-    args['dtAll'] = dtAll
+    args['dtAll_el'] = dtAll_el
+    args['dtAll_h'] = dtAll_h
+    args['dtAll_w'] = dtAll_w
     args['obj_title'] = obj_title
     args['obj_key'] = obj_key
     args['obj_parent_title'] = obj_parent_title

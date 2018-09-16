@@ -8696,7 +8696,8 @@ def get_heat_no_data(obj_title,  electric_data_end):
  
 def MakeSqlQuery_heat_count( obj_title, electric_data_end, my_params):
     sQuery="""
-    Select obj_name, Count(z.energy), Count(z.ab_name), round((count(energy)*100/count(ab_name))::numeric,0) as percent_val, (count (ab_name)-count (energy)) as no_val
+    Select obj_name, Count(z.energy), Count(z.ab_name), round((count(energy)*100/count(ab_name))::numeric,0) as percent_val, 
+    (count (ab_name)-count (energy)) as no_val, '%s'
 from
 (Select heat_abons.obj_name, heat_abons.ab_name, heat_abons.factory_number_manual, 
 round(z2.energy::numeric,7) as energy,
@@ -8752,7 +8753,7 @@ on z2.number_manual=heat_abons.factory_number_manual
 where heat_abons.obj_name='%s'
 order by heat_abons.ab_name) as z
 group by obj_name
-    """%(my_params[0],my_params[1],my_params[2],my_params[3], obj_title,my_params[4],electric_data_end, obj_title)
+    """%(electric_data_end,my_params[0],my_params[1],my_params[2],my_params[3], obj_title,my_params[4],electric_data_end, obj_title)
     return sQuery
 def get_heat_count(obj_title,  electric_data_end):
     my_params=['Энергия','Объем','Ti','To', 'Тепло']   
@@ -8831,7 +8832,8 @@ def get_water_impulse_no_data(obj_title,  electric_data_end):
     
 def MakeSqlQuery_water_impulse_count( obj_title, electric_data_end, my_params):
     sQuery="""
-    Select obj_name, Count(z.value), Count(z.ab_name), round((count(value)*100/count(ab_name))::numeric,0) as percent_val, (count (ab_name)-count (value)) as no_val
+    Select obj_name, Count(z.value), Count(z.ab_name), round((count(value)*100/count(ab_name))::numeric,0) as percent_val, 
+    (count (ab_name)-count (value)) as no_val, '%s'
 from
 (
 Select water_abons_report.name as obj_name, obj_name as ab_name, water_abons_report.ab_name as meter_name,  z2.meter_name, z2.name_params, z2.value 
@@ -8875,7 +8877,7 @@ WHERE
   where water_abons_report.name='%s'  
   order by obj_name, z2.name_params) z
   group by obj_name
-    """%(my_params[0],electric_data_end,obj_title,obj_title)
+    """%(electric_data_end,my_params[0],electric_data_end,obj_title,obj_title)
     return sQuery    
     
 def get_water_impulse_count(obj_title,  electric_data_end):
