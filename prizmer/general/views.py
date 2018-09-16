@@ -13507,31 +13507,35 @@ def electric_res_status_monthly(request):
         if request.method == 'GET':
             request.session["obj_title"]           = obj_title           = request.GET['obj_title']
             request.session["obj_key"]             = obj_key             = request.GET['obj_key']
-            request.session["obj_parent_title"]    = obj_parent_title    = request.GET['obj_parent_title']       
-            request.session["electric_data_end"]   = electric_data_end   = request.GET['electric_data_end']  
+            request.session["obj_parent_title"]    = obj_parent_title    = request.GET['obj_parent_title'] 
             request.session["electric_data_start"]   = electric_data_start   = request.GET['electric_data_start']  
-   
-    AllData=[]
-    Xcoord=[]    
-     
-    if not(bool(is_abonent_level.search(obj_key))):
-         data_table = common_sql.get_data_table_balance_water_impulse_perid(obj_parent_title, obj_title,electric_data_start, electric_data_end)
+            request.session["electric_data_end"]   = electric_data_end   = request.GET['electric_data_end']  
+    #print electric_data_end
+    dt_objects = common_sql.get_res_objects('electric')
+    #print 'print len(dt_objects) ', len(dt_objects)
+        
+    dt_date=common_sql.get_date_month_range_by_date(electric_data_end)
+    dtAll = []
+    for dd in dt_date:
+        dtAll_statistic=[]
+        for obj in dt_objects:
+            #print obj[0]
+            dt_statistic= common_sql.get_electric_count(obj[0],  dd[0])           
+            dtAll_statistic.append(dt_statistic)
+        dtAll.append( dtAll_statistic)
 
         
-    data_table=common_sql.ChangeNull(data_table, None)
-      
-    args['data_table'] = data_table
+    args['dtAll'] = dtAll
     args['obj_title'] = obj_title
     args['obj_key'] = obj_key
     args['obj_parent_title'] = obj_parent_title
     args['is_electric_monthly'] = is_electric_monthly
     args['is_electric_daily'] = is_electric_daily
     args['is_electric_current'] = is_electric_current
-    args['is_electric_delta'] = is_electric_delta
-    args['electric_data_start'] = electric_data_start
+    args['is_electric_delta'] = is_electric_delta      
     args['electric_data_end'] = electric_data_end
-    args['label'] = Xcoord
-    args['AllData']=AllData
+    args['electric_data_start'] = electric_data_start
+    
     return render_to_response("data_table/92.html", args)
     
 class AddCommentForm(forms.ModelForm):

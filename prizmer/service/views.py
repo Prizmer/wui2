@@ -2482,7 +2482,7 @@ def LoadBalance(sPath, sheet):
 
     if len(dtAll)==0: return u'Таблица пуста!'
     
-    if (len(str(dtAll[1][3])) < 0) or (dtAll[1][3] is None):
+    if (len(unicode(dtAll[1][3])) < 0) or (dtAll[1][3] is None):
         result = LoadImpulseWaterBalance(dtAll)
     else:      
     

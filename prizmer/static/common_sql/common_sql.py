@@ -8546,7 +8546,7 @@ def get_electric_no_data(obj_title, electric_data_end):
 
 def MakeSqlQuery_electric_count( obj_title,  electric_data_end, my_params):
     sQuery="""
-    select obj_name, count (t0) as have_val,  count (ab_name) as all_row, round((count(t0)*100/count(ab_name))::numeric,0) as percent_val, (count (ab_name)-count (t0)) as no_val
+    select obj_name, count (t0) as have_val,  count (ab_name) as all_row, round((count(t0)*100/count(ab_name))::numeric,0) as percent_val, (count (ab_name)-count (t0)) as no_val, '%s'
 from
 (
 Select  z2.daily_date,
@@ -8596,7 +8596,7 @@ z1.ktn, z1.ktt, z1.a
                         resources.name='%s' and
                         Objects.name= '%s' 
                         and            
-                        daily_values.date = '%s' 
+                        daily_values.date = '%s'
                         ) z1                      
 group by z1.name_objects, z1.daily_date, z1.name_objects, z1.name_abonents, z1.number_manual, z1.ktn, z1.ktt, z1.a 
 ) z2
@@ -8604,7 +8604,8 @@ on electric_abons.ab_name=z2.name_abonents
 where  electric_abons.obj_name= '%s' 
    
 ORDER BY electric_abons.ab_name ASC) as z 
-group by obj_name"""%(my_params[0],my_params[1],my_params[2],my_params[3],my_params[4],obj_title,electric_data_end,obj_title)
+group by obj_name"""%(electric_data_end,my_params[0],my_params[1],my_params[2],my_params[3],my_params[4],obj_title,electric_data_end,obj_title)
+    #print sQuery
     return sQuery 
     
 def get_electric_count(obj_title, electric_data_end):
@@ -8955,5 +8956,20 @@ def get_data_table_balance_water_impulse_perid(obj_parent_title, obj_title,elect
     cursor = connection.cursor()
     data_table=[]      
     cursor.execute(MakeSqlQuery_water_impulse_balnce_period( obj_title, electric_data_start, electric_data_end, my_params))  
+    data_table = cursor.fetchall()      
+    return data_table
+
+def get_date_month_range_by_date(electric_date_end):
+    cursor = connection.cursor()
+    data_table=[] 
+    sQuery="""
+    SELECT date_trunc('day', dd)::date::text
+    FROM generate_series
+        ( (date_trunc('month', '%s'::timestamp))::timestamp 
+        , (date_trunc('day', date_trunc('month', '%s'::TIMESTAMP) +'1 month' - '1 hour'::INTERVAL))::timestamp
+        , '1 day'::interval) dd
+    """%(electric_date_end, electric_date_end) 
+    #print sQuery    
+    cursor.execute(sQuery)  
     data_table = cursor.fetchall()      
     return data_table
