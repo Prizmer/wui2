@@ -82,7 +82,8 @@ urlpatterns = patterns('',
     url(r'^67/$', views.report_water_pulsar_potreblenie_skladochnaya), #skladochnaya - otch`t za period
     
     url(r'^68/$', views.report_rejim_electro), #отчёт-режимный день
-    url(r'^71/$', views.report_electric_potreblenie_3_zones_v2), # отчёт 17, Электрика. Отчет по потреблению за период по двум датам. 3 Тарифа.
+    url(r'^71/$', views.report_forma_80040), #Выгрузка архива с файлами xml по форме Мосэнергосбыт 80040
+   
     url(r'^73/$', views.report_pulsar_water_period), # отчёт 57, Показание за период с водосчётчиков Пульсар
     #url(r'^74/$', views.report_current_3_zones_v2), # Электрика. Простой отчет по показаниям на дату. 3 Тарифа   
     url(r'^74/$', views.report_heat_karat_daily), #karat307 pokazaniya
@@ -105,7 +106,9 @@ urlpatterns = patterns('',
     url(r'^86/$', views.report_electric_res_status),
     url(r'^88/$', views.report_heat_res_status),
     url(r'^90/$', views.report_water_impulse_res_status),
-
+    
+    url(r'^91/$', views.report_electric_potreblenie_3_zones_v2), # отчёт 17, Электрика. Отчет по потреблению за период по двум датам. 3 Тарифа.
+    
     url(r'^87/$', views.report_balance_period_water_impulse), 
     url(r'^92/$', views.report_empty_alert), 
     
