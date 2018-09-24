@@ -115,7 +115,9 @@ urlpatterns = patterns('',
     url(r'^68/$', views.rejim_day), #режимный день
     
     url(r'^69/$', views.electric_daily_graphic), #график потребления электроэнергии по дням
-    url(r'^71/$', views.electric_potreblenie_3_zones_v3), # отчёт 17, но с графиком!! Потребление по электричеству за период. 3 тарифа
+    
+    url(r'^71/$', views.forma_80040), # Отчёт по форме 80040
+   
     url(r'^72/$', views.electric_simple_3_zones_v3), # Показания по электричеству на дату. 3 тарифа
     url(r'^73/$', views.pulsar_water_period_2), # отчёт 57, но с графиком!  Показание за период с водосчётчиков Пульсар
     #url(r'^74/$', views.electric_current_3_zones_v2), # Показания текущие для М-200 по электричеству на дату. 3 тарифа
@@ -128,19 +130,23 @@ urlpatterns = patterns('',
 
     url(r'^79/$', views.water_potreblenie_pulsar_with_graphic), # вода, показания за период Импульсные, отчёт как 39
     
+    url(r'^81/$', views.pulsar_heat_period_with_graphic), # Показание на дату с теплосчётчиков Пульсар, отчёт как 59
     url(r'^83/$', views.water_elf_potreblenie_monthly_with_delta), # Потребление по месяцам с эльфов хв и гв
     url(r'^84/$', views.water_elf_daily), # 
-    url(r'^85/$', views.water_elf_potreblenie), # Потребление за период с эльфов хв и гв
-    
-    url(r'^81/$', views.pulsar_heat_period_with_graphic), # Показание на дату с теплосчётчиков Пульсар, отчёт как 59
+    url(r'^85/$', views.water_elf_potreblenie), # Потребление за период с эльфов хв и гв    
     
     url(r'^86/$', views.electric_res_status),
+
+    url(r'^87/$', views.balance_period_water_impulse),
+
     url(r'^88/$', views.heat_digital_res_status),
     url(r'^90/$', views.water_impulse_res_status),
     
+    url(r'^91/$', views.electric_potreblenie_3_zones_v3), # отчёт 17, но с графиком!! Потребление по электричеству за период. 3 тарифа
+
     url(r'^92/$', views.all_res_status_monthly),
 
-    url(r'^87/$', views.balance_period_water_impulse),
+    
     
    #---- Test urls
     url(r'^addnum/$', views.add_numbers),

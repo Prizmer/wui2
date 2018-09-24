@@ -2639,7 +2639,7 @@ on electric_abons.ab_name=z2.name_abonents
 where electric_abons.obj_name='%s'
 ORDER BY electric_abons.ab_name ASC;
 """%(params[0],params[1],params[2],params[3], res,obj_title, electric_data, obj_title)
-    print sQuery
+    #print sQuery
     if dm=='monthly' or dm=='daily' or dm=='current':
         sQuery=sQuery.replace('monthly',dm)
         #print sQuery
