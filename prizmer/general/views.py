@@ -12526,7 +12526,8 @@ def electric_potreblenie_3_zones_v3(request):
                     data_table=common_sql.get_data_table_electric_period(isAbon,obj_title,obj_parent_title, electric_data_start, electric_data_end, res, dm)
                     request.session["data_table_export"] = data_table
 
-                    
+                    data_table_graphic = common_sql.get_data_table_electric_between_for_obj(obj_title, obj_parent_title,electric_data_start, electric_data_end)
+
             #*********************************************************************************************************************************************************************
             elif (is_electric_delta == '1') &(bool(is_group_level.search(obj_key))):
                     data_table=common_sql.get_data_table_electric_period_for_group(obj_title,obj_parent_title, electric_data_start, electric_data_end, res)
@@ -12545,7 +12546,7 @@ def electric_potreblenie_3_zones_v3(request):
     AllData=[]
     Xcoord=[]
     
-    if (len( data_table_graphic) >0) & (bool(is_abonent_level.search(obj_key))):
+    if len( data_table_graphic) >0:
         Xcoord=makeOneCoords(data_table_graphic,0) #label 
     
         AllData=[{str("data"):makeOneCoords(data_table_graphic,12), str("label"):str("potreblenie T0"), str("backgroundColor"): get_rgba_color(5)},
@@ -13588,7 +13589,7 @@ def add_comment(request):
     args['form'] = form
     args['comment_status'] = comment_status
     args['guid_abonent'] = guid_abonent
-    print guid_abonent
+    #print guid_abonent
     return render_to_response("data_table/add_comment.html", args)
     
 @csrf_exempt       

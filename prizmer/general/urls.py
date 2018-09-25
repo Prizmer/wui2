@@ -115,8 +115,8 @@ urlpatterns = patterns('',
     url(r'^68/$', views.rejim_day), #режимный день
     
     url(r'^69/$', views.electric_daily_graphic), #график потребления электроэнергии по дням
-    
     url(r'^71/$', views.forma_80040), # Отчёт по форме 80040
+
    
     url(r'^72/$', views.electric_simple_3_zones_v3), # Показания по электричеству на дату. 3 тарифа
     url(r'^73/$', views.pulsar_water_period_2), # отчёт 57, но с графиком!  Показание за период с водосчётчиков Пульсар
