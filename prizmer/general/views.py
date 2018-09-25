@@ -12525,6 +12525,8 @@ def electric_potreblenie_3_zones_v3(request):
                     isAbon=False
                     data_table=common_sql.get_data_table_electric_period(isAbon,obj_title,obj_parent_title, electric_data_start, electric_data_end, res, dm)
                     request.session["data_table_export"] = data_table
+
+                    
             #*********************************************************************************************************************************************************************
             elif (is_electric_delta == '1') &(bool(is_group_level.search(obj_key))):
                     data_table=common_sql.get_data_table_electric_period_for_group(obj_title,obj_parent_title, electric_data_start, electric_data_end, res)
@@ -12822,6 +12824,9 @@ def balance_period_electric(request):
              type_abon=translate(dt_type_abon[i][1])
              #print type_abon             
              if len(data_table)>0: 
+                 data_table[0]=list(data_table[0])
+                 data_table[0][6]="-"
+                 data_table[0]=tuple(data_table[0])
                  data_table=common_sql.ChangeNull(data_table, None)
                  dtAll.append(data_table)
                  AllData.append({str("data"):makeOneCoords(data_table,6), str("label"):str(type_abon), str("backgroundColor"): get_rgba_color(i+2)})
@@ -12835,8 +12840,8 @@ def balance_period_electric(request):
             sumD=0
             vv=0
             for i in range(0,len(dtAll)):
-                print i, j
-                print dtAll[i][j][8] 
+                #print i, j
+                #print dtAll[i][j][8] 
                 if (dtAll[i][j][6] == 'Н/Д' or dtAll[i][j][6] == None  or dtAll[i][j][6] == 'None'): 
                     if (j+1)<len(dtAll[0]): j+=1
                               
@@ -12858,6 +12863,9 @@ def balance_period_electric(request):
         data_table = common_sql.get_data_table_balance_electric_perid_potrebiteli(obj_parent_title, obj_title,electric_data_start, electric_data_end, type_abon) 
                   
         if len(data_table)>0: 
+            data_table[0]=list(data_table[0])
+            data_table[0][6]="-"
+            data_table[0]=tuple(data_table[0])
             data_table=common_sql.ChangeNull(data_table, None)
             dtAll.append(data_table)
             AllData.append({str("data"):makeOneCoords(data_table,6), str("label"):str(type_abon), str("backgroundColor"): get_rgba_color(1)}) 

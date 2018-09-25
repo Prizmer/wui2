@@ -84,6 +84,8 @@ urlpatterns = patterns('',
     url(r'^68/$', views.report_rejim_electro), #отчёт-режимный день
     url(r'^71/$', views.report_forma_80040), #Выгрузка архива с файлами xml по форме Мосэнергосбыт 80040
    
+    url(r'^72/$', views.report_electric_simple_3_zones_v2),
+
     url(r'^73/$', views.report_pulsar_water_period), # отчёт 57, Показание за период с водосчётчиков Пульсар
     #url(r'^74/$', views.report_current_3_zones_v2), # Электрика. Простой отчет по показаниям на дату. 3 Тарифа   
     url(r'^74/$', views.report_heat_karat_daily), #karat307 pokazaniya

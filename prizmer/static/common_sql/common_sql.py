@@ -1949,7 +1949,7 @@ order by z3.ab_name ASC""" % (params[0],params[1],params[2],params[3], params[4]
                             params[0],params[1],params[2],params[3], params[4], params[5],obj_title,  date_start, res,obj_title)
     if dm=='monthly' or dm=='daily' or dm=='current':
         sQuery=sQuery.replace('daily',dm)
-    
+    print sQuery
     return sQuery
 
 def get_data_table_electric_parametr_by_period_v2(isAbon,obj_title, obj_parent_title, electric_data_start, electric_data_end, params, res, dm):
