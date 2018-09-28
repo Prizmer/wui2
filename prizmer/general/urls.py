@@ -140,6 +140,7 @@ urlpatterns = patterns('',
     url(r'^87/$', views.balance_period_water_impulse),
 
     url(r'^88/$', views.heat_digital_res_status),
+    url(r'^89/$', views.electric_report_for_c300), #отчёт по потрелениею элеткричества для ботсада
     url(r'^90/$', views.water_impulse_res_status),
     
     url(r'^91/$', views.electric_potreblenie_3_zones_v3), # отчёт 17, но с графиком!! Потребление по электричеству за период. 3 тарифа

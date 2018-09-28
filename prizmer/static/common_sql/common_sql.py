@@ -9047,3 +9047,122 @@ def get_date_month_range_by_date(electric_date_end):
     cursor.execute(sQuery)  
     data_table = cursor.fetchall()      
     return data_table
+
+def MakeQuery_electric_period_c300(obj_parent_title, obj_title ,electric_data_start, electric_data_end, my_params):
+    sQuery="""
+    Select row_number() over(ORDER BY z_start.account_1) num, 
+z_start.account_1,
+z_start.type_energo, 
+' '::text,
+' '::text,
+' '::text,
+z_start.factory_number_manual, 
+z_start.type_energo2, z_start.value_daily, z_end.value_daily, round((z_end.value_daily-z_start.value_daily)::numeric, 3)
+
+from
+(Select account_1, type_energo,  
+    electric_abons_report_for_botsad.factory_number_manual, type_energo2,
+    name_params, value_daily,
+    ktt,ktn, electric_abons_report_for_botsad.obj_name, electric_abons_report_for_botsad.ab_name
+from electric_abons_report_for_botsad
+LEFT JOIN
+(SELECT daily_values.date as daily_date,
+                        objects.name as name_objects,
+                        abonents.name as name_abonents,
+                        meters.factory_number_manual as number_manual,
+                        daily_values.value as value_daily,
+                        names_params.name as params_name,
+                        link_abonents_taken_params.coefficient as ktt,
+                         link_abonents_taken_params.coefficient_2 as ktn,
+                          link_abonents_taken_params.coefficient_3 as a
+                        FROM
+                         public.daily_values,
+                         public.link_abonents_taken_params,
+                         public.taken_params,
+                         public.abonents,
+                         public.objects,
+                         public.names_params,
+                         public.params,
+                         public.meters,
+                         public.types_meters,
+                         public.resources
+                        WHERE
+                        taken_params.guid = link_abonents_taken_params.guid_taken_params AND
+                        taken_params.id = daily_values.id_taken_params AND
+                        taken_params.guid_params = params.guid AND
+                        taken_params.guid_meters = meters.guid AND
+                        abonents.guid = link_abonents_taken_params.guid_abonents AND
+                        objects.guid = abonents.guid_objects AND
+                        names_params.guid = params.guid_names_params AND
+                        params.guid_names_params=names_params.guid and
+                        types_meters.guid=meters.guid_types_meters and
+                        names_params.guid_resources=resources.guid and
+                        resources.name='%s' and                        
+                        objects.name = '%s' AND
+                        daily_values.date ='%s' 
+                        and names_params.name!='T0 A+'
+                        
+) z2
+on z2.number_manual=electric_abons_report_for_botsad.factory_number_manual and electric_abons_report_for_botsad.name_params=z2.params_name
+where 
+ electric_abons_report_for_botsad.obj_name='%s'  
+ ) z_start,
+
+(Select account_1, type_energo,  
+    electric_abons_report_for_botsad.factory_number_manual, type_energo2,
+    name_params, value_daily,
+    ktt,ktn, electric_abons_report_for_botsad.obj_name, electric_abons_report_for_botsad.ab_name
+from electric_abons_report_for_botsad
+LEFT JOIN
+(SELECT daily_values.date as daily_date,
+                        objects.name as name_objects,
+                        abonents.name as name_abonents,
+                        meters.factory_number_manual as number_manual,
+                        daily_values.value as value_daily,
+                        names_params.name as params_name,
+                        link_abonents_taken_params.coefficient as ktt,
+                         link_abonents_taken_params.coefficient_2 as ktn,
+                          link_abonents_taken_params.coefficient_3 as a
+                        FROM
+                         public.daily_values,
+                         public.link_abonents_taken_params,
+                         public.taken_params,
+                         public.abonents,
+                         public.objects,
+                         public.names_params,
+                         public.params,
+                         public.meters,
+                         public.types_meters,
+                         public.resources
+                        WHERE
+                        taken_params.guid = link_abonents_taken_params.guid_taken_params AND
+                        taken_params.id = daily_values.id_taken_params AND
+                        taken_params.guid_params = params.guid AND
+                        taken_params.guid_meters = meters.guid AND
+                        abonents.guid = link_abonents_taken_params.guid_abonents AND
+                        objects.guid = abonents.guid_objects AND
+                        names_params.guid = params.guid_names_params AND
+                        params.guid_names_params=names_params.guid and
+                        types_meters.guid=meters.guid_types_meters and
+                        names_params.guid_resources=resources.guid and
+                        resources.name='%s' and                        
+                        objects.name = '%s' AND
+                        daily_values.date ='%s' 
+                        and names_params.name!='T0 A+'                        
+) z2
+on z2.number_manual=electric_abons_report_for_botsad.factory_number_manual and electric_abons_report_for_botsad.name_params=z2.params_name
+where 
+ electric_abons_report_for_botsad.obj_name='%s'  
+ ) z_end
+where z_start.factory_number_manual=z_end.factory_number_manual and z_start.type_energo=z_end.type_energo
+ order by z_start.account_1, z_start.type_energo2
+    """%( my_params[0],obj_title ,electric_data_start, obj_title, my_params[0],obj_title ,electric_data_end,obj_title )
+    return sQuery
+
+def get_data_table_electric_period_c300(obj_parent_title, obj_title ,electric_data_start, electric_data_end):
+    my_params=[u'Электричество',]
+    cursor = connection.cursor()
+    data_table=[]      
+    cursor.execute(MakeQuery_electric_period_c300(obj_parent_title, obj_title ,electric_data_start, electric_data_end, my_params))  
+    data_table = cursor.fetchall()      
+    return data_table
