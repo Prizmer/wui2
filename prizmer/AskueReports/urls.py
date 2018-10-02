@@ -107,6 +107,9 @@ urlpatterns = patterns('',
     
     url(r'^86/$', views.report_electric_res_status),
     url(r'^88/$', views.report_heat_res_status),
+
+    url(r'^89/$', views.report_electric_report_for_c300), #отчёт по потрелениею элеткричества для ботсада в csv
+
     url(r'^90/$', views.report_water_impulse_res_status),
     
     url(r'^91/$', views.report_electric_potreblenie_3_zones_v2), # отчёт 17, Электрика. Отчет по потреблению за период по двум датам. 3 Тарифа.

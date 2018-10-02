@@ -12277,7 +12277,7 @@ def report_heat_res_status(request):
     ws = wb.active
     electric_data_end   = request.session["electric_data_end"]  
 
-#Шапка
+    #Шапка
     ws.merge_cells('A2:E2')
     ws['A2'] = 'Статистика опроса по теплу на ' + str(electric_data_end)
     
@@ -12826,4 +12826,62 @@ def report_forma_80040(request):
     file_ext = u'zip'
     response['Content-Disposition'] = 'attachment;filename="%s.%s"' % (output_name.replace('"', '\"'), file_ext)   
   
+    return response
+
+def report_electric_report_for_c300(request):
+    response = StringIO.StringIO()
+    import unicodecsv
+    
+    #Шапка отчёта
+    caption=[u'N',
+            u'AREA',
+            u'FUNCTION',
+            u'CODE',
+            u'SUBNET',
+            u'MBUS',
+            u'SERIAL_NUM',
+            u'SENSOR_TYPE',
+            u'PREVIOUS',
+            u'CURRENT',
+            U'DELTA']
+
+    
+    #Запрашиваем данные для отчета
+    is_abonent_level = re.compile(r'abonent')
+    is_object_level_2 = re.compile(r'level2')
+
+    obj_title           = request.session['obj_title']
+    obj_parent_title    = request.session['obj_parent_title']       
+    electric_data_start   = request.session['electric_data_start']  
+    electric_data_end   = request.session['electric_data_end']            
+    obj_key             = request.session['obj_key']
+
+    data_table = []
+    
+    if (bool(is_abonent_level.search(obj_key))): 
+        pass
+    elif (bool(is_object_level_2.search(obj_key))):
+        data_table = common_sql.get_data_table_electric_period_c300(obj_parent_title, obj_title ,electric_data_start, electric_data_end)
+        
+    #zamenyem None na N/D vezde
+    if len(data_table)>0: 
+        data_table=common_sql.ChangeNull(data_table, None)
+
+    #Запрашиваем данные для отчета - конец
+    
+    # Заполняем отчет значениями
+    file_name=u'electric_'+translate(obj_title )+'_'+unicode(electric_data_start)+'-'+unicode(electric_data_end)
+    response = HttpResponse(response.read(), content_type='text/csv')       
+    file_ext = u'csv'    
+    response['Content-Disposition'] = 'attachment;filename="%s.%s"' % (file_name.replace('"', '\"'), file_ext)
+
+    # zagolovok
+    response.write(u'\ufeff'.encode('utf8'))
+    writer = unicodecsv.writer(response)     
+    writer.writerow(caption)
+    # dannie
+    for row in data_table: 
+        writer.writerow(row)     
+        #writer.writerow([unicode(row[0]), unicode(row[1]),row[2],unicode(row[3]),unicode(row[4]),unicode(row[5]),unicode(row[6]),unicode(row[7]),unicode(row[8]),unicode(row[9]),unicode(row[10])] )
+
     return response
