@@ -13108,10 +13108,10 @@ def report_electric_report_for_c300(request):
     response = HttpResponse(response.read(), content_type='text/csv')       
     file_ext = u'csv'    
     response['Content-Disposition'] = 'attachment;filename="%s.%s"' % (file_name.replace('"', '\"'), file_ext)
-
-    # zagolovok
+    
     response.write(u'\ufeff'.encode('utf8'))
-    writer = unicodecsv.writer(response)     
+    writer = unicodecsv.writer(response, delimiter=str(';'))  
+    # zagolovok   
     writer.writerow(caption)
     # dannie
     for row in data_table: 

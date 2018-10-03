@@ -9054,14 +9054,17 @@ def get_date_month_range_by_date(electric_date_end):
 
 def MakeQuery_electric_period_c300(obj_parent_title, obj_title ,electric_data_start, electric_data_end, my_params):
     sQuery="""
-    Select row_number() over(ORDER BY z_start.account_1) num, 
-z_start.account_1,
+    Select row_number() over(ORDER BY z_start.account_1, z_start.type_energo) num, 
+z_start.account_1::numeric::text,
 z_start.type_energo, 
-' '::text,
-' '::text,
-' '::text,
+''::text,
+''::text,
+''::text,
 z_start.factory_number_manual, 
-z_start.type_energo2, z_start.value_daily, z_end.value_daily, round((z_end.value_daily-z_start.value_daily)::numeric, 3)
+z_start.type_energo2, 
+(case when z_start.value_daily > 0 then z_start.value_daily::text else '-' end), 
+(case when z_end.value_daily > 0 then z_end.value_daily::text   else '-' end), 
+(case when z_end.value_daily > 0 and z_start.value_daily > 0 then round((z_end.value_daily-z_start.value_daily)::numeric, 3)::text else '-' end)
 
 from
 (Select account_1, type_energo,  
@@ -9159,7 +9162,7 @@ where
  electric_abons_report_for_botsad.obj_name='%s'  
  ) z_end
 where z_start.factory_number_manual=z_end.factory_number_manual and z_start.type_energo=z_end.type_energo
- order by z_start.account_1, z_start.type_energo2
+ order by num, z_start.account_1, z_start.type_energo2
     """%( my_params[0],obj_title ,electric_data_start, obj_title, my_params[0],obj_title ,electric_data_end,obj_title )
     return sQuery
 
