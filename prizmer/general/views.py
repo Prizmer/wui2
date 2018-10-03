@@ -11804,10 +11804,10 @@ def forma_80020_v2(request):
                     temp_dt =  common_sql.get_A_R_energy_by_factory_number_period(factory_number_manual,electric_data_start,electric_data_end, name_param)
                      
                     data_table_check_data=add_1columns_to_dt(data_table_check_data,temp_dt,1)
-                    print factory_number_manual                    
-                    #print temp_dt
-                    print k
-                    print temp_dt
+                    # print factory_number_manual                    
+                    # print temp_dt
+                    # print k
+                    # print temp_dt
                
             #Заголовок
             #В заголовок добавляем дату чуть позже, чтобы спокойно пройти по номерам и параметрам
