@@ -80,7 +80,7 @@ urlpatterns = patterns('',
     url(r'^39/$', views.water_potreblenie_pulsar), # вода, показания за период Импульсные 
     
     url(r'^40/$', views.electric_check_factory_numbers), # Сверка заводских номеров приборов
-    url(r'^41/$', views.forma_80020), # Отчёт по форме 80020
+    url(r'^41/$', views.forma_80020_v2), # Отчёт по форме 80020
     
     url(r'^42/$', views.resources_all_by_date), # Отчёт по всем ресурсам на дату
     url(r'^44/$', views.resources_electric_by_date), # Отчёт по электрике

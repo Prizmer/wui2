@@ -5391,6 +5391,8 @@ def get_count_of_30_profil_by_meter_number(date, meters_number, names_params):
     simpleq = simpleq.fetchall()
     return simpleq[0][0]
 
+
+
 def get_sum_of_30_profil_by_meter_number(date, meters_number, names_params):
     simpleq = connection.cursor()
     simpleq.execute("""SELECT 
@@ -5581,6 +5583,8 @@ def get_data_table_by_date_daily_pulsar_teplo(obj_parent_title, obj_title, elect
     
     if len(data_table)>0: data_table=ChangeNull(data_table, electric_data)
     return data_table
+
+
 
 def makeSqlQuery_heat_pulsar_teplo_abon_period(obj_parent_title,obj_title, electric_data_end, electric_data_start, params):
     sQuery="""
@@ -9164,5 +9168,254 @@ def get_data_table_electric_period_c300(obj_parent_title, obj_title ,electric_da
     cursor = connection.cursor()
     data_table=[]      
     cursor.execute(MakeQuery_electric_period_c300(obj_parent_title, obj_title ,electric_data_start, electric_data_end, my_params))  
+    data_table = cursor.fetchall()      
+    return data_table
+
+def MakeQuery_80020_statistic(group_name,electric_data_start,electric_data_end, my_params):
+    sQuery="""
+    Select z_info.name_sender, 
+                         z_info.inn_sender, 
+                         z_info.dogovor_number, 
+                         z_info.factory_number_manual, 
+                         z_info.measuringpoint_name, 
+                         z_info.measuringpoint_code, 
+                         z_info.dt_last_read,
+                         z_info.val_start,
+                         z_info.val_end,
+                         z_info.delta,
+                         round(z_count.sum_30::numeric,2),
+                         z_count.percent
+from
+(Select z_start.name_sender, 
+                         z_start.inn_sender, 
+                         z_start.dogovor_number, 
+                         z_start.factory_number_manual, 
+                         z_start.measuringpoint_name, 
+                          z_start.measuringpoint_code, 
+                          z_start.dt_last_read,
+                          z_start.value as val_start,
+                          z_end.value as val_end,
+                          round((z_end.value-z_start.value)::numeric,2) as delta
+from
+(Select report_80020.name_sender, 
+                         report_80020.inn_sender, 
+                          report_80020.dogovor_number, 
+                         report_80020.factory_number_manual, 
+                         report_80020.measuringpoint_name, 
+                          report_80020.measuringpoint_code, 
+                          report_80020.dt_last_read,
+                          z1.value
+from
+report_80020
+Left Join
+(SELECT 
+  meters.name, 
+  meters.factory_number_manual, 
+  daily_values.date, 
+  daily_values.value, 
+  groups_80020.name, 
+  names_params.name
+FROM 
+  public.meters, 
+  public.taken_params, 
+  public.daily_values, 
+  public.groups_80020, 
+  public.link_groups_80020_meters, 
+  public.params, 
+  public.names_params
+WHERE 
+  taken_params.guid_meters = meters.guid AND
+  taken_params.guid_params = params.guid AND
+  daily_values.id_taken_params = taken_params.id AND
+  link_groups_80020_meters.guid_meters = meters.guid AND
+  link_groups_80020_meters.guid_groups_80020 = groups_80020.guid AND
+  params.guid_names_params = names_params.guid AND
+  daily_values.date = '%s' AND 
+  names_params.name = '%s') z1
+on z1.factory_number_manual=report_80020.factory_number_manual
+where report_80020.group_name='%s') z_start,
+
+(Select report_80020.name_sender, 
+                         report_80020.inn_sender, 
+                          report_80020.dogovor_number, 
+                         report_80020.factory_number_manual, 
+                         report_80020.measuringpoint_name, 
+                          report_80020.measuringpoint_code, 
+                          report_80020.dt_last_read,
+                          z1.value 
+from
+report_80020
+Left Join
+(SELECT 
+  meters.name, 
+  meters.factory_number_manual, 
+  daily_values.date, 
+  daily_values.value, 
+  groups_80020.name, 
+  names_params.name
+FROM 
+  public.meters, 
+  public.taken_params, 
+  public.daily_values, 
+  public.groups_80020, 
+  public.link_groups_80020_meters, 
+  public.params, 
+  public.names_params
+WHERE 
+  taken_params.guid_meters = meters.guid AND
+  taken_params.guid_params = params.guid AND
+  daily_values.id_taken_params = taken_params.id AND
+  link_groups_80020_meters.guid_meters = meters.guid AND
+  link_groups_80020_meters.guid_groups_80020 = groups_80020.guid AND
+  params.guid_names_params = names_params.guid AND
+  daily_values.date = '%s' AND 
+  names_params.name = '%s') z1
+on z1.factory_number_manual=report_80020.factory_number_manual
+where report_80020.group_name='%s') z_end
+where z_start.factory_number_manual=z_end.factory_number_manual ) z_info
+left join
+(Select 
+sum(z.summa) as sum_30 ,
+z.factory_number_manual,
+round( (
+        100 -((((SELECT count(dd)
+          FROM generate_series
+        ( '%s'::timestamp 
+        , '%s'::timestamp
+        , '1 day'::interval) dd) *48)-sum(z.count_48))/((SELECT count(dd)
+          FROM generate_series
+        ( '%s'::timestamp 
+        , '%s'::timestamp
+        , '1 day'::interval) dd) *48)) *100)::numeric,1) as percent
+from
+(SELECT 
+  names_params.name, 
+  various_values.date, 
+  sum (various_values.value) as summa, 
+  count(meters.factory_number_manual) as count_48,
+  meters.factory_number_manual, 
+  groups_80020.name
+FROM 
+  public.meters, 
+  public.groups_80020, 
+  public.link_groups_80020_meters, 
+  public.taken_params, 
+  public.various_values, 
+  public.params, 
+  public.names_params
+WHERE 
+  link_groups_80020_meters.guid_groups_80020 = groups_80020.guid AND
+  link_groups_80020_meters.guid_meters = meters.guid AND
+  taken_params.guid_meters = meters.guid AND
+  taken_params.guid_params = params.guid AND
+  various_values.id_taken_params = taken_params.id AND
+  params.guid_names_params = names_params.guid AND
+  names_params.name = '%s' AND 
+  various_values.date BETWEEN '%s' and '%s'
+  group by names_params.name, 
+  various_values.date,  
+  meters.factory_number_manual, 
+  groups_80020.name 
+  order by factory_number_manual, date ) z
+  group by z.factory_number_manual
+) z_count
+on z_count.factory_number_manual=z_info.factory_number_manual
+    """%(electric_data_start, my_params[0], group_name, electric_data_end, my_params[0], group_name, electric_data_start,electric_data_end,electric_data_start,electric_data_end,my_params[1],electric_data_start,electric_data_end)
+    return sQuery
+
+def get_80020_statistic(group_name,electric_data_start,electric_data_end):
+    my_params=[u'T0 A+',u'A+ Профиль']
+    cursor = connection.cursor()
+    data_table=[]      
+    cursor.execute(MakeQuery_80020_statistic(group_name,electric_data_start,electric_data_end, my_params))  
+    data_table = cursor.fetchall()      
+    return data_table
+
+def get_header_taken_params(group_name):
+    sQuery="""
+    SELECT 
+  meters.factory_number_manual, 
+  names_params.name
+FROM 
+  public.groups_80020, 
+  public.meters, 
+  public.types_meters, 
+  public.names_params, 
+  public.params, 
+  public.link_groups_80020_meters
+WHERE 
+  meters.guid_types_meters = types_meters.guid AND
+  params.guid_names_params = names_params.guid AND
+  params.guid_types_meters = types_meters.guid AND
+  link_groups_80020_meters.guid_groups_80020 = groups_80020.guid AND
+  link_groups_80020_meters.guid_meters = meters.guid AND
+  (names_params.name = '%s' OR 
+  names_params.name = '%s')
+  and groups_80020.name='%s'
+group by   meters.factory_number_manual, 
+  names_params.name,
+  measuringpoint_name
+  order by measuringpoint_name
+    """%('T0 A+',u'T0 R+', group_name)
+    cursor = connection.cursor()
+    data_table=[]      
+    cursor.execute(sQuery)  
+    data_table = cursor.fetchall()      
+    return data_table
+
+def get_A_R_energy_by_factory_number_period(factory_number_manual,electric_data_start,electric_data_end, name_param):
+    if name_param == 'T0 R+':
+        name_param = 'R+ Профиль'
+    else:
+        name_param = 'A+ Профиль'
+
+    sQuery="""
+    Select dd::date,
+(case when count_48>1 then count_48 else 0 end)
+FROM generate_series
+        ( '%s'::timestamp
+        , '%s'::timestamp
+        , '1 day'::interval) dd
+        left join
+        (
+SELECT
+  names_params.name as name_param,
+  various_values.date,
+  count(meters.factory_number_manual) as count_48,
+  meters.factory_number_manual
+FROM
+  public.meters,
+  public.groups_80020,
+  public.link_groups_80020_meters,
+  public.taken_params,
+  public.various_values,
+  public.params,
+  public.names_params
+WHERE
+  link_groups_80020_meters.guid_groups_80020 = groups_80020.guid AND
+  link_groups_80020_meters.guid_meters = meters.guid AND
+  taken_params.guid_meters = meters.guid AND
+  taken_params.guid_params = params.guid AND
+  various_values.id_taken_params = taken_params.id AND
+  params.guid_names_params = names_params.guid AND
+  factory_number_manual='%s' and
+  various_values.date BETWEEN '%s' and '%s'
+  and names_params.name = '%s'
+
+  group by names_params.name,
+  various_values.date,
+  meters.factory_number_manual,
+  groups_80020.name
+  order by factory_number_manual, date) z
+  on z.date=dd
+  group by dd,
+  factory_number_manual,
+  count_48
+  order by  dd
+    """%(electric_data_start,electric_data_end,factory_number_manual,electric_data_start,electric_data_end, name_param)
+    #print sQuery
+    cursor = connection.cursor()
+    data_table=[]      
+    cursor.execute(sQuery)  
     data_table = cursor.fetchall()      
     return data_table
