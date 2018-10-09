@@ -9234,9 +9234,18 @@ WHERE
   link_groups_80020_meters.guid_groups_80020 = groups_80020.guid AND
   params.guid_names_params = names_params.guid AND
   daily_values.date = '%s' AND 
-  names_params.name = '%s') z1
+  names_params.name = '%s'
+   and groups_80020.name='%s'
+   group by 
+  meters.name,
+  meters.factory_number_manual,
+  daily_values.date,
+  daily_values.value,
+  groups_80020.name,
+  names_params.name) z1
 on z1.factory_number_manual=report_80020.factory_number_manual
-where report_80020.group_name='%s') z_start,
+where report_80020.group_name='%s'
+ ) z_start,
 
 (Select report_80020.name_sender, 
                          report_80020.inn_sender, 
@@ -9272,10 +9281,28 @@ WHERE
   link_groups_80020_meters.guid_groups_80020 = groups_80020.guid AND
   params.guid_names_params = names_params.guid AND
   daily_values.date = '%s' AND 
-  names_params.name = '%s') z1
+  names_params.name = '%s'
+   and groups_80020.name='%s'
+   group by 
+  meters.name,
+  meters.factory_number_manual,
+  daily_values.date,
+  daily_values.value,
+  groups_80020.name,
+  names_params.name) z1
 on z1.factory_number_manual=report_80020.factory_number_manual
-where report_80020.group_name='%s') z_end
-where z_start.factory_number_manual=z_end.factory_number_manual ) z_info
+where report_80020.group_name='%s'
+ ) z_end
+where z_start.factory_number_manual=z_end.factory_number_manual
+group by z_start.name_sender,
+                         z_start.inn_sender,
+                         z_start.dogovor_number,
+                         z_start.factory_number_manual,
+                         z_start.measuringpoint_name,
+                          z_start.measuringpoint_code,
+                          z_start.dt_last_read,
+                          z_start.value,
+                          z_end.value ) z_info
 left join
 (Select 
 sum(z.summa) as sum_30 ,
@@ -9315,6 +9342,7 @@ WHERE
   params.guid_names_params = names_params.guid AND
   names_params.name = '%s' AND 
   various_values.date BETWEEN '%s' and '%s'
+  and groups_80020.name='%s'
   group by names_params.name, 
   various_values.date,  
   meters.factory_number_manual, 
@@ -9323,7 +9351,9 @@ WHERE
   group by z.factory_number_manual
 ) z_count
 on z_count.factory_number_manual=z_info.factory_number_manual
-    """%(electric_data_start, my_params[0], group_name, electric_data_end, my_params[0], group_name, electric_data_start,electric_data_end,electric_data_start,electric_data_end,my_params[1],electric_data_start,electric_data_end)
+    """%(electric_data_start, my_params[0],group_name, group_name, electric_data_end, my_params[0], group_name,group_name, electric_data_start,electric_data_end,
+    electric_data_start,electric_data_end,my_params[1],electric_data_start,electric_data_end, group_name)
+    #print sQuery
     return sQuery
 
 def get_80020_statistic(group_name,electric_data_start,electric_data_end):
@@ -9416,7 +9446,7 @@ WHERE
   count_48
   order by  dd
     """%(electric_data_start,electric_data_end,factory_number_manual,electric_data_start,electric_data_end, name_param)
-    #print sQuery
+    print sQuery
     cursor = connection.cursor()
     data_table=[]      
     cursor.execute(sQuery)  
