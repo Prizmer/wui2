@@ -147,6 +147,8 @@ urlpatterns = patterns('',
 
     url(r'^92/$', views.all_res_status_monthly),
 
+    url(r'^93/$', views.water_impulse_report_for_c300), #отчёт по потрелению воды для ботсада
+
     
     
    #---- Test urls

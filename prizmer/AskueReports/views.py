@@ -13119,3 +13119,60 @@ def report_electric_report_for_c300(request):
         #writer.writerow([unicode(row[0]), unicode(row[1]),row[2],unicode(row[3]),unicode(row[4]),unicode(row[5]),unicode(row[6]),unicode(row[7]),unicode(row[8]),unicode(row[9]),unicode(row[10])] )
 
     return response
+
+def report_water_impulse_report_for_c300(request):
+    response = StringIO.StringIO()
+    import unicodecsv
+    
+    #Шапка отчёта
+    caption=[u'N',
+            u'AREA',
+            u'FUNCTION',
+            u'CODE',
+            u'SUBNET',
+            u'MBUS',
+            u'SERIAL_NUM',
+            u'SENSOR_TYPE',
+            u'PREVIOUS',
+            u'CURRENT',
+            U'DELTA']
+
+    
+    #Запрашиваем данные для отчета
+    is_object_level_1 = re.compile(r'level')
+
+    obj_title           = request.session['obj_title']
+    obj_parent_title    = request.session['obj_parent_title']       
+    electric_data_start   = request.session['electric_data_start']  
+    electric_data_end   = request.session['electric_data_end']            
+    obj_key             = request.session['obj_key']
+
+    data_table = []
+    
+    if (bool(is_object_level_1.search(obj_key))) : 
+         data_table = common_sql.get_data_table_water_period_c300(obj_parent_title, obj_title ,electric_data_start, electric_data_end)
+    else:
+        pass
+        
+    #zamenyem None na N/D vezde
+    if len(data_table)>0: 
+        data_table=common_sql.ChangeNull(data_table, None)
+
+    #Запрашиваем данные для отчета - конец
+    
+    # Заполняем отчет значениями
+    file_name=u'water_'+translate(obj_title )+'_'+unicode(electric_data_start)+'-'+unicode(electric_data_end)
+    response = HttpResponse(response.read(), content_type='text/csv')       
+    file_ext = u'csv'    
+    response['Content-Disposition'] = 'attachment;filename="%s.%s"' % (file_name.replace('"', '\"'), file_ext)
+    
+    response.write(u'\ufeff'.encode('utf8'))
+    writer = unicodecsv.writer(response, delimiter=str(';'))  
+    # zagolovok   
+    writer.writerow(caption)
+    # dannie
+    for row in data_table: 
+        writer.writerow(row)     
+        #writer.writerow([unicode(row[0]), unicode(row[1]),row[2],unicode(row[3]),unicode(row[4]),unicode(row[5]),unicode(row[6]),unicode(row[7]),unicode(row[8]),unicode(row[9]),unicode(row[10])] )
+
+    return response

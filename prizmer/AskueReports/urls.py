@@ -116,6 +116,8 @@ urlpatterns = patterns('',
     
     url(r'^87/$', views.report_balance_period_water_impulse), 
     url(r'^92/$', views.report_empty_alert), 
+
+    url(r'^93/$', views.report_water_impulse_report_for_c300), #отчёт по потрелениею элеткричества для ботсада в csv
     
     #---- Test urls
 

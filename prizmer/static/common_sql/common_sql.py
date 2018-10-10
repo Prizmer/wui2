@@ -9446,9 +9446,110 @@ WHERE
   count_48
   order by  dd
     """%(electric_data_start,electric_data_end,factory_number_manual,electric_data_start,electric_data_end, name_param)
-    print sQuery
+    #print sQuery
     cursor = connection.cursor()
     data_table=[]      
     cursor.execute(sQuery)  
+    data_table = cursor.fetchall()      
+    return data_table
+
+def MakeQuery_water_period_c300(obj_parent_title, obj_title ,electric_data_start, electric_data_end, my_params):
+    sQuery="""
+    Select row_number() over(ORDER BY ab_name) num, 
+substring(ab_name from 10)::int,
+(case when type_energo='Горячее водоснабжение' then 'ГВС' else 'ХВС' end),
+''::text,
+''::text,
+''::text,
+substring(meter_name from (position('№' in meter_name)+1)::int ),
+(case when type_energo='Горячее водоснабжение' then 'fhw' else 'fcw' end),
+(case when val_start > 0 then val_start::text else '-' end) as val_start, 
+(case when val_end > 0 then val_end::text   else '-' end) as val_end, 
+(case when val_end > 0 and val_start > 0 then round((val_end-val_start)::numeric, 3)::text else '-' end) as delta 
+from
+(
+Select z_st.ab_name, z_st.account_2,z_st.date, z_st.meter_name,z_st.type_energo, z_st.value as val_start,z_end.value as val_end, z_st.date_install, z_end.date
+from 
+(Select  obj_name as ab_name, account_2,z2.date, water_abons_report.ab_name as meter_name,type_energo, z2.value,date_install
+from water_abons_report
+LEFT JOIN (
+SELECT
+  meters.name,
+  daily_values.date,
+  daily_values.value,
+  abonents.name as ab_name,
+  abonents.guid
+FROM
+  public.meters,
+  public.taken_params,
+  public.daily_values,
+  public.abonents,
+  public.link_abonents_taken_params,
+  params,
+  names_params,
+  resources
+WHERE
+  taken_params.guid_meters = meters.guid AND
+  daily_values.id_taken_params = taken_params.id AND
+  link_abonents_taken_params.guid_taken_params = taken_params.guid AND
+  link_abonents_taken_params.guid_abonents = abonents.guid
+and
+  params.guid=taken_params.guid_params  and
+  names_params.guid=params.guid_names_params and
+  resources.guid=names_params.guid_resources and
+  resources.name='%s'
+  and date='%s'
+
+)z2
+on z2.ab_name=water_abons_report.ab_name
+where water_abons_report.name='%s'
+order by account_2, obj_name) z_st,
+(
+Select  obj_name as ab_name, account_2,z2.date, water_abons_report.ab_name as meter_name,type_energo, z2.value,date_install
+from water_abons_report
+LEFT JOIN (
+SELECT
+  meters.name,
+  daily_values.date,
+  daily_values.value,
+  abonents.name as ab_name,
+  abonents.guid
+FROM
+  public.meters,
+  public.taken_params,
+  public.daily_values,
+  public.abonents,
+  public.link_abonents_taken_params,
+  params,
+  names_params,
+  resources
+WHERE
+  taken_params.guid_meters = meters.guid AND
+  daily_values.id_taken_params = taken_params.id AND
+  link_abonents_taken_params.guid_taken_params = taken_params.guid AND
+  link_abonents_taken_params.guid_abonents = abonents.guid
+and
+  params.guid=taken_params.guid_params  and
+  names_params.guid=params.guid_names_params and
+  resources.guid=names_params.guid_resources and
+  resources.name='%s'
+  and date='%s'
+
+)z2
+on z2.ab_name=water_abons_report.ab_name
+where water_abons_report.name='%s'
+order by account_2, obj_name) z_end
+where z_st.meter_name=z_end.meter_name
+and z_st.ab_name like '%%Квартира%%'
+) z
+order by ab_name
+    """%(my_params[0],electric_data_start,obj_title, my_params[0], electric_data_end, obj_title)
+    #print sQuery
+    return sQuery
+def get_data_table_water_period_c300(obj_parent_title, obj_title ,electric_data_start, electric_data_end,):
+    my_params=[u'Импульс']
+    cursor = connection.cursor()
+    data_table=[]      
+    cursor.execute(MakeQuery_water_period_c300(obj_parent_title, obj_title ,electric_data_start, electric_data_end, my_params))  
     data_table = cursor.fetchall()      
     return data_table

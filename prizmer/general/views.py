@@ -13875,3 +13875,55 @@ def electric_report_for_c300(request):
     args['electric_data_start'] = electric_data_start
     
     return render_to_response("data_table/89.html", args)
+
+def water_impulse_report_for_c300(request):
+    args = {}    
+    obj_title = u'Не выбран'
+    obj_key = u'Не выбран'
+    obj_parent_title = u'Не выбран'
+    is_abonent_level = re.compile(r'abonent')
+    is_object_level_2 = re.compile(r'level2')
+    is_object_level_1 = re.compile(r'level')
+    is_electric_monthly = u''
+    is_electric_daily = u''
+    is_electric_current = u''
+    is_electric_delta = u''
+    electric_data_start = u''
+    electric_data_end = u''
+    decimal.getcontext().prec = 3
+    data_table=[]
+  
+    if request.is_ajax():
+        if request.method == 'GET':
+            request.session["obj_title"]           = obj_title           = request.GET['obj_title']
+            request.session["obj_key"]             = obj_key             = request.GET['obj_key']
+            request.session["obj_parent_title"]    = obj_parent_title    = request.GET['obj_parent_title'] 
+            request.session["electric_data_start"]   = electric_data_start   = request.GET['electric_data_start']  
+            request.session["electric_data_end"]   = electric_data_end   = request.GET['electric_data_end']  
+    
+    # print (bool(is_object_level_2.search(obj_key)))
+    # print (bool(is_object_level_1.search(obj_key))) 
+    # print bool(is_abonent_level.search(obj_key))
+    if (bool(is_object_level_1.search(obj_key))) : 
+         data_table = common_sql.get_data_table_water_period_c300(obj_parent_title, obj_title ,electric_data_start, electric_data_end)
+    else:
+        pass
+       
+        
+
+    #zamenyem None na N/D vezde
+    if len(data_table)>0: 
+        data_table=common_sql.ChangeNull(data_table, None)
+        
+    args['data_table'] = data_table
+    args['obj_title'] = obj_title
+    args['obj_key'] = obj_key
+    args['obj_parent_title'] = obj_parent_title
+    args['is_electric_monthly'] = is_electric_monthly
+    args['is_electric_daily'] = is_electric_daily
+    args['is_electric_current'] = is_electric_current
+    args['is_electric_delta'] = is_electric_delta      
+    args['electric_data_end'] = electric_data_end
+    args['electric_data_start'] = electric_data_start
+    
+    return render_to_response("data_table/93.html", args)
