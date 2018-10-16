@@ -764,6 +764,10 @@ def add_taken_param(sender, instance, created, **kwargs): # Добавляем �
         add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"c3bb9033-ffcb-4a28-91e2-6b45924b8858")) # A+ T3 суточные
         add_param.save()
     
+    #Код ошибки
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"7175f6c7-b816-40f6-86f4-e08a309c08f6")) # код ошибки
+        add_param.save()
+
     # Ток
         #add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"aee312b0-adb1-4be9-9879-b3a3598f9b29")) # Ia текущее
         #add_param.save()
