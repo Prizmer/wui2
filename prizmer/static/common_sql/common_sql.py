@@ -9553,3 +9553,16 @@ def get_data_table_water_period_c300(obj_parent_title, obj_title ,electric_data_
     cursor.execute(MakeQuery_water_period_c300(obj_parent_title, obj_title ,electric_data_start, electric_data_end, my_params))  
     data_table = cursor.fetchall()      
     return data_table
+
+
+def update_table_with_replace(table, update_field, where_field, where_value, old_value, new_value):
+  cursor = connection.cursor()
+  sQuery="""
+  UPDATE %s
+   SET %s=replace(%s, '%s', '%s')
+ WHERE %s='%s'
+  """%(table, update_field, update_field, old_value, new_value, where_field, where_value)
+  cursor.execute(sQuery)
+  #connection.commit()
+  cursor.close()
+
