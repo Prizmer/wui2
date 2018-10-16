@@ -1836,6 +1836,15 @@ def rename_taken_params(sender, instance, **kwargs):
 
 signals.pre_save.connect(rename_taken_params, sender=Meters)
 
+def rename_link_abonents_taken_params(sender, instance, **kwargs):
+    guid_abon = instance.guid
+    new_val = instance.name
+    old_val = Abonents.objects.get(guid=guid_abon).name
+    common_sql.update_table_with_replace('link_abonents_taken_params', 'name', 'guid_abonents', guid_abon, old_val, new_val)
+
+
+signals.pre_save.connect(rename_link_abonents_taken_params, sender=Abonents)
+
 
 
 
