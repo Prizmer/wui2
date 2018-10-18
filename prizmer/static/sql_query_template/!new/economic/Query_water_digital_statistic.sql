@@ -1,4 +1,6 @@
-﻿Select water_pulsar_abons.obj_name, water_pulsar_abons.ab_name, water_pulsar_abons.factory_number_manual, 
+﻿Select obj_name, Count(z.volume), Count(z.ab_name), round((count(volume)*100/count(ab_name))::numeric,2) as percent_val, (count (ab_name)-count (volume)) as no_val
+from
+(Select water_pulsar_abons.obj_name, water_pulsar_abons.ab_name, water_pulsar_abons.factory_number_manual, 
 round(z2.value_daily::numeric,3) as volume, water_pulsar_abons.name
 from water_pulsar_abons
 left join
@@ -44,5 +46,5 @@ left join
             order by z1.name_abonents) as z2
 on z2.number_manual=water_pulsar_abons.factory_number_manual
 where water_pulsar_abons.obj_name='Корпус 7'
-  and value_daily is null
-  order by obj_name
+order by water_pulsar_abons.ab_name) as z
+group by obj_name

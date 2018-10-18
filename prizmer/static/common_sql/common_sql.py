@@ -9468,7 +9468,7 @@ substring(meter_name from (position('№' in meter_name)+1)::int ),
 (case when val_end > 0 and val_start > 0 then round((val_end-val_start)::numeric, 3)::text else '-' end) as delta 
 from
 (
-Select z_st.ab_name, z_st.account_2,z_st.date, z_st.meter_name,z_st.type_energo, z_st.value as val_start,z_end.value as val_end, z_st.date_install, z_end.date
+Select z_st.ab_name, z_st.account_2,z_st.date, z_st.meter_name,z_st.type_energo, round(z_st.value::numeric,3) as val_start, round(z_end.value::numeric,3) as val_end, z_st.date_install, z_end.date
 from 
 (Select  obj_name as ab_name, account_2,z2.date, water_abons_report.ab_name as meter_name,type_energo, z2.value,date_install
 from water_abons_report
@@ -9565,4 +9565,139 @@ def update_table_with_replace(table, update_field, where_field, where_value, old
   cursor.execute(sQuery)
   #connection.commit()
   cursor.close()
+def MakeQuery_water_digital_pulsar_statistic(obj,  electric_data_end, my_params):
+  sQuery="""
+  Select obj_name, Count(z.volume), Count(z.ab_name), round((count(volume)*100/count(ab_name))::numeric,2) as percent_val, (count (ab_name)-count (volume)) as no_val
+from
+(Select water_pulsar_abons.obj_name, water_pulsar_abons.ab_name, water_pulsar_abons.factory_number_manual, 
+round(z2.value_daily::numeric,3) as volume, water_pulsar_abons.name
+from water_pulsar_abons
+left join
+(SELECT z1.daily_date, z1.name_objects, z1.name_abonents, z1.number_manual, z1.value_daily
+            
+                                    FROM
+                                    (SELECT 
+            			  daily_values.date as daily_date, 
+            			  objects.name as name_objects, 
+            			  abonents.name as name_abonents, 
+            			  daily_values.value as value_daily, 
+            			  meters.factory_number_manual as number_manual, 
+            			  names_params.name as params_name, 
+            			  types_meters.name as meter_type,
+            			  resources.name as res
+            			FROM 
+            			  public.daily_values, 
+            			  public.taken_params, 
+            			  public.abonents, 
+            			  public.link_abonents_taken_params, 
+            			  public.objects, 
+            			  public.params, 
+            			  public.names_params, 
+            			  public.meters, 
+            			  public.types_meters,
+            			  resources
+            			WHERE 
+            			  daily_values.id_taken_params = taken_params.id AND
+            			  taken_params.guid_params = params.guid AND
+            			  taken_params.guid_meters = meters.guid AND
+            			  abonents.guid_objects = objects.guid AND
+            			  link_abonents_taken_params.guid_abonents = abonents.guid AND
+            			  link_abonents_taken_params.guid_taken_params = taken_params.guid AND
+            			  params.guid_names_params = names_params.guid AND
+            			  meters.guid_types_meters = types_meters.guid AND
+            			  names_params.guid_resources=resources.guid and
+            			  objects.name = '%s' AND            			  
+            			  (types_meters.name::text = '%s'::text OR types_meters.name::text = '%s'::text)
+            			  AND
+            			  daily_values.date = '%s' 
+                                    ) z1
+            group by z1.name_abonents, z1.daily_date, z1.name_objects, z1.number_manual, z1.res, z1.value_daily
+            order by z1.name_abonents) as z2
+on z2.number_manual=water_pulsar_abons.factory_number_manual
+where water_pulsar_abons.obj_name='%s'
+order by water_pulsar_abons.ab_name) as z
+group by obj_name
+  """%(obj, my_params[0],my_params[1], electric_data_end, obj)
+  #print sQuery
+  return sQuery
+def get_water_digital_pulsar_count(obj,  electric_data_end):
+    my_params=[u'Пульсар ГВС', u'Пульсар ХВС']
+    cursor = connection.cursor()
+    data_table=[]      
+    cursor.execute(MakeQuery_water_digital_pulsar_statistic(obj,  electric_data_end, my_params))  
+    data_table = cursor.fetchall()      
+    return data_table
 
+def MakeQuery_water_digital_pulsar_no_data(obj,  electric_data_end, my_params):
+  sQuery="""
+  Select water_pulsar_abons.obj_name, water_pulsar_abons.ab_name, water_pulsar_abons.factory_number_manual, 
+round(z2.value_daily::numeric,3) as volume, water_pulsar_abons.name
+from water_pulsar_abons
+left join
+(SELECT z1.daily_date, z1.name_objects, z1.name_abonents, z1.number_manual, z1.value_daily
+            
+                                    FROM
+                                    (SELECT 
+            			  daily_values.date as daily_date, 
+            			  objects.name as name_objects, 
+            			  abonents.name as name_abonents, 
+            			  daily_values.value as value_daily, 
+            			  meters.factory_number_manual as number_manual, 
+            			  names_params.name as params_name, 
+            			  types_meters.name as meter_type,
+            			  resources.name as res
+            			FROM 
+            			  public.daily_values, 
+            			  public.taken_params, 
+            			  public.abonents, 
+            			  public.link_abonents_taken_params, 
+            			  public.objects, 
+            			  public.params, 
+            			  public.names_params, 
+            			  public.meters, 
+            			  public.types_meters,
+            			  resources
+            			WHERE 
+            			  daily_values.id_taken_params = taken_params.id AND
+            			  taken_params.guid_params = params.guid AND
+            			  taken_params.guid_meters = meters.guid AND
+            			  abonents.guid_objects = objects.guid AND
+            			  link_abonents_taken_params.guid_abonents = abonents.guid AND
+            			  link_abonents_taken_params.guid_taken_params = taken_params.guid AND
+            			  params.guid_names_params = names_params.guid AND
+            			  meters.guid_types_meters = types_meters.guid AND
+            			  names_params.guid_resources=resources.guid and
+            			  objects.name = '%s' AND            			  
+            			  (types_meters.name::text = '%s'::text OR types_meters.name::text = '%s'::text)
+            			  AND
+            			  daily_values.date = '%s' 
+                                    ) z1
+            group by z1.name_abonents, z1.daily_date, z1.name_objects, z1.number_manual, z1.res, z1.value_daily
+            order by z1.name_abonents) as z2
+on z2.number_manual=water_pulsar_abons.factory_number_manual
+where water_pulsar_abons.obj_name='%s'
+  and value_daily is null
+  order by obj_name
+  """%(obj, my_params[0],my_params[1], electric_data_end, obj)
+  #print sQuery
+  return sQuery
+
+def get_water_digital_pulsar_no_data(obj,  electric_data_end):
+    my_params=[u'Пульсар ГВС', u'Пульсар ХВС']
+    cursor = connection.cursor()
+    data_table=[]      
+    cursor.execute(MakeQuery_water_digital_pulsar_no_data(obj,  electric_data_end, my_params))  
+    data_table = cursor.fetchall()      
+    return data_table
+
+def get_water_digital_pulsar_objects(): 
+    cursor = connection.cursor()
+    data_table=[]     
+    sQuery=""" SELECT  obj_name
+                       FROM water_pulsar_abons
+                        group by obj_name   
+                        order by obj_name ASC
+                        """
+    cursor.execute(sQuery)  
+    data_table = cursor.fetchall()    
+    return data_table

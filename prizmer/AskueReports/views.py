@@ -13127,7 +13127,7 @@ def report_water_impulse_report_for_c300(request):
     #Шапка отчёта
     caption=[u'N',
             u'AREA',
-            u'FUNCTION',
+            u' FUNCTION',
             u'CODE',
             u'SUBNET',
             u'MBUS',
@@ -13155,8 +13155,8 @@ def report_water_impulse_report_for_c300(request):
         pass
         
     #zamenyem None na N/D vezde
-    if len(data_table)>0: 
-        data_table=common_sql.ChangeNull(data_table, None)
+    # if len(data_table)>0: 
+    #     data_table=common_sql.ChangeNull(data_table, None)
 
     #Запрашиваем данные для отчета - конец
     
@@ -13175,4 +13175,174 @@ def report_water_impulse_report_for_c300(request):
         writer.writerow(row)     
         #writer.writerow([unicode(row[0]), unicode(row[1]),row[2],unicode(row[3]),unicode(row[4]),unicode(row[5]),unicode(row[6]),unicode(row[7]),unicode(row[8]),unicode(row[9]),unicode(row[10])] )
 
+    return response
+
+def report_water_digital_pulsar_res_status(request):
+    response = StringIO.StringIO()
+    wb = Workbook()
+    ws = wb.active
+    electric_data_end   = request.session["electric_data_end"]  
+
+#Шапка
+    ws.merge_cells('A2:E2')
+    ws['A2'] = 'Статистика опроса по воде(цифровые ПУ) на ' + str(electric_data_end)
+    
+
+    ws['A5'] = 'Объект'
+    ws['A5'].style = ali_grey
+    
+    ws['B5'] = 'Опрошено счётчиков'
+    ws['B5'].style = ali_grey
+    
+    ws['C5'] = 'Всего счётчиков'
+    ws['C5'].style = ali_grey
+    
+    ws['D5'] = 'Процент опроса'
+    ws['D5'].style = ali_grey
+    
+    ws['e5'] = 'Не опрошено счётчиков'
+    ws['e5'].style = ali_grey
+    
+  
+#Запрашиваем данные для отчета
+          
+    dt_objects = common_sql.get_water_digital_pulsar_objects()
+    
+    dtAll_statistic=[]
+    dtAll_no_data_meters=[]
+    for obj in dt_objects:
+        #print electric_data_end
+        dt_statistic= common_sql.get_water_digital_pulsar_count(obj[0],  electric_data_end)
+        dt_no_data_meters=common_sql.get_water_digital_pulsar_no_data(obj[0],  electric_data_end)
+        dtAll_statistic.append(dt_statistic)
+        if len(dt_no_data_meters)>0: 
+            dt_no_data_meters=common_sql.ChangeNull(dt_no_data_meters, None)
+            dtAll_no_data_meters.append(dt_no_data_meters)
+
+    
+# Заполняем отчет значениями
+    for row in range(6, len(dtAll_statistic)+6):
+        try:
+            ws.cell('A%s'%(row)).value = '%s' % (dtAll_statistic[row-6][0][0])  # Абонент
+            ws.cell('A%s'%(row)).style = ali_white
+        except:
+            ws.cell('A%s'%(row)).style = ali_white
+            next
+        
+        try:
+            ws.cell('B%s'%(row)).value = '%s' % (dtAll_statistic[row-6][0][1])  # заводской номер
+            ws.cell('B%s'%(row)).style = ali_white
+        except:
+            ws.cell('B%s'%(row)).style = ali_white
+            next
+            
+        try:
+            ws.cell('C%s'%(row)).value = '%s' % (dtAll_statistic[row-6][0][2]) # '%s' % (data_table[row-6][2])  # 
+            ws.cell('C%s'%(row)).style = ali_white
+        except:
+            ws.cell('C%s'%(row)).style = ali_white
+            next
+            
+        try:
+            ws.cell('d%s'%(row)).value = '%s' % (dtAll_statistic[row-6][0][3]) # '%s' % (data_table[row-6][2])  # 
+            ws.cell('d%s'%(row)).style = ali_white
+        except:
+            ws.cell('d%s'%(row)).style = ali_white
+            next
+            
+        try:
+            ws.cell('e%s'%(row)).value = '%s' % (dtAll_statistic[row-6][0][4]) # '%s' % (data_table[row-6][2])  # 
+            ws.cell('e%s'%(row)).style = ali_white
+        except:
+            ws.cell('e%s'%(row)).style = ali_white
+            next
+            
+    ws.row_dimensions[5].height = 51
+    ws.column_dimensions['A'].width = 30 
+    ws.column_dimensions['b'].width = 20 
+    ws.column_dimensions['c'].width = 20 
+   
+    #ws.column_dimensions['H'].width = 
+    #___________________________________________________
+    
+    #print val[1], val[2], val[3]
+    ws2 = wb.create_sheet(title="water_detail")
+    ws2.merge_cells('A1:E1')
+           
+    ws2.merge_cells('A2:E2')
+    ws2['A2'] = 'Не ответившие счётчики на ' + str(electric_data_end)
+    
+    ws2['A5'] = 'Объект'
+    ws2['A5'].style = ali_grey
+    
+    ws2['B5'] = 'Абонент'
+    ws2['B5'].style = ali_grey
+    
+    ws2['C5'] = 'Счётчик '
+    ws2['C5'].style = ali_grey
+    
+    ws2['d5'] = 'Показания'
+    ws2['d5'].style = ali_grey
+    
+    ws2['e5'] = 'Тип счётчика'
+    ws2['e5'].style = ali_grey
+    
+    
+        #print val
+    row = 5
+    for value in dtAll_no_data_meters:                 
+        for val in value: 
+            row+=1
+            try:
+                ws2.cell('A%s'%(row)).value = '%s' % (val[0])  # Абонент
+                ws2.cell('A%s'%(row)).style = ali_white
+            except:
+                ws2.cell('A%s'%(row)).style = ali_white
+                next
+                
+            try:
+                ws2.cell('b%s'%(row)).value = '%s' % (val[1])  # Абонент
+                ws2.cell('b%s'%(row)).style = ali_white
+            except:
+                ws2.cell('b%s'%(row)).style = ali_white
+                next
+                
+            try:
+                ws2.cell('c%s'%(row)).value = '%s' % (val[2])  # Абонент
+                ws2.cell('c%s'%(row)).style = ali_white
+            except:
+                ws2.cell('c%s'%(row)).style = ali_white
+                next
+                
+            try:
+                ws2.cell('d%s'%(row)).value = '%s' % (val[3])  # Абонент
+                ws2.cell('d%s'%(row)).style = ali_white
+            except:
+                ws2.cell('d%s'%(row)).style = ali_white
+                next
+                
+            try:
+                ws2.cell('e%s'%(row)).value = '%s' % (val[4])  # Абонент
+                ws2.cell('e%s'%(row)).style = ali_white
+            except:
+                ws2.cell('e%s'%(row)).style = ali_white
+                next
+                
+                          
+   
+    ws2.row_dimensions[5].height = 51
+    ws2.column_dimensions['A'].width = 35 
+    ws2.column_dimensions['b'].width = 20 
+    ws2.column_dimensions['c'].width = 30 
+    ws2.column_dimensions['d'].width = 30 
+    ws2.column_dimensions['e'].width = 20 
+    
+    wb.save(response)
+    response.seek(0)
+    response = HttpResponse(response.read(), content_type="application/vnd.ms-excel")
+    #response['Content-Disposition'] = "attachment; filename=profil.xlsx"
+    
+    output_name = u'report_water_digital_pulsar_statistic_'+str(electric_data_end)
+    file_ext = u'xlsx'    
+    response['Content-Disposition'] = 'attachment;filename="%s.%s"' % (output_name.replace('"', '\"'), file_ext)   
     return response
