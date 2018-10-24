@@ -13069,7 +13069,7 @@ def report_electric_report_for_c300(request):
     #Шапка отчёта
     caption=[u'N',
             u'AREA',
-            u'FUNCTION',
+            u' FUNCTION',
             u'CODE',
             u'SUBNET',
             u'MBUS',

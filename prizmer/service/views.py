@@ -1577,17 +1577,64 @@ else:
     signals.post_save.disconnect(add_taken_param, sender=Meters)
     signals.post_save.disconnect(add_link_taken_params, sender=TakenParams)
 
+
+#_____________________________________________________________________________________________________________
+#При изменении в админке будут переименовыватсья все линки
+#Не удалять!
+#_____________________________________________________________________________________________________________
+#from general.models import  Meters, TypesMeters, LinkAbonentsTakenParams, TakenParams, Params
+def rename_taken_params(sender, instance, **kwargs):
+    try:   
+        #переименовываем taken_params
+        guid_meter=instance.guid
+        #print guid_meter
+        new_val=instance.name
+        old_val= Meters.objects.get(guid=guid_meter).name    
+        common_sql.update_table_with_replace('taken_params', 'name', 'guid_meters', guid_meter, old_val, new_val)
+    except Meters.DoesNotExist:
+        return False
+
+    try:
+    #переименовываем link_abonents_taken_params
+        for row in TakenParams.objects.filter(guid_meters=guid_meter):
+            guid_taken_params= row.guid
+            common_sql.update_table_with_replace('link_abonents_taken_params', 'name', 'guid_taken_params', guid_taken_params, old_val, new_val)
+    except TakenParams.DoesNotExist:
+        return False
+
+
+def rename_link_abonents_taken_params(sender, instance, **kwargs): 
+    
+    try:
+        guid_abon = instance.guid
+        new_val = instance.name
+        old_val = Abonents.objects.get(guid=guid_abon).name
+        common_sql.update_table_with_replace('link_abonents_taken_params', 'name', 'guid_abonents', guid_abon, old_val, new_val)
+    except Abonents.DoesNotExist:
+        return False
+
+
+signals.pre_save.connect(rename_link_abonents_taken_params, sender=Abonents)
+signals.pre_save.connect(rename_taken_params, sender=Meters)
+
+#____________________________________________________________________________________________
 def OnOffSignals():
     if (isService):
         print 'signals ON'
         signals.post_save.connect(add_link_taken_params, sender=TakenParams)
         signals.post_save.connect(add_link_meter, sender=Meters)
         signals.post_save.connect(add_taken_param, sender=Meters)
+
+        signals.pre_save.disconnect(rename_link_abonents_taken_params, sender=Abonents)
+        signals.pre_save.disconnect(rename_taken_params, sender=Meters)
     else:
         print 'signals Off'
         signals.post_save.disconnect(add_link_meter, sender=Meters)
         signals.post_save.disconnect(add_taken_param, sender=Meters)
         signals.post_save.disconnect(add_link_taken_params, sender=TakenParams)
+
+        signals.pre_save.connect(rename_link_abonents_taken_params, sender=Abonents)
+        signals.pre_save.connect(rename_taken_params, sender=Meters)  
 
 def add_link_abonents_taken_params(sender, instance, created, **kwargs):
     def get_taken_param_by_abonent_from_excel_cfg(input_taken_param):
@@ -1814,6 +1861,7 @@ def LoadObjectsAndAbons_water(sPath, sheet):
             add_object2.save()            
             writeToLog('create abonent '+abon)
             add_abonent = Abonents(name = abon, guid_objects =add_object2, guid_types_abonents = TypesAbonents.objects.get(guid= u"e4d813ca-e264-4579-ae15-385cdbf5d28c"))
+            
             add_abonent.save()
             kv+=1
             result=u"Объекты: "+obj_l0+", "+obj_l1+u", "+obj_l2+u","+abon+u" созданы"

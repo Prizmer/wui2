@@ -9,7 +9,7 @@ from functools import wraps
 from django.db.models.signals import pre_save
 from django.db.models.signals import post_save
 import common_sql
-
+import service 
 
 def autoconnect(cls):
     """ 
@@ -1816,34 +1816,44 @@ WHERE
 #signals.post_save.connect(add_link_meter_port_by_type_meter, sender=Resources)
 
 
-#_____________________________________________________________________________________________________________
-#При изменении в админке будут переименовыватсья все линки
-#Не удалять!
-#_____________________________________________________________________________________________________________
-#from general.models import  Meters, TypesMeters, LinkAbonentsTakenParams, TakenParams, Params
-def rename_taken_params(sender, instance, **kwargs):    
-    #переименовываем taken_params
-    guid_meter=instance.guid
-    #print guid_meter
-    new_val=instance.name
-    old_val= Meters.objects.get(guid=guid_meter).name    
-    common_sql.update_table_with_replace('taken_params', 'name', 'guid_meters', guid_meter, old_val, new_val)
+# #_____________________________________________________________________________________________________________
+# #При изменении в админке будут переименовыватсья все линки
+# #Не удалять!
+# #_____________________________________________________________________________________________________________
+# #from general.models import  Meters, TypesMeters, LinkAbonentsTakenParams, TakenParams, Params
+# def rename_taken_params(sender, instance, **kwargs):
+#     if (service.views.isService): 
+#         pass
+#     else:    
+#         #переименовываем taken_params
+#         guid_meter=instance.guid
+#         #print guid_meter
+#         new_val=instance.name
+#         old_val= Meters.objects.get(guid=guid_meter).name    
+#         common_sql.update_table_with_replace('taken_params', 'name', 'guid_meters', guid_meter, old_val, new_val)
 
-    #переименовываем link_abonents_taken_params
-    for row in TakenParams.objects.filter(guid_meters=guid_meter):
-        guid_taken_params= row.guid
-        common_sql.update_table_with_replace('link_abonents_taken_params', 'name', 'guid_taken_params', guid_taken_params, old_val, new_val)
-
-signals.pre_save.connect(rename_taken_params, sender=Meters)
-
-def rename_link_abonents_taken_params(sender, instance, **kwargs):
-    guid_abon = instance.guid
-    new_val = instance.name
-    old_val = Abonents.objects.get(guid=guid_abon).name
-    common_sql.update_table_with_replace('link_abonents_taken_params', 'name', 'guid_abonents', guid_abon, old_val, new_val)
+#         #переименовываем link_abonents_taken_params
+#         for row in TakenParams.objects.filter(guid_meters=guid_meter):
+#             guid_taken_params= row.guid
+#             common_sql.update_table_with_replace('link_abonents_taken_params', 'name', 'guid_taken_params', guid_taken_params, old_val, new_val)
 
 
-signals.pre_save.connect(rename_link_abonents_taken_params, sender=Abonents)
+
+# def rename_link_abonents_taken_params(sender, instance, **kwargs): 
+#     print  service.views.isService 
+#     if (service.views.isService): 
+#         pass
+#     else:
+#         print 'not work in service'
+#         guid_abon = instance.guid
+#         new_val = instance.name
+#         old_val = Abonents.objects.get(guid=guid_abon).name
+#         common_sql.update_table_with_replace('link_abonents_taken_params', 'name', 'guid_abonents', guid_abon, old_val, new_val)
+
+# signals.pre_save.connect(rename_link_abonents_taken_params, sender=Abonents)
+# signals.pre_save.connect(rename_taken_params, sender=Meters)
+
+
 
 
 
