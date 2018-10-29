@@ -24,8 +24,8 @@ LEFT JOIN
                         daily_values.value as value_daily,
                         names_params.name as params_name,
                         link_abonents_taken_params.coefficient as ktt,
-                         link_abonents_taken_params.coefficient_2 as ktn,
-                          link_abonents_taken_params.coefficient_3 as a
+                        link_abonents_taken_params.coefficient_2 as ktn,
+                        link_abonents_taken_params.coefficient_3 as a
                         FROM
                          public.daily_values,
                          public.link_abonents_taken_params,
@@ -98,7 +98,7 @@ LEFT JOIN
                         names_params.guid_resources=resources.guid and
                         resources.name='Электричество' and                        
                         objects.name = 'Лазоревый пр-д, д.1а к1 (к5)' AND
-                        daily_values.date ='13.10.2018' 
+                        daily_values.date ='04.09.2018' 
                         and names_params.name!='T0 A+'
                         
 ) z2
@@ -108,4 +108,4 @@ where
  ) z_end
 
 where z_start.factory_number_manual=z_end.factory_number_manual and z_start.type_energo=z_end.type_energo
- order by num, z_start.type_energo, z_start.type_energo2, z_start.account_1
+ order by num, z_start.type_energo, z_start.type_energo2, z_start.account_1::numeric

@@ -22,6 +22,8 @@ import datetime
 from django.db.models import Max 
 import uuid
 
+import common_sql
+
 cfg_excel_name=""
 cfg_sheet_name=""
 

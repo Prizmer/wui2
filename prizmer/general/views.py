@@ -13911,11 +13911,38 @@ def electric_report_for_c300(request):
         pass
     elif (bool(is_object_level_2.search(obj_key))):
         data_table = common_sql.get_data_table_electric_period_c300(obj_parent_title, obj_title ,electric_data_start, electric_data_end)
-        
 
-    #zamenyem None na N/D vezde
-    if len(data_table)>0: 
-        data_table=common_sql.ChangeNull(data_table, None)
+    i=0
+    while i<len(data_table):
+        #print data_table[i][6]
+        data_table[i]=list(data_table[i])
+        data_table[i+1]=list(data_table[i+1])
+        data_table[i+2]=list(data_table[i+2])
+
+        if data_table[i][8] == '-' or data_table[i+1][8] =='-' or data_table[i+2][8] == '-':
+            data_table[i][8]     = '-'
+            data_table[i+1][8]   = '-'
+            data_table[i+2][8]   = '-'
+            data_table[i][10]     = '-'
+            data_table[i+1][10]   = '-'
+            data_table[i+2][10]   = '-'
+        
+        if data_table[i][9] == '-' or data_table[i+1][9] =='-' or data_table[i+2][9] == '-':
+            data_table[i][9]     = '-'
+            data_table[i+1][9]   = '-'
+            data_table[i+2][9]   = '-'
+            data_table[i][10]     = '-'
+            data_table[i+1][10]   = '-'
+            data_table[i+2][10]   = '-'
+
+        data_table[i]   = tuple(data_table[i])
+        data_table[i+1] = tuple(data_table[i+1])
+        data_table[i+2] = tuple(data_table[i+2])
+        i+=3   
+
+    # zamenyem None na N/D vezde
+    # if len(data_table)>0: 
+    #     data_table=common_sql.ChangeNull(data_table, None) 
         
     args['data_table'] = data_table
     args['obj_title'] = obj_title
