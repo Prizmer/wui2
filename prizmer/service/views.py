@@ -31,7 +31,11 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 # Create your views here.
 
 isService=False
-    
+import logging
+
+logging.basicConfig(filename=u"C:\\Users\\Lena\\Desktop\\m_errors\\service_log.log", level=logging.INFO)
+logger=logging.getLogger('service_log')
+
     
 class UploadFileForm(forms.Form):
     #title = forms.CharField(max_length=150)
@@ -55,21 +59,11 @@ def MakeSheet(request):
     args['sheets']=sheets
     return render_to_response("service/service_sheets_excel.html", args)
 
+
 def writeToLog(msg):
-    #msg=unicode(msg)
-#    directory=os.path.join(BASE_DIR,'static\\log\\')
-#    if  not(os.path.exists(directory)):
-#        os.mkdir(directory)
-#    dir_date=datetime.datetime.now().strftime("%d-%m-%Y")        
-#    if  not(os.path.exists(directory+dir_date)):
-#        os.mkdir(directory+dir_date)  
-#        
-#    path=directory+dir_date+'\log.txt'
-#     
-#    f = open(path, 'w')
-#    f.write(msg)
-#    f.close()
-    pass
+    ##################################
+    log_date=datetime.datetime.now().strftime("%d-%m-%Y %H:%M")
+    logger.info('['+log_date+']: '+msg)
 
 def choose_service(request):
     args={}
@@ -249,7 +243,14 @@ def load_tcp_ip_or_com_ports_from_excel(sPath, sSheet):
                         IsAdded=True
     #                add_meter = Meters(name = unicode(sheet_ranges[u'F%s'%(row)].value) + u' ' + unicode(sheet_ranges[u'E%s'%(row)].value), address = unicode(sheet_ranges[u'E%s'%(row)].value),  factory_number_manual = unicode(sheet_ranges[u'E%s'%(row)].value), guid_types_meters = TypesMeters.objects.get(guid = u"7cd88751-d232-410c-a0ef-6354a79112f1") )
     #                add_meter.save()
-                    else: result+= u'Порт '+str(ip_adr)+": "+str(ip_port)+u" уже существует"
+                    else: 
+                        newRes = u'Порт '+str(ip_adr)+": "+str(ip_port)+u" уже существует "
+                        # print result
+                        # print newRes
+                        # print result.find(newRes)
+                        if bool(result.find(newRes) == -1):
+                            result+= newRes
+                            
         writeToLog( result)
         row+=1
     return IsAdded
@@ -610,7 +611,7 @@ def add_link_meter(sender, instance, created, **kwargs):
 def add_link_meter_port_from_excel_cfg_water_v2(sender, instance, created, **kwargs):
     """Делаем привязку счётчика к порту по excel файлу ведомости"""
     dtAll=GetTableFromExcel(cfg_excel_name,cfg_sheet_name) #получили из excel все строки до первой пустой строки (проверка по колонке А)
-    print u'test'
+    #print u'test'
     for i in range(1,len(dtAll)):
         #print u'Обрабатываем строку ' + unicode(dtAll[i][6])+' - '+unicode(dtAll[i][7])
         #print dtAll[i]
@@ -2184,11 +2185,11 @@ def load_tcp_ip_water_ports_from_excel(sPath, sheet):
             ip_adr=unicode(sheet_ranges[u'H%s'%(row)].value)
             ip_port=unicode(sheet_ranges[u'I%s'%(row)].value)
             #print ip_adr, ip_port
-            writeToLog(u'Обрабатываем адрес ' +ip_adr + ip_port)
+            writeToLog(u'Обрабатываем адрес ' +ip_adr +' '+ ip_port)
             
             # проверка есть ли уже такой порт, запрос в БД с адресом и портом, если ответ пустой-добавляем, в противном случае continue
             if not ip_adr or not ip_port or ip_adr==None or ip_port==None: 
-                result+=u"Отсутствует значение/я для tcp/ip-порта в строке"+unicode(row)+". Заполните все ячейки excel таблицы."
+                result+=u"Отсутствует значение/я для tcp/ip-порта в строке"+unicode(row)+". Заполните все ячейки excel таблицы. "
                 break
             else:
                 if (checkPortIsExist(ip_adr,ip_port)):
@@ -2196,7 +2197,13 @@ def load_tcp_ip_water_ports_from_excel(sPath, sheet):
                     add_port.save()
                     result =u'Новый tcp/ip порт добавлен'
                     IsAdded=True
-                else: result+= u'Порт '+unicode(ip_adr)+": "+unicode(ip_port)+u" уже существует"
+                else: 
+                        newRes = u'Порт '+str(ip_adr)+": "+str(ip_port)+u" уже существует "
+                        # print result
+                        # print newRes
+                        # print result.find(newRes)
+                        if bool(result.find(newRes) == -1):
+                            result+= newRes
         writeToLog( result)
         row+=1
     return IsAdded

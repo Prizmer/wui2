@@ -134,7 +134,25 @@ USE_TZ = True
 #For gunicorn correct work
 LOGGING = {
     'version': 1,
-    'disable_existing_loggers': True,
+    'disable_existing_loggers': False,
+	}
+	
+import logging.config
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': BASE_DIR+'\static\log\service_log.log',
+        }},	
+	'loggers': {
+        'service_log': {
+            'handlers': ['file'],
+            'level': os.getenv( 'DJANGO_LOG_LEVEL', 'INFO'),
+         },
+	    }
 }
 
 #TEMPLATE_LOADERS = (
