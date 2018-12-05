@@ -13177,11 +13177,8 @@ def report_water_impulse_report_for_c300(request):
          data_table = common_sql.get_data_table_water_period_c300(obj_parent_title, obj_title ,electric_data_start, electric_data_end)
     else:
         pass
-        
-    #zamenyem None na N/D vezde
-    # if len(data_table)>0: 
-    #     data_table=common_sql.ChangeNull(data_table, None)
-
+    
+    
     #Запрашиваем данные для отчета - конец
     
     # Заполняем отчет значениями

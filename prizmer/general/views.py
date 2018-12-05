@@ -13990,12 +13990,7 @@ def water_impulse_report_for_c300(request):
     else:
         pass
        
-        
-
-    #zamenyem None na N/D vezde
-    # if len(data_table)>0: 
-    #     data_table=common_sql.ChangeNull(data_table, None)
-        
+          
     args['data_table'] = data_table
     args['obj_title'] = obj_title
     args['obj_key'] = obj_key
