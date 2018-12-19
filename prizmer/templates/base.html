@@ -272,12 +272,18 @@ $("#datepickerEnd").datepicker({onSelect:function(){refresh_data_table($("#choic
     msg = msg ? ": " + msg : "";
     $.ui.fancytree.info("Event('" + event.type + "', node=" + data.node + ")" + msg);
   }
-
+    
+	
     $(function(){ 
+	var pre_url=window.location.pathname
+	console.log(pre_url)
         $("#tree").fancytree({
-           source: {
-           url: "/askue/tree_data/"
-         },
+		//var pathname = window.location.pathname;
+		 source: {		   
+           url: "/askue/tree_data/",
+           data: {preurl: window.location.pathname}		   
+         }, 
+        
         blurTree: function(event, data) {
         logEvent(event, data);
       },

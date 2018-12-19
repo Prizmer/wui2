@@ -13,7 +13,7 @@ urlpatterns = patterns('',
 
     
     url(r'^$', views.default),
-    url(r'^tree_data/$', views.tree_data_json),
+    url(r'^tree_data/$', views.tree_data_json_v2),
     url(r'^get_object_title/$', views.get_object_title),
     url(r'^get_object_key/$', views.get_object_key),
     url(r'^get_data_table/$', views.get_data_table),

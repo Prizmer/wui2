@@ -9701,3 +9701,136 @@ def get_water_digital_pulsar_objects():
     cursor.execute(sQuery)  
     data_table = cursor.fetchall()    
     return data_table
+
+def get_abons_by_object_guid_and_res(obj_guid, res):
+    cursor = connection.cursor()
+    data_table=[]  
+    #res='Электричество'  
+    sQuery=""" SELECT   
+  abonents.name,
+  abonents.guid
+FROM 
+  public.abonents, 
+  public.link_abonents_taken_params, 
+  public.taken_params, 
+  public.params, 
+  public.names_params, 
+  public.resources, 
+  public.objects
+WHERE 
+  abonents.guid_objects = objects.guid AND
+  link_abonents_taken_params.guid_abonents = abonents.guid AND
+  link_abonents_taken_params.guid_taken_params = taken_params.guid AND
+  taken_params.guid_params = params.guid AND
+  params.guid_names_params = names_params.guid AND
+  names_params.guid_resources = resources.guid AND
+  resources.name = '%s' AND
+  objects.guid = '%s'
+    group by 
+  abonents.name,  abonents.guid
+  order by abonents.name
+                        """ %(res, obj_guid)
+    #print sQuery
+    cursor.execute(sQuery)  
+    data_table = cursor.fetchall()    
+    return data_table
+
+def get_meters_by_abons_guid_and_res(abon_guid, res):
+    cursor = connection.cursor()
+    data_table=[]  
+ 
+    sQuery="""SELECT   
+  abonents.name,
+  meters.name,
+  meters.factory_number_manual  
+FROM 
+  public.abonents, 
+  public.link_abonents_taken_params, 
+  public.taken_params, 
+  public.params, 
+  public.names_params, 
+  public.resources,   
+  public.meters
+WHERE 
+  link_abonents_taken_params.guid_abonents = abonents.guid AND
+  link_abonents_taken_params.guid_taken_params = taken_params.guid AND
+  taken_params.guid_params = params.guid AND
+  taken_params.guid_meters = meters.guid AND
+  params.guid_names_params = names_params.guid AND
+  names_params.guid_resources = resources.guid AND
+  resources.name = '%s' AND
+  abonents.guid = '%s'
+    group by 
+  abonents.name,
+  meters.name,
+  meters.factory_number_manual
+  order by abonents.name""" %(res, abon_guid)
+    #print sQuery
+    cursor.execute(sQuery)  
+    data_table = cursor.fetchall()    
+    return data_table
+
+def get_balance_groups_by_res(res_name):
+    cursor = connection.cursor()
+    data_table=[]  
+ 
+    sQuery="""
+    SELECT 
+  balance_groups.name, 
+  resources.name
+FROM 
+  public.balance_groups, 
+  public.link_balance_groups_meters, 
+  public.meters, 
+  public.types_meters, 
+  public.params, 
+  public.names_params, 
+  public.resources
+WHERE 
+  link_balance_groups_meters.guid_balance_groups = balance_groups.guid AND
+  link_balance_groups_meters.guid_meters = meters.guid AND
+  meters.guid_types_meters = types_meters.guid AND
+  params.guid_types_meters = types_meters.guid AND
+  params.guid_names_params = names_params.guid AND
+  names_params.guid_resources = resources.guid AND
+  resources.name = '%s'
+  group by   balance_groups.name, 
+  resources.name
+  order by   balance_groups.name
+    """ %(res_name)
+    #print sQuery
+    cursor.execute(sQuery)  
+    data_table = cursor.fetchall()    
+    return data_table
+
+def get_water_abonents_by_obj_guid(obj_guid, name_res):
+    cursor = connection.cursor()
+    data_table=[]  
+ 
+    sQuery="""
+    SELECT 
+  abonents.name, 
+  abonents.guid, 
+  resources.name
+FROM 
+  public.abonents, 
+  public.objects, 
+  public.link_abonents_taken_params, 
+  public.taken_params, 
+  public.resources, 
+  public.params, 
+  public.names_params
+WHERE 
+  abonents.guid_objects = objects.guid AND
+  link_abonents_taken_params.guid_abonents = abonents.guid AND
+  link_abonents_taken_params.guid_taken_params = taken_params.guid AND
+  taken_params.guid_params = params.guid AND
+  params.guid_names_params = names_params.guid AND
+  names_params.guid_resources = resources.guid AND
+  (resources.name = '%s' or resources.name = '%s' or resources.name = '%s') 
+  and objects.guid = '%s'
+    """ %(name_res[0], name_res[1], name_res[2], obj_guid)
+    #print sQuery
+    cursor.execute(sQuery)  
+    data_table = cursor.fetchall()    
+    return data_table

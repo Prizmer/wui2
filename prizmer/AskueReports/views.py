@@ -2293,6 +2293,7 @@ def report_electric_simple_3_zones_v2(request):
     response = StringIO.StringIO()
     wb = Workbook()
     ws = wb.active
+    wb.guess_types = True
     
     obj_title           = request.session['obj_title']
     electric_data_end   = request.session['electric_data_end']    
@@ -2460,8 +2461,11 @@ def report_electric_simple_3_zones_v2(request):
             next
                    
         try:
+            #ws.cell('F%s'%(row)).number_format = 'Comma'
+            #ws.cell('F%s'%(row)).value = '%s' % str(data_table[row-6][3]).replace('.',',')  # Сумма А+
             ws.cell('F%s'%(row)).value = '%s' % (data_table[row-6][3])  # Сумма А+
             ws.cell('F%s'%(row)).style = ali_white
+            
         except:
             ws.cell('F%s'%(row)).style = ali_white
             next

@@ -11,6 +11,8 @@ from django.db.models.signals import post_save
 import common_sql
 import service 
 
+from jsonfield import JSONField
+
 def autoconnect(cls):
     """ 
     Class decorator that automatically connects pre_save / post_save signals on 
@@ -82,7 +84,18 @@ class Comments(models.Model):
     def __unicode__(self):
         return self.name  
 #        return u'%s %s %s %s %s' % (self.id_taken_params.guid_meters.name ,self.id_taken_params.guid_meters.factory_number_manual , self.id_taken_params.guid_params.guid_names_params.name, self.date, self.value )
-     
+
+""" class Tree_data(models.Model):
+    guid = UUIDField(primary_key=True, max_length=38)
+    name=models.CharField('Имя', max_length=50, blank=True)
+    info = JSONField()
+    class Meta:
+        db_table = 'Tree_data'
+        verbose_name = u'Дерево объектов'
+        verbose_name_plural = u'Дерево объектов'
+           
+    def __unicode__(self):
+        return self.name     """
 
 class TypesAbonents(models.Model):
     guid = UUIDField(primary_key=True, max_length=38)
