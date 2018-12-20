@@ -82,6 +82,7 @@ urlpatterns = patterns('',
     url(r'^67/$', views.report_water_pulsar_potreblenie_skladochnaya), #skladochnaya - otch`t za period
     
     url(r'^68/$', views.report_rejim_electro), #отчёт-режимный день
+    url(r'^69/$', views.electric_between_3_zones_report), #отчёт как 29
     url(r'^71/$', views.report_forma_80040), #Выгрузка архива с файлами xml по форме Мосэнергосбыт 80040
    
     url(r'^72/$', views.report_electric_simple_3_zones_v2),

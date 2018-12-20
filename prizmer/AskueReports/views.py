@@ -19,6 +19,8 @@ import decimal
 # для работы с xml
 from lxml import etree
 
+separator = ',' #separator = '.' or ','
+
 
 def zagotovka(request):
     response = StringIO.StringIO()
@@ -2439,22 +2441,22 @@ def report_electric_simple_3_zones_v2(request):
             ws.cell('B%s'%(row)).style = ali_white
             next
             
-        try:
-            ws.cell('C%s'%(row)).value = '%s' % (data_table[row-6][9])  # Ктн
+        try:            
+            ws.cell('C%s'%(row)).value = '%s' % str(data_table[row-6][9]).replace('.', separator)# Ктн
             ws.cell('C%s'%(row)).style = ali_white
         except:
             ws.cell('C%s'%(row)).style = ali_white
             next
             
         try:
-            ws.cell('D%s'%(row)).value = '%s' % (data_table[row-6][8])  # Ктт
+            ws.cell('D%s'%(row)).value = '%s' % str(data_table[row-6][8]).replace('.', separator)  # Ктт
             ws.cell('D%s'%(row)).style = ali_white
         except:
             ws.cell('D%s'%(row)).style = ali_white
             next
             
         try:
-            ws.cell('E%s'%(row)).value = '%s' % (data_table[row-6][10])  # Ка
+            ws.cell('E%s'%(row)).value = '%s' % str(data_table[row-6][10]).replace('.', separator)  # Ка
             ws.cell('E%s'%(row)).style = ali_white
         except:
             ws.cell('E%s'%(row)).style = ali_white
@@ -2463,7 +2465,7 @@ def report_electric_simple_3_zones_v2(request):
         try:
             #ws.cell('F%s'%(row)).number_format = 'Comma'
             #ws.cell('F%s'%(row)).value = '%s' % str(data_table[row-6][3]).replace('.',',')  # Сумма А+
-            ws.cell('F%s'%(row)).value = '%s' % (data_table[row-6][3])  # Сумма А+
+            ws.cell('F%s'%(row)).value = '%s' % str(data_table[row-6][3]).replace('.', separator)  # Сумма А+
             ws.cell('F%s'%(row)).style = ali_white
             
         except:
@@ -2471,42 +2473,44 @@ def report_electric_simple_3_zones_v2(request):
             next
             
         try:
-            ws.cell('G%s'%(row)).value = '%s' % round((data_table[row-6][3]*data_table[row-6][8]*data_table[row-6][9]),3)  # "Энергия Сумма А+
+            ws.cell('G%s'%(row)).value = '%s' % str(round((data_table[row-6][3]*data_table[row-6][8]*data_table[row-6][9]),3)).replace('.', separator)  # "Энергия Сумма А+
             ws.cell('G%s'%(row)).style = ali_yellow
         except:
             ws.cell('G%s'%(row)).style = ali_yellow
             next
             
         try:
-            ws.cell('H%s'%(row)).value = '%s' % (data_table[row-6][4])  # Тариф 1 А+
+            ws.cell('H%s'%(row)).value = '%s' % str(data_table[row-6][4]).replace('.', separator)  # Тариф 1 А+
             ws.cell('H%s'%(row)).style = ali_white
         except:
             ws.cell('H%s'%(row)).style = ali_white
             next
             
         try:
-            ws.cell('I%s'%(row)).value = '%s' % round((data_table[row-6][4]*data_table[row-6][8]*data_table[row-6][9]),3)  # "Энергия Тариф 1 А+
+            val = round((data_table[row-6][4]*data_table[row-6][8]*data_table[row-6][9]),3)            
+            ws.cell('I%s'%(row)).value = '%s' % str(val).replace('.', separator)  # "Энергия Тариф 1 А+
             ws.cell('I%s'%(row)).style = ali_yellow
         except:
             ws.cell('I%s'%(row)).style = ali_yellow
             next
             
         try:
-            ws.cell('J%s'%(row)).value = '%s' % (data_table[row-6][5])  # Тариф 2 А+
+            ws.cell('J%s'%(row)).value = '%s' % str(data_table[row-6][5]).replace('.', separator)  # Тариф 2 А+
             ws.cell('J%s'%(row)).style = ali_white
         except:
             ws.cell('J%s'%(row)).style = ali_white
             next
             
         try:
-            ws.cell('K%s'%(row)).value = '%s' % round((data_table[row-6][5]*data_table[row-6][8]*data_table[row-6][9]),3) # "Энергия Тариф 2 А+
+            val = round((data_table[row-6][5]*data_table[row-6][8]*data_table[row-6][9]),3)
+            ws.cell('K%s'%(row)).value = '%s' % str(val).replace('.', separator) # "Энергия Тариф 2 А+
             ws.cell('K%s'%(row)).style = ali_yellow
         except:
             ws.cell('K%s'%(row)).style = ali_yellow
             next
             
         try:
-            ws.cell('L%s'%(row)).value = '%s' % (data_table[row-6][6])  # Тариф 3 А+
+            ws.cell('L%s'%(row)).value = '%s' % str(data_table[row-6][6]).replace('.', separator)  # Тариф 3 А+
             ws.cell('L%s'%(row)).style = ali_white
 
         except:
@@ -2514,7 +2518,8 @@ def report_electric_simple_3_zones_v2(request):
             next
             
         try:
-            ws.cell('M%s'%(row)).value = '%s' % round((data_table[row-6][6]*data_table[row-6][8]*data_table[row-6][9]),3)  # "Энергия Тариф 3 А+
+            val = round((data_table[row-6][6]*data_table[row-6][8]*data_table[row-6][9]),3)
+            ws.cell('M%s'%(row)).value = '%s' % str(val).replace('.', separator)  # "Энергия Тариф 3 А+
             ws.cell('M%s'%(row)).style = ali_yellow
         except:
             ws.cell('M%s'%(row)).style = ali_yellow
@@ -3018,6 +3023,7 @@ def electric_between_2_zones_report(request):
     return response
     
 def electric_between_3_zones_report(request):
+    
     response = StringIO.StringIO()
     wb = Workbook()
     ws = wb.active
@@ -3136,53 +3142,58 @@ def electric_between_3_zones_report(request):
             next
             
         try:
-            ws.cell('D%s'%(row)).value = '%s' % (data_table[row-6][5])  # сумма-показания t0
+            ws.cell('D%s'%(row)).value = '%s' % get_val(data_table[row-6][5])  # сумма-показания t0
             ws.cell('D%s'%(row)).style = ali_white
         except:
             ws.cell('D%s'%(row)).style = ali_white
             next
             
         try:
-            ws.cell('E%s'%(row)).value = '%s' % (data_table[row-6][12])  # Расход за прошедшие сутки t0
+            # print 'val ', data_table[row-6][12]
+            # print type(data_table[row-6][12])
+            # print 'just str ' ,unicode(data_table[row-6][12])
+            # print '%s' % unicode(data_table[row-6][12]).replace('.', separator)
+
+            ws.cell('E%s'%(row)).value = '%s' % get_val(data_table[row-6][12]) #str(data_table[row-6][12]).replace('.', separator)   # Расход за прошедшие сутки t0
             ws.cell('E%s'%(row)).style = ali_white
         except:
             ws.cell('E%s'%(row)).style = ali_white
             next
         try:
-            ws.cell('F%s'%(row)).value = '%s' % (data_table[row-6][6])  # сумма-показанияt1
+            ws.cell('F%s'%(row)).value = '%s' % get_val(data_table[row-6][6])   # сумма-показанияt1
             ws.cell('F%s'%(row)).style = ali_white
         except:
             ws.cell('F%s'%(row)).style = ali_white
             next
             
         try:
-            ws.cell('G%s'%(row)).value = '%s' % (data_table[row-6][13])  # Расход за прошедшие суткиt1
+            ws.cell('G%s'%(row)).value = '%s' % get_val(data_table[row-6][13])   # Расход за прошедшие суткиt1
             ws.cell('G%s'%(row)).style = ali_white
         except:
             ws.cell('G%s'%(row)).style = ali_white
             next
         try:
-            ws.cell('H%s'%(row)).value = '%s' % (data_table[row-6][7])  # сумма-показанияt2
+            ws.cell('H%s'%(row)).value = '%s' % get_val(data_table[row-6][7])  # сумма-показанияt2
             ws.cell('H%s'%(row)).style = ali_white
         except:
             ws.cell('H%s'%(row)).style = ali_white
             next
             
         try:
-            ws.cell('I%s'%(row)).value = '%s' % (data_table[row-6][14])  # Расход за прошедшие суткиt2
+            ws.cell('I%s'%(row)).value = '%s' % get_val(data_table[row-6][14])  # Расход за прошедшие суткиt2
             ws.cell('I%s'%(row)).style = ali_white
         except:
             ws.cell('I%s'%(row)).style = ali_white
             next
         try:
-            ws.cell('J%s'%(row)).value = '%s' % (data_table[row-6][8])  # сумма-показанияt3
+            ws.cell('J%s'%(row)).value = '%s' % get_val(data_table[row-6][8])   # сумма-показанияt3
             ws.cell('J%s'%(row)).style = ali_white
         except:
             ws.cell('J%s'%(row)).style = ali_white
             next
             
         try:
-            ws.cell('K%s'%(row)).value = '%s' % (data_table[row-6][15])  # Расход за прошедшие суткиt3
+            ws.cell('K%s'%(row)).value = '%s' % get_val(data_table[row-6][15])   # Расход за прошедшие суткиt3
             ws.cell('K%s'%(row)).style = ali_white
         except:
             ws.cell('K%s'%(row)).style = ali_white
@@ -3199,6 +3210,14 @@ def electric_between_3_zones_report(request):
     
     response['Content-Disposition'] = 'attachment;filename="%s.%s"' % (output_name.replace('"', '\"'), file_ext)    
     return response
+
+def get_val(val):
+    if val == 'Н/Д': 
+        return val
+    else: 
+        return str(val).replace('.', separator)
+        
+
 
 def report_electric_potreblenie_2_zones(request):
     response = StringIO.StringIO()
@@ -4267,42 +4286,44 @@ def report_electric_potreblenie_3_zones_v2(request):
             next
             
         try:
-            ws.cell('C%s'%(row)).value = '%s' % (data_table[row-6][23])  # Ктн
+            ws.cell('C%s'%(row)).value = '%s' % get_val(data_table[row-6][23])  # Ктн
             ws.cell('C%s'%(row)).style = ali_white
         except:
             ws.cell('C%s'%(row)).style = ali_white
             next
             
         try:
-            ws.cell('D%s'%(row)).value = '%s' % (data_table[row-6][20])  # Ктт
+            ws.cell('D%s'%(row)).value = '%s' % get_val(data_table[row-6][20])  # Ктт
             ws.cell('D%s'%(row)).style = ali_white
         except:
             ws.cell('D%s'%(row)).style = ali_white
             next
             
         try:
-            ws.cell('E%s'%(row)).value = '%s' % (data_table[row-6][24])  # Ка
+            ws.cell('E%s'%(row)).value = '%s' % get_val(data_table[row-6][24])  # Ка
             ws.cell('E%s'%(row)).style = ali_white
         except:
             ws.cell('E%s'%(row)).style = ali_white
             next
                    
-        try:
-            ws.cell('H%s'%(row)).value = '%s' % (format(data_table[row-6][7],'.3f'))  # Сумма А+ на конец интервала
+        try:            
+            ws.cell('H%s'%(row)).value = '%s' % get_val(format(data_table[row-6][7],'.3f'))  # Сумма А+ на конец интервала
             ws.cell('H%s'%(row)).style = ali_white
         except:
             ws.cell('H%s'%(row)).style = ali_white
             next
             
         try:
-            ws.cell('I%s'%(row)).value = '%s' % (format(data_table[row-6][7]*data_table[row-6][20]*data_table[row-6][23],'.3f'))  # Энергия Сумма А+ на конец интервала
+            #val = 
+            ws.cell('I%s'%(row)).value = '%s' % get_val(format(data_table[row-6][7]*data_table[row-6][20]*data_table[row-6][23],'.3f'))  # Энергия Сумма А+ на конец интервала
             ws.cell('I%s'%(row)).style = ali_yellow
         except:
             ws.cell('I%s'%(row)).style = ali_yellow
             next
             
         try:
-            ws.cell('F%s'%(row)).value = '%s'%(format(data_table[row-6][2], '.3f'))  # '%s' % (data_table[row-6][2])  # Сумма А+ на начало интервала
+            #val = format(data_table[row-6][2], '.3f')
+            ws.cell('F%s'%(row)).value = '%s '% get_val(format(data_table[row-6][2], '.3f'))  # '%s' % (data_table[row-6][2])  # Сумма А+ на начало интервала
             ws.cell('F%s'%(row)).style = ali_white
             #ws.cell('F%s'%(row)).number_format = '0.000'
         except:
@@ -4310,63 +4331,72 @@ def report_electric_potreblenie_3_zones_v2(request):
             next
             
         try:
-            ws.cell('G%s'%(row)).value = '%s' % (format(data_table[row-6][2]*data_table[row-6][20]*data_table[row-6][23],'.3f'))  # Энергия Сумма А+ на начало интервала
+            #val = format(data_table[row-6][2]*data_table[row-6][20]*data_table[row-6][23],'.3f')
+            ws.cell('G%s'%(row)).value = '%s' % get_val(format(data_table[row-6][2]*data_table[row-6][20]*data_table[row-6][23],'.3f'))  # Энергия Сумма А+ на начало интервала
             ws.cell('G%s'%(row)).style = ali_yellow
         except:
             ws.cell('G%s'%(row)).style = ali_yellow
             next
             
         try:
-            ws.cell('L%s'%(row)).value = '%s' % (format(data_table[row-6][8],'.3f'))  # Тариф 1 А+ на конец интервала
+            #val = format(data_table[row-6][8],'.3f')
+            ws.cell('L%s'%(row)).value = '%s' % get_val(format(data_table[row-6][8],'.3f'))   # Тариф 1 А+ на конец интервала
             ws.cell('L%s'%(row)).style = ali_white
         except:
             ws.cell('L%s'%(row)).style = ali_white
             next
             
         try:
-            ws.cell('M%s'%(row)).value = '%s' % (format(data_table[row-6][8]*data_table[row-6][20]*data_table[row-6][23],'.3f'))  # Энергия Тариф 1 А+ на конец интервала
+            #val = format(data_table[row-6][8]*data_table[row-6][20]*data_table[row-6][23],'.3f')
+            ws.cell('M%s'%(row)).value = '%s' % get_val(format(data_table[row-6][8]*data_table[row-6][20]*data_table[row-6][23],'.3f'))  # Энергия Тариф 1 А+ на конец интервала
             ws.cell('M%s'%(row)).style = ali_yellow
         except:
             ws.cell('M%s'%(row)).style = ali_yellow
             next
             
         try:
-            ws.cell('J%s'%(row)).value = '%s' % (format(data_table[row-6][3],'.3f'))  # Тариф 1 А+ на начало интервала
+            #val = format(data_table[row-6][3],'.3f')
+            ws.cell('J%s'%(row)).value = '%s' % get_val(format(data_table[row-6][3],'.3f'))  # Тариф 1 А+ на начало интервала
             ws.cell('J%s'%(row)).style = ali_white
         except:
             ws.cell('J%s'%(row)).style = ali_white
             next
             
         try:
-            ws.cell('K%s'%(row)).value = '%s' % (format(data_table[row-6][3]*data_table[row-6][20]*data_table[row-6][23],'.3f'))  # Энергия Тариф 1 А+ на начало интервала
+            #val = format(data_table[row-6][3]*data_table[row-6][20]*data_table[row-6][23],'.3f')
+            ws.cell('K%s'%(row)).value = '%s' % get_val(format(data_table[row-6][3]*data_table[row-6][20]*data_table[row-6][23],'.3f'))  # Энергия Тариф 1 А+ на начало интервала
             ws.cell('K%s'%(row)).style = ali_yellow
         except:
             ws.cell('K%s'%(row)).style = ali_yellow
             next
             
         try:
-            ws.cell('P%s'%(row)).value = '%s' % (format(data_table[row-6][9],'.3f'))  # Тариф 2 А+ на конец интервала
+            #val = format(data_table[row-6][9],'.3f')
+            ws.cell('P%s'%(row)).value = '%s' % get_val(format(data_table[row-6][9],'.3f'))   # Тариф 2 А+ на конец интервала
             ws.cell('P%s'%(row)).style = ali_white
         except:
             ws.cell('P%s'%(row)).style = ali_white
             next
             
         try:
-            ws.cell('Q%s'%(row)).value = '%s' % (format(data_table[row-6][9]*data_table[row-6][20]*data_table[row-6][23],'.3f'))  # Энергия Тариф 2 А+ на конец интервала
+            #val = format(data_table[row-6][9]*data_table[row-6][20]*data_table[row-6][23],'.3f')
+            ws.cell('Q%s'%(row)).value = '%s' % get_val(format(data_table[row-6][9]*data_table[row-6][20]*data_table[row-6][23],'.3f'))  # Энергия Тариф 2 А+ на конец интервала
             ws.cell('Q%s'%(row)).style = ali_yellow
         except:
             ws.cell('Q%s'%(row)).style = ali_yellow
             next
 
         try:
-            ws.cell('N%s'%(row)).value = '%s' % (format(data_table[row-6][4],'.3f'))  # Тариф 2 А+ на начало интервала
+            #val = format(data_table[row-6][4],'.3f')
+            ws.cell('N%s'%(row)).value = '%s' % get_val(format(data_table[row-6][4],'.3f'))  # Тариф 2 А+ на начало интервала
             ws.cell('N%s'%(row)).style = ali_white
         except:
             ws.cell('N%s'%(row)).style = ali_white
             next
             
         try:
-            ws.cell('O%s'%(row)).value = '%s' % (format(data_table[row-6][4]*data_table[row-6][20]*data_table[row-6][23],'.3f'))  # Энергия Тариф 2 А+ на начало интервала
+            #val = format(data_table[row-6][4]*data_table[row-6][20]*data_table[row-6][23],'.3f')
+            ws.cell('O%s'%(row)).value = '%s' % get_val(format(data_table[row-6][4]*data_table[row-6][20]*data_table[row-6][23],'.3f'))  # Энергия Тариф 2 А+ на начало интервала
             ws.cell('O%s'%(row)).style = ali_yellow
         except:
             ws.cell('O%s'%(row)).style = ali_yellow
@@ -4375,35 +4405,40 @@ def report_electric_potreblenie_3_zones_v2(request):
 
             
         try:
-            ws.cell('T%s'%(row)).value = '%s' % (format(data_table[row-6][10],'.3f'))  # Тариф 3 А+ на конец интервала
+            #val = format(data_table[row-6][10],'.3f')
+            ws.cell('T%s'%(row)).value = '%s' % get_val(format(data_table[row-6][10],'.3f'))  # Тариф 3 А+ на конец интервала
             ws.cell('T%s'%(row)).style = ali_white
         except:
             ws.cell('T%s'%(row)).style = ali_white
             next
             
         try:
-            ws.cell('U%s'%(row)).value = '%s' % (format(data_table[row-6][10]*data_table[row-6][20]*data_table[row-6][23],'.3f'))  # "Энергия Тариф 3 А+ на конец интервала
+            #val = format(data_table[row-6][10]*data_table[row-6][20]*data_table[row-6][23],'.3f')
+            ws.cell('U%s'%(row)).value = '%s' % get_val(format(data_table[row-6][10]*data_table[row-6][20]*data_table[row-6][23],'.3f'))  # "Энергия Тариф 3 А+ на конец интервала
             ws.cell('U%s'%(row)).style = ali_yellow
         except:
             ws.cell('U%s'%(row)).style = ali_yellow
             next
             
         try:
-            ws.cell('R%s'%(row)).value = '%s' % (format(data_table[row-6][5],'.3f'))  # Тариф 3 А+ на начало интервала
+            #val = format(data_table[row-6][5],'.3f')
+            ws.cell('R%s'%(row)).value = '%s' % get_val(format(data_table[row-6][5],'.3f'))  # Тариф 3 А+ на начало интервала
             ws.cell('R%s'%(row)).style = ali_white
         except:
             ws.cell('R%s'%(row)).style = ali_white
             next
             
         try:
-            ws.cell('S%s'%(row)).value = '%s' % (format(data_table[row-6][5]*data_table[row-6][20]*data_table[row-6][23],'.3f'))  # "Энергия Тариф 3 А+ на начало интервала
+            #val = format(data_table[row-6][5]*data_table[row-6][20]*data_table[row-6][23],'.3f')
+            ws.cell('S%s'%(row)).value = '%s' % get_val(format(data_table[row-6][5]*data_table[row-6][20]*data_table[row-6][23],'.3f'))  # "Энергия Тариф 3 А+ на начало интервала
             ws.cell('S%s'%(row)).style = ali_yellow
         except:
             ws.cell('S%s'%(row)).style = ali_yellow
             next
         # Расход
         try:
-            ws.cell('V%s'%(row)).value = '%s' % (format(data_table[row-6][12],'.3f'))  # Расход Сумма А+
+            #val = format(data_table[row-6][12],'.3f')
+            ws.cell('V%s'%(row)).value = '%s' % get_val(format(data_table[row-6][12],'.3f'))  # Расход Сумма А+
             ws.cell('V%s'%(row)).style = ali_white
             #ws.cell('V%s'%(row)).number_format = '0.000'
         except:
@@ -4411,7 +4446,8 @@ def report_electric_potreblenie_3_zones_v2(request):
             next
             
         try:
-            ws.cell('W%s'%(row)).value = '%s' % (format(data_table[row-6][12]*data_table[row-6][20]*data_table[row-6][23],'.3f'))  # Расход Сумма Энергия А+
+            #val = format(data_table[row-6][12]*data_table[row-6][20]*data_table[row-6][23],'.3f')
+            ws.cell('W%s'%(row)).value = '%s' % get_val(format(data_table[row-6][12]*data_table[row-6][20]*data_table[row-6][23],'.3f'))  # Расход Сумма Энергия А+
             ws.cell('W%s'%(row)).style = ali_yellow
             #ws.cell('W%s'%(row)).number_format = '0.000'
         except:
@@ -4419,42 +4455,48 @@ def report_electric_potreblenie_3_zones_v2(request):
             next
             
         try:
-            ws.cell('X%s'%(row)).value = '%s' % (format(data_table[row-6][13],'.3f'))  # Расход Тариф 1 А+
+            #val = format(data_table[row-6][13],'.3f')
+            ws.cell('X%s'%(row)).value = '%s' % get_val(format(data_table[row-6][13],'.3f'))    # Расход Тариф 1 А+
             ws.cell('X%s'%(row)).style = ali_white
         except:
             ws.cell('X%s'%(row)).style = ali_white
             next
             
         try:
-            ws.cell('Y%s'%(row)).value = '%s' % (format(data_table[row-6][13]*data_table[row-6][20]*data_table[row-6][23],'.3f'))  # Расход Тариф 1 Энергия А+
+            #val = format(data_table[row-6][13]*data_table[row-6][20]*data_table[row-6][23],'.3f')
+            ws.cell('Y%s'%(row)).value = '%s' % get_val(format(data_table[row-6][13]*data_table[row-6][20]*data_table[row-6][23],'.3f'))    # Расход Тариф 1 Энергия А+
             ws.cell('Y%s'%(row)).style = ali_yellow
         except:
             ws.cell('Y%s'%(row)).style = ali_yellow
             next
             
         try:
-            ws.cell('Z%s'%(row)).value = '%s' % (format(data_table[row-6][14],'.3f'))  # Расход Тариф 2 А+
+            #val = format(data_table[row-6][14],'.3f')
+            ws.cell('Z%s'%(row)).value = '%s' % get_val(format(data_table[row-6][14],'.3f'))  # Расход Тариф 2 А+
             ws.cell('Z%s'%(row)).style = ali_white
         except:
             ws.cell('Z%s'%(row)).style = ali_white
             next
             
         try:
-            ws.cell('AA%s'%(row)).value = '%s' % (format(data_table[row-6][14]*data_table[row-6][20]*data_table[row-6][23],'.3f'))  # Расход Тариф 2 Энергия А+
+            #val = format(data_table[row-6][14]*data_table[row-6][20]*data_table[row-6][23],'.3f')
+            ws.cell('AA%s'%(row)).value = '%s' % get_val(format(data_table[row-6][14]*data_table[row-6][20]*data_table[row-6][23],'.3f'))  # Расход Тариф 2 Энергия А+
             ws.cell('AA%s'%(row)).style = ali_yellow
         except:
             ws.cell('AA%s'%(row)).style = ali_yellow
             next
             
         try:
-            ws.cell('AB%s'%(row)).value = '%s' % (format(data_table[row-6][15],'.3f'))  # Расход Тариф 3 А+
+            #val = format(data_table[row-6][15],'.3f')
+            ws.cell('AB%s'%(row)).value = '%s' % get_val(format(data_table[row-6][15],'.3f'))  # Расход Тариф 3 А+
             ws.cell('AB%s'%(row)).style = ali_white
         except:
             ws.cell('AB%s'%(row)).style = ali_white
             next
             
         try:
-            ws.cell('AC%s'%(row)).value = '%s' % (format(data_table[row-6][15]*data_table[row-6][20]*data_table[row-6][23],'.3f'))  # Расход Тариф 3 Энергия А+
+            #val = format(data_table[row-6][15]*data_table[row-6][20]*data_table[row-6][23],'.3f')
+            ws.cell('AC%s'%(row)).value = '%s' % get_val(format(data_table[row-6][15]*data_table[row-6][20]*data_table[row-6][23],'.3f'))  # Расход Тариф 3 Энергия А+
             ws.cell('AC%s'%(row)).style = ali_yellow
         except:
             ws.cell('AC%s'%(row)).style = ali_yellow
@@ -5606,10 +5648,7 @@ def report_water_potreblenie_pulsar(request):
     
     ws['g5'] = 'Лицевой номер '
     ws['g5'].style = ali_grey    
-    
-
-
-
+  
     
 #Запрашиваем данные для отчета
     is_abonent_level = re.compile(r'level2')
@@ -5664,21 +5703,21 @@ def report_water_potreblenie_pulsar(request):
             next
             
         try:
-            ws.cell('d%s'%(row)).value = '%s' % (data_table[row-6][5])  # Показания на начало
+            ws.cell('d%s'%(row)).value = '%s' % get_val(data_table[row-6][5])  # Показания на начало
             ws.cell('d%s'%(row)).style = ali_white
         except:
             ws.cell('d%s'%(row)).style = ali_white
             next
             
         try:
-            ws.cell('e%s'%(row)).value = '%s' % (data_table[row-6][6])  # Показания  на конец
+            ws.cell('e%s'%(row)).value = '%s' % get_val(data_table[row-6][6])  # Показания  на конец
             ws.cell('e%s'%(row)).style = ali_white
         except:
             ws.cell('e%s'%(row)).style = ali_white
             next
             
         try:
-            ws.cell('f%s'%(row)).value = '%s' % (data_table[row-6][7])  # Потребление
+            ws.cell('f%s'%(row)).value = '%s' % get_val(data_table[row-6][7])  # Потребление
             ws.cell('f%s'%(row)).style = ali_white
         except:
             ws.cell('f%s'%(row)).style = ali_white
@@ -8206,7 +8245,7 @@ def report_water_by_date(request):
             ws.cell('D%s'%(row)).style = ali_white
             next
         try:
-            ws.cell('E%s'%(row)).value = '%s' % (data_table[row-6][5])  # Показания
+            ws.cell('E%s'%(row)).value = '%s' % get_val(data_table[row-6][5])  # Показания
             ws.cell('E%s'%(row)).style = ali_white
         except:
             ws.cell('E%s'%(row)).style = ali_white
@@ -9615,27 +9654,27 @@ def report_pulsar_heat_daily(request):
             next
             
         try:
-            ws.cell('C%s'%(row)).value = '%s' % (data_table[row-6][3])  # стояк
+            ws.cell('C%s'%(row)).value = '%s' % get_val(data_table[row-6][3])  # стояк
             ws.cell('C%s'%(row)).style = ali_white
         except:
             ws.cell('C%s'%(row)).style = ali_white
             next
             
         try:
-            ws.cell('D%s'%(row)).value =  '%s' % (data_table[row-6][4])  # счётчик
+            ws.cell('D%s'%(row)).value =  '%s' % get_val(data_table[row-6][4])  # счётчик
             ws.cell('D%s'%(row)).style = ali_white
         except:
             ws.cell('D%s'%(row)).style = ali_white
             next
             
         try:
-            ws.cell('E%s'%(row)).value = '%s' % (data_table[row-6][5])  # показаня
+            ws.cell('E%s'%(row)).value = '%s' % get_val(data_table[row-6][5])  # показаня
             ws.cell('E%s'%(row)).style = ali_white
         except:
             ws.cell('E%s'%(row)).style = ali_white
             next
         try:
-            ws.cell('F%s'%(row)).value = '%s' % (data_table[row-6][6])  # показаня
+            ws.cell('F%s'%(row)).value = '%s' % get_val(data_table[row-6][6])  # показаня
             ws.cell('F%s'%(row)).style = ali_white
         except:
             ws.cell('F%s'%(row)).style = ali_white
@@ -9646,7 +9685,7 @@ def report_pulsar_heat_daily(request):
     ws.column_dimensions['C'].width = 23 
     ws.column_dimensions['E'].width = 17 
     ws.column_dimensions['F'].width = 17
-#    ws.column_dimensions['D'].width = 17
+    ws.column_dimensions['D'].width = 17
 
 #------------
             
@@ -9734,49 +9773,49 @@ def report_pulsar_heat_period(request):
             next
             
         try:
-            ws.cell('C%s'%(row)).value = '%s' % (round(float(data_table[row-6][2]),7)) # '%s' % (data_table[row-6][2])  # Показания по теплу на начало
+            ws.cell('C%s'%(row)).value = '%s' % get_val(round(float(data_table[row-6][2]),7)) # '%s' % (data_table[row-6][2])  # Показания по теплу на начало
             ws.cell('C%s'%(row)).style = ali_white
         except:
             ws.cell('C%s'%(row)).style = ali_white
             next
             
         try:
-            ws.cell('D%s'%(row)).value = '%s' % (round(float(data_table[row-6][3]),7)) # '%s' % (data_table[row-6][3])  # Показания по теплу на конец
+            ws.cell('D%s'%(row)).value = '%s' % get_val(round(float(data_table[row-6][3]),7)) # '%s' % (data_table[row-6][3])  # Показания по теплу на конец
             ws.cell('D%s'%(row)).style = ali_white
         except:
             ws.cell('D%s'%(row)).style = ali_white
             next
             
         try:
-            ws.cell('E%s'%(row)).value =  '%s' % (round(float(data_table[row-6][4]),7))  # '%s' % (data_table[row-6][4])  # Потребление
+            ws.cell('E%s'%(row)).value =  '%s' % get_val(round(float(data_table[row-6][4]),7))  # '%s' % (data_table[row-6][4])  # Потребление
             ws.cell('E%s'%(row)).style = ali_white
         except:
             ws.cell('E%s'%(row)).style = ali_white
             next
         
         try:
-            ws.cell('F%s'%(row)).value =  '%s' % (round(float(data_table[row-6][5]),7)) # '%s' % (data_table[row-6][5])  # Время работы
+            ws.cell('F%s'%(row)).value =  '%s' % get_val(round(float(data_table[row-6][5]),7)) # '%s' % (data_table[row-6][5])  # Время работы
             ws.cell('F%s'%(row)).style = ali_white
         except:
             ws.cell('F%s'%(row)).style = ali_white
             next
             
         try:
-            ws.cell('G%s'%(row)).value = '%s' % (round(float(data_table[row-6][6]),7)) # '%s' % (data_table[row-6][6])  # Время работы
+            ws.cell('G%s'%(row)).value = '%s' % get_val(round(float(data_table[row-6][6]),7)) # '%s' % (data_table[row-6][6])  # Время работы
             ws.cell('G%s'%(row)).style = ali_white
         except:
             ws.cell('G%s'%(row)).style = ali_white
             next
             
         try:
-            ws.cell('H%s'%(row)).value =  '%s' % (round(float(data_table[row-6][7]),7))  #'%s' % (data_table[row-6][7])  # Время работы
+            ws.cell('H%s'%(row)).value =  '%s' % get_val(round(float(data_table[row-6][7]),7))  #'%s' % (data_table[row-6][7])  # Время работы
             ws.cell('H%s'%(row)).style = ali_white
         except:
             ws.cell('H%s'%(row)).style = ali_white
             next
             
      
-    ws.row_dimensions[5].height = 51
+    ws.row_dimensions[5].height = 54
     ws.column_dimensions['A'].width = 17 
     ws.column_dimensions['H'].width = 15
         
@@ -11739,7 +11778,7 @@ def report_balance_period_electric(request):
             next
         
         try:
-            ws.cell('B%s'%(row)).value = '%s' % (dt_delta[row-6][1])  # счётчик эльф
+            ws.cell('B%s'%(row)).value = '%s' % str(dt_delta[row-6][1]).replace('.',separator)  # счётчик эльф
             ws.cell('B%s'%(row)).style = ali_white
         except:
             ws.cell('B%s'%(row)).style = ali_white
