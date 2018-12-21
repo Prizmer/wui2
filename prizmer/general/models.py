@@ -11,7 +11,7 @@ from django.db.models.signals import post_save
 import common_sql
 import service 
 
-from jsonfield import JSONField
+#from jsonfield import JSONField
 
 def autoconnect(cls):
     """ 

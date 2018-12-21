@@ -1009,7 +1009,7 @@ def del_object_no_children(all_level_0):
     for obj in range(len(all_level_0)):
         children_abons = Abonents.objects.filter(guid_objects=all_level_0[obj].guid)
         if len(children_abons) == 0:
-            print 'del ', all_level_0[obj].name
+            #print 'del ', all_level_0[obj].name
             result.exclude(guid=all_level_0[obj].guid)  
 
     return result
@@ -1113,7 +1113,7 @@ def tree_data_json_electric(request):
         #all_level_0.exclude(guid='7fc2741d-0d39-4dea-b856-9d4b146181d1')
         #print u'Объекты уровня 0 \n', all_level_0
         for l0 in range(len(all_level_0)):
-            print all_level_0[l0].name
+            #print all_level_0[l0].name
             filter_level_1 = Objects.objects.filter(level=1).filter(guid_parent = all_level_0[l0].guid)
             #print all_level_0[l0].name    #москва      
             children_data_l1 = []
@@ -1253,7 +1253,7 @@ def tree_data_json_water(request):
                     filter_level_abonents = common_sql.get_water_abonents_by_obj_guid(filter_level_2[l2].guid, name_res)
                     
                     #print filter_level_2[l2].name, 'abonentov: ', str(len(filter_level_abonents))
-                    print filter_level_abonents
+                    #print filter_level_abonents
                     for abon in range(len(filter_level_abonents)):
                         meters_data = []                                                
                         list_of_meters =  common_sql.get_meters_by_abons_guid_and_res(filter_level_abonents[abon][1], filter_level_abonents[abon][2])
