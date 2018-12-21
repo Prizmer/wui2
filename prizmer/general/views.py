@@ -896,7 +896,7 @@ def tree_data_json_v2(request):
     #     print(key), type(key)
     #     value = request.GET[key]
     #     print(value)
-    pre_url = request.GET.get(u'preurl')
+    pre_url = str(request.GET.get(u'preurl'))
     tree_data_json = '_________'
     #tree_data = '_________'
     if (pre_url.find('electric') > -1):       
