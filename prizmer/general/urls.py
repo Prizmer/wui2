@@ -150,6 +150,8 @@ urlpatterns = patterns('',
     url(r'^93/$', views.water_impulse_report_for_c300), #отчёт по потрелению воды для ботсада
 
     url(r'^94/$', views.water_digital_pulsar_res_status), 
+
+    url(r'^95/$', views.electric_period_graphic_activ_reactiv), #график потребления электроэнергии по дням 3 тарифа R+ A+
     
     
    #---- Test urls

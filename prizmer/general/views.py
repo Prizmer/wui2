@@ -10290,7 +10290,8 @@ def electric_between_3_zones(request):
             request.session["is_electric_period"]  = is_electric_period  = request.GET['is_electric_period']
             
             if (is_electric_daily == '1') & (bool(is_abonent_level.search(obj_key))):   # daily for abonents
-                data_table = common_sql.get_data_table_electric_between(obj_title, obj_parent_title,electric_data_start, electric_data_end)
+                params=[u'T0 A+',u'T1 A+',u'T2 A+',u'T3 A+', u'Электричество']
+                data_table = common_sql.get_data_table_electric_between(obj_title, obj_parent_title,electric_data_start, electric_data_end, params)
             else:
                 pass
             
@@ -10339,7 +10340,8 @@ def electric_between_2_zones(request):
             request.session["is_electric_period"]  = is_electric_period  = request.GET['is_electric_period']
             
             if (is_electric_daily == '1') & (bool(is_abonent_level.search(obj_key))):   # daily for abonents
-                data_table = common_sql.get_data_table_electric_between(obj_title, obj_parent_title,electric_data_start, electric_data_end)
+                params=[u'T0 A+',u'T1 A+',u'T2 A+',u'T3 A+', u'Электричество']
+                data_table = common_sql.get_data_table_electric_between(obj_title, obj_parent_title,electric_data_start, electric_data_end, params)
             else:
                 pass
             
@@ -10388,7 +10390,8 @@ def electric_between(request):
             request.session["is_electric_period"]  = is_electric_period  = request.GET['is_electric_period']
             
             if (is_electric_daily == '1') & (bool(is_abonent_level.search(obj_key))):   # daily for abonents
-                data_table = common_sql.get_data_table_electric_between(obj_title, obj_parent_title,electric_data_start, electric_data_end)
+                params=[u'T0 A+',u'T1 A+',u'T2 A+',u'T3 A+', u'Электричество']
+                data_table = common_sql.get_data_table_electric_between(obj_title, obj_parent_title,electric_data_start, electric_data_end, params)
             else:
                 pass
             
@@ -12815,7 +12818,8 @@ def electric_daily_graphic(request):
               
             if (is_electric_daily == '1') & (bool(is_abonent_level.search(obj_key))):   # daily for abonents
                 #print obj_title, obj_parent_title,electric_data_start, electric_data_end
-                data_table = common_sql.get_data_table_electric_between(obj_title, obj_parent_title,electric_data_start, electric_data_end)
+                params=[u'T0 A+',u'T1 A+',u'T2 A+',u'T3 A+', u'Электричество']
+                data_table = common_sql.get_data_table_electric_between(obj_title, obj_parent_title,electric_data_start, electric_data_end, params)
             else:
                 pass
             
@@ -12887,8 +12891,8 @@ def electric_potreblenie_3_zones_v3(request):
                     isAbon=True                    
                     data_table=common_sql.get_data_table_electric_period(isAbon,obj_title,obj_parent_title, electric_data_start, electric_data_end, res, dm)
                     request.session["data_table_export"] = data_table      
-                                        
-                    data_table_graphic = common_sql.get_data_table_electric_between(obj_title, obj_parent_title,electric_data_start, electric_data_end)
+                    params=[u'T0 A+',u'T1 A+',u'T2 A+',u'T3 A+', u'Электричество']
+                    data_table_graphic = common_sql.get_data_table_electric_between(obj_title, obj_parent_title,electric_data_start, electric_data_end, params)
                        
             elif (is_electric_delta == '1') & (bool(is_object_level.search(obj_key))): # daily delta for abonents group
                     isAbon=False
@@ -14315,5 +14319,64 @@ def water_impulse_report_for_c300(request):
     
     return render_to_response("data_table/93.html", args)
 
+
+def electric_period_graphic_activ_reactiv(request):
+    args = {}
+    is_abonent_level = re.compile(r'abonent')
+    is_object_level_2 = re.compile(r'level2')
+    data_table = []
+    obj_title = u'Не выбран'
+    obj_key = u'Не выбран'
+    obj_parent_title = u'Не выбран'
+    is_electric_monthly = u''
+    is_electric_daily = u''
+    is_electric_current = u''
+    is_electric_delta = u''
+    electric_data_start = u''
+    electric_data_end = u''
+
+    if request.is_ajax():        
+        if request.method == 'GET':
+            request.session["obj_title"]           = obj_title           = request.GET['obj_title']
+            request.session["obj_key"]             = obj_key             = request.GET['obj_key']
+            request.session["obj_parent_title"]    = obj_parent_title    = request.GET['obj_parent_title']
+            request.session["is_electric_monthly"] = is_electric_monthly = request.GET['is_electric_monthly']
+            request.session["is_electric_daily"]   = is_electric_daily   = request.GET['is_electric_daily']
+            request.session["is_electric_current"] = is_electric_current = request.GET['is_electric_current']
+            request.session["is_electric_delta"]   = is_electric_delta   = request.GET['is_electric_delta']
+            request.session["electric_data_start"] = electric_data_start = request.GET['electric_data_start']
+            request.session["electric_data_end"]   = electric_data_end   = request.GET['electric_data_end']
+              
+            if (is_electric_daily == '1') & (bool(is_abonent_level.search(obj_key))):   # daily for abonents
+                #print obj_title, obj_parent_title,electric_data_start, electric_data_end
+                params=[u'T0 A+',u'T0 R+', u'Электричество']
+                data_table= common_sql.get_data_table_electric_between(obj_title, obj_parent_title,electric_data_start, electric_data_end, params)
+            else:
+                pass
+            
+    AllData=[]
+    Xcoord=[]
+    
+    if (len(data_table) >0):
+        Xcoord=makeOneCoords(data_table,0) #label 
+    
+        AllData=[{str("data"):makeOneCoords(data_table,10), str("label"):str("delta T0 A+"), str("backgroundColor"): get_rgba_color(5)},
+             {str("data"):makeOneCoords(data_table,11), str("label"):str("delta T0 R+"),  str("backgroundColor"): get_rgba_color(1)}]       
+    
+    args['data_table'] = data_table
+    args['obj_title'] = obj_title
+    args['obj_key'] = obj_key
+    args['obj_parent_title'] = obj_parent_title
+    args['is_electric_monthly'] = is_electric_monthly
+    args['is_electric_daily'] = is_electric_daily
+    args['is_electric_current'] = is_electric_current
+    args['is_electric_delta'] = is_electric_delta
+    args['electric_data_start'] = electric_data_start
+    args['electric_data_end'] = electric_data_end
+    args['label'] = Xcoord
+    args['AllData']=AllData
+   
+
+    return render_to_response("data_table/electric/95.html", args)
 
 
