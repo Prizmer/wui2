@@ -1646,8 +1646,8 @@ def makeSqlQuery_electric_between_activ_reactiv(obj_title, obj_parent_title,data
 
     sQuery="""
     Select c_date,daily_date,obj_name,ab_name,factory_number_manual,t0,t1,ktn,ktt,a, 
-z3.t0-lag(t0) over (order by c_date) as delta_a,
-z3.t1-lag(t1) over (order by c_date) as delta_r
+round ((z3.t0-lag(t0) over (order by c_date))::numeric,3) as delta_a,
+round((z3.t1-lag(t1) over (order by c_date)::numeric,3) as delta_r
 from
 (select c_date::date
 from
