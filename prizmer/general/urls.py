@@ -152,7 +152,7 @@ urlpatterns = patterns('',
     url(r'^94/$', views.water_digital_pulsar_res_status), 
 
     url(r'^95/$', views.electric_period_graphic_activ_reactiv), #график потребления электроэнергии по дням 3 тарифа R+ A+
-    
+    url(r'^96/$', views.water_current_impulse), #текущие по воде-импульсные ПУ
     
    #---- Test urls
     url(r'^addnum/$', views.add_numbers),

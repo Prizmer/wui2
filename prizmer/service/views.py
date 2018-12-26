@@ -2343,10 +2343,9 @@ def get_water_progruz(request):
 def get_heat_progruz(request):
     pass
 
-def get_info(request):
-    args={}
-    
-
+def get_info(request):    
+    args={}   
+    args['pulsar16m_status'] = ''
     return render_to_response("service/service_get_info.html", args)
     
 def load_balance_group(request):
@@ -2574,4 +2573,106 @@ def service_balance_load(request):
     args={}
     
     return render_to_response("service/service_balance_load.html", args)
+
+def add_current_taken_params_pulsar16m(request):    
+    result = "Прогрузка прошла не успешно"
+    args={}
+    dt_pulsar16m=common_sql.get_meters_by_type( u'Пульсар 16M')
+    count16m=0
+    for puls in dt_pulsar16m:  
+    # Текущие
+      #Канал 1
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = Meters.objects.get(guid=puls[0]), guid_params = Params.objects.get(guid = u"e3f1325e-3018-40ba-b94a-ab6d6ac093e9"))
+        add_param.save()
+      #Канал 2
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = Meters.objects.get(guid=puls[0]), guid_params = Params.objects.get(guid = u"5a6b0338-c15d-4224-a04f-a10fc73c5fc7"))
+        add_param.save()
+      #Канал 3
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = Meters.objects.get(guid=puls[0]), guid_params = Params.objects.get(guid = u"48a42afe-d9ac-4180-a733-6dd5f9d9ca80"))
+        add_param.save()
+      #Канал 4
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = Meters.objects.get(guid=puls[0]), guid_params = Params.objects.get(guid = u"01a5419c-c701-4185-95b6-457b8c9ca2d0"))
+        add_param.save()
+      #Канал 5
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = Meters.objects.get(guid=puls[0]), guid_params = Params.objects.get(guid = u"85c4295e-bc6a-46ec-9866-0bf9f77c6904"))
+        add_param.save()
+      #Канал 6
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = Meters.objects.get(guid=puls[0]), guid_params = Params.objects.get(guid = u"68270d0a-5043-4ea2-9b61-4adaa298abad"))
+        add_param.save()
+      #Канал 7
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = Meters.objects.get(guid=puls[0]), guid_params = Params.objects.get(guid = u"cd489c4b-6e74-4c65-bfee-c0fa78a853bf"))
+        add_param.save()
+      #Канал 8
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = Meters.objects.get(guid=puls[0]), guid_params = Params.objects.get(guid = u"f29062a4-ab60-4117-8f85-0cdec634c797"))
+        add_param.save()
+      #Канал 9
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = Meters.objects.get(guid=puls[0]), guid_params = Params.objects.get(guid = u"e8521cd7-2f38-4619-935d-8fe86234dbe7"))
+        add_param.save()
+      #Канал 10
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = Meters.objects.get(guid=puls[0]), guid_params = Params.objects.get(guid = u"1349b747-41ca-4ba8-a690-69c649129f44"))
+        add_param.save()
+      #Канал 11
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = Meters.objects.get(guid=puls[0]), guid_params = Params.objects.get(guid = u"99ab1a30-fde8-4b81-9f9e-2f731516ce1b"))
+        add_param.save()
+      #Канал 12
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = Meters.objects.get(guid=puls[0]), guid_params = Params.objects.get(guid = u"c7f6a397-833d-4020-9d2b-38c19bec272c"))
+        add_param.save()
+      #Канал 13
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = Meters.objects.get(guid=puls[0]), guid_params = Params.objects.get(guid = u"4413bffb-1832-4900-9351-5ac3666dd8b0"))
+        add_param.save()
+      #Канал 14
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = Meters.objects.get(guid=puls[0]), guid_params = Params.objects.get(guid = u"6280490b-123d-4e27-bef9-19fd7dc2cf54"))
+        add_param.save()
+      #Канал 15
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = Meters.objects.get(guid=puls[0]), guid_params = Params.objects.get(guid = u"93891c5a-1c8f-4906-b7f0-961dc8ad3c9f"))
+        add_param.save()
+      #Канал 16
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = Meters.objects.get(guid=puls[0]), guid_params = Params.objects.get(guid = u"22dd3a17-a828-44e0-80d9-db075ba120ae"))
+        add_param.save()
+
+        count16m+=1
+
+    dt_pulsar10m=common_sql.get_meters_by_type( u'Пульсар 10M')
+    count10m=0
+    for puls in dt_pulsar10m:        
+        #Добавляем параметры для Пульсар10 
+    
+    # Текущие
+      #Канал 1
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = Meters.objects.get(guid=puls[0]), guid_params = Params.objects.get(guid = u"32dad392-ca1e-4110-8f2c-a86b02e26fb3"))
+        add_param.save()
+      #Канал 2
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = Meters.objects.get(guid=puls[0]), guid_params = Params.objects.get(guid = u"3e13694b-7cb5-4417-a091-af8a7db34dc7"))
+        add_param.save()
+      #Канал 3
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = Meters.objects.get(guid=puls[0]), guid_params = Params.objects.get(guid = u"1023b35b-3cbf-4519-aac3-3bf1ebae07c1"))
+        add_param.save()
+      #Канал 4
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = Meters.objects.get(guid=puls[0]), guid_params = Params.objects.get(guid = u"eea27ade-44cd-4e66-8298-00a4a6ad915a"))
+        add_param.save()
+      #Канал 5
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = Meters.objects.get(guid=puls[0]), guid_params = Params.objects.get(guid = u"25e09d4d-3a48-4381-ad5d-b783c03c4d35"))
+        add_param.save()
+      #Канал 6
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = Meters.objects.get(guid=puls[0]), guid_params = Params.objects.get(guid = u"069898ea-9d74-4571-b719-e8e6f1513c12"))
+        add_param.save()
+      #Канал 7
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = Meters.objects.get(guid=puls[0]), guid_params = Params.objects.get(guid = u"084aa5f4-75d5-41f6-b0d6-9f2403eacd2c"))
+        add_param.save()
+      #Канал 8
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = Meters.objects.get(guid=puls[0]), guid_params = Params.objects.get(guid = u"786ed8b8-aed1-478c-ae75-99caf1358cf0"))
+        add_param.save()
+      #Канал 9
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = Meters.objects.get(guid=puls[0]), guid_params = Params.objects.get(guid = u"6fc4c39c-9a43-4cb7-a066-c40fd2ca47e5"))
+        add_param.save()
+      #Канал 10
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = Meters.objects.get(guid=puls[0]), guid_params = Params.objects.get(guid = u"8b2aa40a-cd91-4e22-b9d1-596e49e5f839"))
+        add_param.save()
+
+        count10m+=1
+
+    result = 'Добавлены параметры для ' + str(count16m) + ' ПУ Пульсар 16М и ' + str(count10m) + ' ПУ Пульcар 10М'  
+    #print result
+    args['pulsar16m_status'] = result
+    return render_to_response("service/service_get_info.html", args)
 

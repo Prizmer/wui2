@@ -11523,6 +11523,8 @@ def water_by_date(request):
     meters_name         = request.GET['obj_title']
     electric_data_end   = request.GET['electric_data_end']            
     obj_key             = request.GET['obj_key']
+    # is_electric_daily   = request.GET['is_electric_daily']
+    # is_electric_current = request.GET['is_electric_current']
     
     data_table = []
     if request.is_ajax():
@@ -11531,11 +11533,16 @@ def water_by_date(request):
             request.session["obj_title"]           = meters_name         = request.GET['obj_title']
             request.session["electric_data_end"]   = electric_data_end   = request.GET['electric_data_end']
             request.session["obj_key"]             = obj_key             = request.GET['obj_key']
-
+            # request.session["is_electric_daily"]   = is_electric_daily   = request.GET['is_electric_daily']
+            # request.session["is_electric_current"] = is_electric_current = request.GET['is_electric_current']
+    # dc - daily or current
+    dc=u'daily'
+    # if is_electric_current == "1":
+    #     dc=u'current'
     if (bool(is_abonent_level.search(obj_key))): 
-        data_table = common_sql.get_data_table_water_by_date(meters_name, parent_name, electric_data_end, True)
+        data_table = common_sql.get_data_table_water_by_date(meters_name, parent_name, electric_data_end, True,dc)
     elif (bool(is_object_level_2.search(obj_key))):
-        data_table = common_sql.get_data_table_water_by_date(meters_name, parent_name, electric_data_end, False)
+        data_table = common_sql.get_data_table_water_by_date(meters_name, parent_name, electric_data_end, False,dc)
 
     #zamenyem None na N/D vezde
     if len(data_table)>0: 
@@ -14380,3 +14387,38 @@ def electric_period_graphic_activ_reactiv(request):
     return render_to_response("data_table/electric/95.html", args)
 
 
+def water_current_impulse(request):
+    args= {}
+    is_abonent_level = re.compile(r'level2')
+    is_object_level_2 = re.compile(r'level1')
+    
+    parent_name         = request.GET['obj_parent_title']
+    meters_name         = request.GET['obj_title']
+    electric_data_end   = request.GET['electric_data_end']            
+    obj_key             = request.GET['obj_key']    
+    
+    data_table = []
+    if request.is_ajax():
+        if request.method == 'GET':
+            request.session["obj_parent_title"]    = parent_name         = request.GET['obj_parent_title']
+            request.session["obj_title"]           = meters_name         = request.GET['obj_title']
+            request.session["electric_data_end"]   = electric_data_end   = request.GET['electric_data_end']
+            request.session["obj_key"]             = obj_key             = request.GET['obj_key']
+           
+    # dc - daily or current
+    dc=u'current'
+
+    if (bool(is_abonent_level.search(obj_key))): 
+        data_table = common_sql.get_data_table_water_current(meters_name, parent_name, electric_data_end, True,dc)
+    elif (bool(is_object_level_2.search(obj_key))):
+        data_table = common_sql.get_data_table_water_current(meters_name, parent_name, electric_data_end, False,dc)
+
+    #zamenyem None na N/D vezde
+    if len(data_table)>0: 
+        data_table=common_sql.ChangeNull(data_table, electric_data_end)
+    
+    args['data_table'] = data_table
+    args['electric_data_end'] = electric_data_end
+    args['obj_title'] = meters_name 
+      
+    return render_to_response("data_table/water/96.html", args)

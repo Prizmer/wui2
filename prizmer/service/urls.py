@@ -34,4 +34,6 @@ urlpatterns = patterns('',
     url(r'^get_heat_progruz/$', views.replace_electric_meters), # прогрузочная ведомость в эксель
     url(r'^load_balance_group/$', views.load_balance_group), # загрузка портов по элетрике
     url(r'^service_balance_load/$', views.service_balance_load), #загрузка формы для прогурзки балансных групп
+
+    url(r'^add_current_taken_params_pulsar16m/$', views.add_current_taken_params_pulsar16m), #загрузка формы для прогурзки балансных групп
 )

@@ -13578,7 +13578,7 @@ def electric_period_graphic_activ_reactiv_report(request):
     response = HttpResponse(response.read(), content_type="application/vnd.ms-excel")
     #response['Content-Disposition'] = "attachment; filename=profil.xlsx"
     
-    output_name = u'potreblenie_electric_3_zones_'+translate(obj_title)+u'_' + electric_data_start + u' - ' +electric_data_end
+    output_name = u'potreblenie_electric_activ_reactiv_'+translate(obj_title)+u'_' + electric_data_start + u' - ' +electric_data_end
     file_ext = u'xlsx'
     
     response['Content-Disposition'] = 'attachment;filename="%s.%s"' % (output_name.replace('"', '\"'), file_ext)    

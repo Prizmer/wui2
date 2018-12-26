@@ -1645,9 +1645,9 @@ order by z4.c_date""" % (data_start,data_end,params[0],params[1],params[2],param
 def makeSqlQuery_electric_between_activ_reactiv(obj_title, obj_parent_title,data_start, data_end, params):
 
     sQuery="""
-    Select c_date,daily_date,obj_name,ab_name,factory_number_manual,t0,t1,ktn,ktt,a, 
-round ((z3.t0-lag(t0) over (order by c_date))::numeric,3) as delta_a,
-round((z3.t1-lag(t1) over (order by c_date)::numeric,3) as delta_r
+    Select c_date,daily_date,obj_name,ab_name,factory_number_manual,t0,tr0,ktn,ktt,a, 
+round((z3.t0-lag(t0) over (order by c_date))::numeric,3) as delta_a,
+round((z3.tr0-lag(tr0) over (order by c_date))::numeric,3) as delta_r
 from
 (select c_date::date
 from
@@ -1655,12 +1655,12 @@ generate_series('%s'::timestamp without time zone, '%s'::timestamp without time 
 left join 
 (Select  z2.daily_date,
   electric_abons.obj_name, electric_abons.ab_name, 
-    electric_abons.factory_number_manual, z2.t0, z2.t1, z2.ktn, z2.ktt, z2.a 
+    electric_abons.factory_number_manual, z2.t0, z2.tr0, z2.ktn, z2.ktt, z2.a 
 from electric_abons
 LEFT JOIN 
 (SELECT z1.daily_date, z1.name_objects, z1.name_abonents, z1.number_manual, 
 sum(Case when z1.params_name = '%s' then z1.value_daily  end) as t0,
-sum(Case when z1.params_name = '%s' then z1.value_daily  end) as t1,
+sum(Case when z1.params_name = '%s' then z1.value_daily  end) as tr0,
 
 z1.ktn, z1.ktt, z1.a 
                         FROM
@@ -4757,7 +4757,7 @@ def get_data_table_tekon_heat_daily(obj_title,obj_parent_title, electric_data_en
     
     return data_table
 
-def MakeSqlQuery_water_by_date_for_korp(meters_name, parent_name, electric_data_end, my_param):
+def MakeSqlQuery_water_by_date_for_korp(meters_name, parent_name, electric_data_end, my_param, dc):
     sQuery="""
 Select z2.date, obj_name as ab_name, water_abons_report.ab_name as meter_name,  z2.meter_name, z2.name_params, z2.value 
 from water_abons_report
@@ -4800,10 +4800,12 @@ WHERE
   where water_abons_report.name='%s'  
   order by obj_name, z2.name_params
     """%(my_param[0],electric_data_end, meters_name,meters_name)
+    # if dc == u'current':
+    #   sQuery=sQuery.replace('daily', dc)
     #print sQuery
     return sQuery
     
-def MakeSqlQuery_water_by_date_for_abon(meters_name, parent_name, electric_data_end, my_param):
+def MakeSqlQuery_water_by_date_for_abon(meters_name, parent_name, electric_data_end, my_param, dc):
     sQuery="""SELECT 
   daily_values.date,
   obj_name as ab_name,
@@ -4840,20 +4842,123 @@ WHERE
   order by obj_name, names_params.name   
     """%(my_param[0],electric_data_end, parent_name, meters_name)
     #print sQuery
+    # if dc == u'current':
+    #   sQuery=sQuery.replace('daily', dc)
+      #print sQuery
+
+    #print dc
     return sQuery
     
-def get_data_table_water_by_date(meters_name, parent_name, electric_data_end, isAbon):
+def get_data_table_water_by_date(meters_name, parent_name, electric_data_end, isAbon, dc):
     cursor = connection.cursor()
     data_table=[]
     my_param=[u'Импульс',]
     #print "meters_name, parent_name, electric_data_end", meters_name, parent_name, electric_data_end
     if (isAbon):
-        cursor.execute(MakeSqlQuery_water_by_date_for_abon(meters_name, parent_name, electric_data_end, my_param))
+        cursor.execute(MakeSqlQuery_water_by_date_for_abon(meters_name, parent_name, electric_data_end, my_param,dc))
     else:
-        cursor.execute(MakeSqlQuery_water_by_date_for_korp(meters_name, parent_name, electric_data_end, my_param))
+        cursor.execute(MakeSqlQuery_water_by_date_for_korp(meters_name, parent_name, electric_data_end, my_param, dc))
     data_table = cursor.fetchall()
 
     return data_table
+
+def MakeSqlQuery_water_current_for_korp(meters_name, parent_name, electric_data_end, my_param):
+    sQuery="""
+Select z2.date, obj_name as ab_name, water_abons_report.ab_name as meter_name,  z2.meter_name, z2.name_params, z2.value, z2.time
+from water_abons_report
+LEFT JOIN (
+SELECT 
+  current_values.date,
+  obj_name as ab_name,
+  abonents.name as meters,
+  meters.name as meter_name,  
+  names_params.name as name_params,
+  current_values.value,    
+  current_values.time, 
+  abonents.guid,
+  water_abons_report.name,
+  resources.name as res
+FROM 
+  public.meters, 
+  public.taken_params, 
+  public.current_values, 
+  public.abonents, 
+  public.link_abonents_taken_params,
+  water_abons_report,
+  params,
+  names_params,
+  resources
+WHERE 
+  taken_params.guid_meters = meters.guid AND
+  current_values.id_taken_params = taken_params.id AND
+  link_abonents_taken_params.guid_taken_params = taken_params.guid AND
+  link_abonents_taken_params.guid_abonents = abonents.guid AND
+  water_abons_report.ab_name=abonents.name and
+  params.guid=taken_params.guid_params  and
+  names_params.guid=params.guid_names_params and
+  resources.guid=names_params.guid_resources and
+  resources.name='%s' and
+  water_abons_report.name='%s'
+  order by obj_name, names_params.name ) z2
+  on z2.meters=water_abons_report.ab_name
+  where water_abons_report.name='%s'  
+  order by obj_name, z2.name_params
+    """%(my_param[0], meters_name, meters_name)
+    #print sQuery
+    return sQuery
+    
+def MakeSqlQuery_water_current_for_abon(meters_name, parent_name, electric_data_end, my_param):
+    sQuery="""SELECT 
+  current_values.date,
+  obj_name as ab_name,
+  abonents.name as meters,
+  meters.name as meter_name,  
+  names_params.name as name_params,
+  current_values.value, 
+  current_values.time,   
+  abonents.guid,
+  water_abons_report.name,
+  resources.name
+FROM 
+  public.meters, 
+  public.taken_params, 
+  public.current_values, 
+  public.abonents, 
+  public.link_abonents_taken_params,
+  water_abons_report,
+  params,
+  names_params,
+  resources
+WHERE 
+  taken_params.guid_meters = meters.guid AND
+  current_values.id_taken_params = taken_params.id AND
+  link_abonents_taken_params.guid_taken_params = taken_params.guid AND
+  link_abonents_taken_params.guid_abonents = abonents.guid AND
+  water_abons_report.ab_name=abonents.name and
+  params.guid=taken_params.guid_params  and
+  names_params.guid=params.guid_names_params and
+  resources.guid=names_params.guid_resources and
+  resources.name='%s'  and
+  water_abons_report.name='%s'
+  and obj_name='%s'
+  order by obj_name, names_params.name   
+    """%(my_param[0], parent_name, meters_name)
+    #print sQuery
+    return sQuery
+
+def get_data_table_water_current(meters_name, parent_name, electric_data_end, isAbon, dc):
+    cursor = connection.cursor()
+    data_table=[]
+    my_param=[u'Импульс',]
+    #print "meters_name, parent_name, electric_data_end", meters_name, parent_name, electric_data_end
+    if (isAbon):
+        cursor.execute(MakeSqlQuery_water_current_for_abon(meters_name, parent_name, electric_data_end, my_param))
+    else:
+        cursor.execute(MakeSqlQuery_water_current_for_korp(meters_name, parent_name, electric_data_end, my_param))
+    data_table = cursor.fetchall()
+    return data_table
+
+
 def MakeSqlQuery_water_period_for_korp(meters_name, parent_name,electric_data_start, electric_data_end, my_param):
     sQuery="""  
 
@@ -9905,6 +10010,27 @@ WHERE
   (resources.name = '%s' or resources.name = '%s' or resources.name = '%s') 
   and objects.guid = '%s'
     """ %(name_res[0], name_res[1], name_res[2], obj_guid)
+    #print sQuery
+    cursor.execute(sQuery)  
+    data_table = cursor.fetchall()    
+    return data_table
+  
+def get_meters_by_type( type_name):
+    cursor = connection.cursor()
+    data_table=[]   
+    sQuery="""
+SELECT 
+  meters.guid,
+  meters.name
+FROM 
+  public.meters, 
+  public.types_meters
+WHERE 
+  meters.guid_types_meters = types_meters.guid and
+  (types_meters.name ='%s')
+   and meters.name !='A'
+order by meters.name
+    """ %(type_name)
     #print sQuery
     cursor.execute(sQuery)  
     data_table = cursor.fetchall()    
