@@ -1246,17 +1246,17 @@ def tree_data_json_water_v2(request):
             children_data_l1 = []
             for l1 in range(len(filter_level_1)):                            
                 children_data_l2 = []
-                #print '-->', filter_level_1[l1].name                           
+                print '-->', filter_level_1[l1].name                           
                 filter_level_2 = Objects.objects.filter(level=2).filter(guid_parent = filter_level_1[l1].guid).order_by('name')
                 for l2 in range(len(filter_level_2)):
                     abonents_data = []
                     #print 'test1', 'filter_level_1[l1].guid', filter_level_1[l1].guid                     
                     filter_level_abonents = common_sql.get_water_abonents_by_obj_guid(filter_level_2[l2].guid, name_res)                    
-                    #print '--->',filter_level_2[l2].name
+                    print '--->',filter_level_2[l2].name, filter_level_2[l2].guid
                     #print len(filter_level_abonents)
                     for abon in range(len(filter_level_abonents)):
                         meters_data = []
-                        #print filter_level_abonents[abon][1], filter_level_abonents[abon][1]
+                        #print filter_level_abonents[abon][1], filter_level_abonents[abon][2], filter_level_abonents[abon][0]
                         list_of_meters =  common_sql.get_meters_by_abons_guid_and_res(filter_level_abonents[abon][1], filter_level_abonents[abon][2])
                         
                         #list_of_meters = common_sql.get_meters_by_abons_guid_and_res(filter_level_abonents[abon][1], name_res)

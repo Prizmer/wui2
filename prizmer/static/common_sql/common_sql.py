@@ -9918,7 +9918,11 @@ WHERE
 def get_meters_by_abons_guid_and_res(abon_guid, res):
     cursor = connection.cursor()
     data_table=[]  
- 
+    if res == 'ХВС':
+        condition =  "(resources.name = 'ХВС' or resources.name = 'ГВС')"
+    elif res == 'Импульс':
+      condition =  "resources.name = 'Импульс'"
+    else: return data_table
     sQuery="""SELECT   
   abonents.name,
   meters.name,
@@ -9938,13 +9942,13 @@ WHERE
   taken_params.guid_meters = meters.guid AND
   params.guid_names_params = names_params.guid AND
   names_params.guid_resources = resources.guid AND
-  resources.name = '%s' AND
+  %s AND
   abonents.guid = '%s'
     group by 
   abonents.name,
   meters.name,
   meters.factory_number_manual
-  order by abonents.name""" %(res, abon_guid)
+  order by abonents.name""" %(condition, abon_guid)
     #print sQuery
     cursor.execute(sQuery)  
     data_table = cursor.fetchall()    
@@ -9988,10 +9992,12 @@ def get_water_abonents_by_obj_guid(obj_guid, name_res):
     data_table=[]  
  
     sQuery="""
-    SELECT 
+    Select name, guid, res_name
+from
+(SELECT 
   abonents.name, 
-  abonents.guid, 
-  resources.name
+  abonents.guid,
+  (case when resources.name = '%s' or resources.name = '%s' then 'ХВС' else 'Импульс' end) as res_name   
 FROM 
   public.abonents, 
   public.objects, 
@@ -10008,15 +10014,19 @@ WHERE
   params.guid_names_params = names_params.guid AND
   names_params.guid_resources = resources.guid AND
   (resources.name = '%s' or resources.name = '%s' or resources.name = '%s') 
-  and objects.guid = '%s'
-  order by abonents.name
-    """ %(name_res[0], name_res[1], name_res[2], obj_guid)
+  and
+  objects.guid = '%s'
+  group by  abonents.name, 
+  abonents.guid, 
+  resources.name) z1
+  
+  group by name, guid, res_name
+  order by name
+    """ %( name_res[0], name_res[1], name_res[0], name_res[1], name_res[2], obj_guid)
     #print sQuery
     cursor.execute(sQuery)  
     data_table = cursor.fetchall()
-    # print obj_guid
-    # if (obj_guid=='8ddd2788-4a65-4fed-a13c-feb7ed360cd4'):
-    #   print data_table[0][0]
+
     return data_table
   
 def get_meters_by_type( type_name):
