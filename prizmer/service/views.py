@@ -215,7 +215,7 @@ def load_tcp_ip_or_com_ports_from_excel(sPath, sSheet):
     portType=sheet_ranges[u'M1'].value
     while (bool(sheet_ranges[u'G%s'%(row)].value)):
         if sheet_ranges[u'G%s'%(row)].value is not None:
-            writeToLog(u'Обрабатываем строку ' + str(u'G%s '%(row)) + str(sheet_ranges[u'G%s'%(row)].value))
+            #writeToLog(u'Обрабатываем строку ' + str(u'G%s '%(row)) + str(sheet_ranges[u'G%s'%(row)].value))
             ip_adr=sheet_ranges[u'K%s'%(row)].value
             ip_port=sheet_ranges[u'L%s'%(row)].value
             com_port=sheet_ranges[u'M%s'%(row)].value
@@ -411,7 +411,7 @@ def load_electric_objects(request):
     object_status    = ""
     counter_status    = ""
     result="Не загружено"
-    writeToLog('test1')
+    #writeToLog('test1')
     
     if request.is_ajax():
         if request.method == 'GET':
@@ -450,7 +450,7 @@ def LoadElectricMeters(sPath, sSheet):
     met=0
     print 'load dt - ok'
     for i in range(1,len(dtAll)):
-        writeToLog(u'Обрабатываем строку ' + unicode(dtAll[i][3])+' - '+unicode(dtAll[i][6]))
+        #writeToLog(u'Обрабатываем строку ' + unicode(dtAll[i][3])+' - '+unicode(dtAll[i][6]))
         print unicode(dtAll[i][3]), unicode(dtAll[i][6])
         obj_l2=unicode(dtAll[i][2]) #корпус
         abon=unicode(dtAll[i][3]) #квартира
@@ -478,7 +478,7 @@ def LoadElectricMeters(sPath, sSheet):
             if unicode(type_meter) == u'М-200':
                 add_meter = Meters(name = unicode(type_meter) + u' ' + unicode(meter), address = unicode(adr), factory_number_manual = unicode(meter), guid_types_meters = TypesMeters.objects.get(guid = u"6224d20b-1781-4c39-8799-b1446b60774d") )
                 add_meter.save()
-                writeToLog(u'Прибор добавлен' + ' --->   ' + u'М-200')
+                writeToLog(u'Device added' + ' --->   ' + u'М-200')
                 
                 
             elif unicode(type_meter) == u'М-230':
@@ -490,65 +490,65 @@ def LoadElectricMeters(sPath, sSheet):
 #                print add_meter
 #                print 'bryak'
                 add_meter.save()
-                writeToLog(u'Прибор добавлен' + ' --->   ' + u'М-230')
+                writeToLog(u'Device added' + ' --->   ' + u'М-230')
                 
             elif unicode(type_meter) == u'М-230-УМ':
                 add_meter = Meters(name = unicode(type_meter) + u' ' + unicode(meter), address = unicode(adr), password = unicode(NumLic) , factory_number_manual = unicode(meter), guid_types_meters = TypesMeters.objects.get(guid = u"20e4767a-49e5-4f84-890c-25e311339c28") )
                 add_meter.save()
-                writeToLog(u'Прибор добавлен' + ' --->   ' + u'М-230-УМ')
+                writeToLog(u'Device added' + ' --->   ' + u'М-230-УМ')
                 
             elif unicode(type_meter) == u'Эльф 1.08':
                 add_meter = Meters(name = unicode(type_meter) + u' ' + unicode(meter), address = unicode(adr), factory_number_manual = unicode(meter), guid_types_meters = TypesMeters.objects.get(guid = u"1c5a8a80-1c51-4733-8332-4ed8d510a650") )
                 add_meter.save()
-                writeToLog(u'Прибор добавлен' + ' --->   ' + u'Эльф 1.08')
+                writeToLog(u'Device added' + ' --->   ' + u'Эльф 1.08')
             elif unicode(type_meter) == u'СПГ762-1':
                 add_meter = Meters(name = unicode(type_meter) + u' ' + unicode(meter), address = unicode(adr), factory_number_manual = unicode(meter), guid_types_meters = TypesMeters.objects.get(guid = u"c3ec5c22-d184-41c5-b6bf-66fa30215a41") )
                 add_meter.save()
-                writeToLog(u'Прибор добавлен' + ' --->   ' + u'СПГ762-1')
+                writeToLog(u'Device added' + ' --->   ' + u'СПГ762-1')
                 
             elif unicode(type_meter) == u'СПГ762-2':
                 add_meter = Meters(name=unicode(type_meter) + u' ' + unicode(meter), address = unicode(adr), factory_number_manual = unicode(meter), guid_types_meters = TypesMeters.objects.get(guid = u"5eb7dd59-faf9-4ead-8654-4f3de74de2b0") )
                 add_meter.save()
-                writeToLog(u'Прибор добавлен' + ' --->   ' + u'СПГ762-2')
+                writeToLog(u'Device added' + ' --->   ' + u'СПГ762-2')
             elif unicode(type_meter) == u'СПГ762-3':
                 add_meter = Meters(name = unicode(type_meter) + u' ' + unicode(meter), address = unicode(adr), factory_number_manual = unicode(meter), guid_types_meters = TypesMeters.objects.get(guid = u"e4fb7950-a44f-41f0-a6ff-af5e30d9d562") )
                 add_meter.save()
-                writeToLog(u'Прибор добавлен' + ' --->   ' + u'СПГ762-3')
+                writeToLog(u'Device added' + ' --->   ' + u'СПГ762-3')
             elif unicode(type_meter) == u'Sayany':
                 add_meter = Meters(name = unicode(type_meter) + u' ' + unicode(meter), address = unicode(adr), factory_number_manual = unicode(meter), guid_types_meters = TypesMeters.objects.get(guid = u"5429b439-233e-4944-b91b-4b521a10f77b") )
                 add_meter.save()
-                writeToLog(u'Прибор добавлен' + ' --->   ' + u'Sayany')
+                writeToLog(u'Device added' + ' --->   ' + u'Sayany')
             elif unicode(type_meter) == u'Tekon_hvs':
                 add_meter = Meters(name = unicode(type_meter) + u' ' + unicode(meter), address = unicode(adr), factory_number_manual = unicode(meter), password = unicode(Group), guid_types_meters = TypesMeters.objects.get(guid = u"8398e7d6-39f7-45d2-9c45-a1c48e751b61") )
                 add_meter.save()
-                writeToLog(u'Прибор добавлен' + ' --->   ' + u'Tekon_gvs')
+                writeToLog(u'Device added' + ' --->   ' + u'Tekon_gvs')
             elif unicode(type_meter) == u'Tekon_hvs':
                 add_meter = Meters(name = unicode(type_meter) + u' ' + unicode(meter), address = unicode(adr), factory_number_manual = unicode(meter), password = unicode(Group), guid_types_meters = TypesMeters.objects.get(guid = u"64f02a2c-41e1-48b2-bc72-7873ea9b6431") )
                 add_meter.save()
-                writeToLog(u'Прибор добавлен' + ' --->   ' + u'Tekon_gvs')
+                writeToLog(u'Device added' + ' --->   ' + u'Tekon_gvs')
 
             elif unicode(type_meter) == u'Tekon_heat':
                 add_meter = Meters(name = unicode(type_meter) + u' ' + unicode(meter), address = unicode(adr), factory_number_manual = unicode(meter), password = unicode(Group), guid_types_meters = TypesMeters.objects.get(guid = u"b53173f2-2307-4b70-b84c-61b634521e87") )
                 add_meter.save()
-                writeToLog(u'Прибор добавлен' + ' --->   ' + u'Tekon_heat')
+                writeToLog(u'Device added' + ' --->   ' + u'Tekon_heat')
             elif unicode(type_meter) == u'Пульсар ХВС':
                 add_meter = Meters(name = unicode(type_meter) + u' ' + unicode(meter), address = unicode(adr), factory_number_manual = unicode(meter), attr1 = unicode(attr1), guid_types_meters = TypesMeters.objects.get(guid = u"f1789bb7-7fcd-4124-8432-40320559890f") )
                 add_meter.save()
-                writeToLog(u'Прибор добавлен' + ' --->   ' + u'Пульсар ХВС')
+                writeToLog(u'Device added' + ' --->   ' + u'Пульсар ХВС')
             
             elif unicode(type_meter) == u'Пульсар ГВС':
                 add_meter = Meters(name = unicode(type_meter) + u' ' + unicode(meter), address = unicode(adr), factory_number_manual = unicode(meter), attr1 = unicode(attr1), guid_types_meters = TypesMeters.objects.get(guid = u"a1a349ba-e070-4ec9-975d-9f39e61c34da") )
                 add_meter.save()
-                writeToLog(u'Прибор добавлен' + ' --->   ' + u'Пульсар ГВС')
+                writeToLog(u'Device added' + ' --->   ' + u'Пульсар ГВС')
 
             elif unicode(type_meter) == u'Пульсар Теплосчётчик':
                 add_meter = Meters(name = unicode(type_meter) + u' ' + unicode(meter), address = unicode(adr), factory_number_manual = unicode(meter), guid_types_meters = TypesMeters.objects.get(guid = u"82b96b1c-31cf-4753-9d64-d22e2f4d036e") )
                 add_meter.save()
-                writeToLog(u'Прибор добавлен' + ' --->   ' + u'Пульсар Теплосчётчик')
+                writeToLog(u'Device added' + ' --->   ' + u'Пульсар Теплосчётчик')
             elif unicode(type_meter) == u'Карат 307':
                 add_meter = Meters(name = unicode(type_meter) + u' ' + unicode(meter), address = unicode(adr), factory_number_manual = unicode(meter), guid_types_meters = TypesMeters.objects.get(guid = u"84fb7a85-ab91-4e93-9154-76ddee35a316") )
                 add_meter.save()
-                writeToLog(u'Прибор добавлен' + ' --->   ' + u'Карат 307')
+                writeToLog(u'Device added' + ' --->   ' + u'Карат 307')
             else:
                 writeToLog(u'Не найдено совпадение с существующим типом прибора')
                 met-=1
@@ -1976,17 +1976,17 @@ def LoadWaterPulsar(sPath, sSheet):
             if unicode(typePulsar) == u'Пульсар 10M':
                     add_meter = Meters(name = unicode(typePulsar) + u' ' + unicode(numPulsar), address = unicode(numPulsar), factory_number_manual = unicode(numPulsar), guid_types_meters = TypesMeters.objects.get(guid = u"cae994a2-6ab9-4ffa-aac3-f21491a2de0b") )
                     add_meter.save()
-                    print (u'OK Прибор добавлен в базу')
+                    print (u'OK Device added в базу')
                     met+=1
             elif unicode(typePulsar) == u'Пульсар 16M':
                    add_meter = Meters(name = unicode(unicode(typePulsar) + u' ' + unicode(numPulsar)), address = unicode(numPulsar),  factory_number_manual = unicode(numPulsar), guid_types_meters = TypesMeters.objects.get(guid = u"7cd88751-d232-410c-a0ef-6354a79112f1") )
                    add_meter.save()
-                   print (u'OK Прибор добавлен в базу')
+                   print (u'OK Device added в базу')
                    met+=1
             elif unicode(typePulsar) == u'Пульсар 2M':
                    add_meter = Meters(name = unicode(unicode(typePulsar) + u' ' + unicode(numPulsar)), address = unicode(numPulsar),  factory_number_manual = unicode(numPulsar), guid_types_meters = TypesMeters.objects.get(guid = u"6599be9a-1f4d-4a6e-a3d9-fb054b8d44e8") )
                    add_meter.save()
-                   print (u'OK Прибор добавлен в базу')
+                   print (u'OK Device added в базу')
                    met+=1
             else:
                 print(u'Такой Пульсар уже есть')
