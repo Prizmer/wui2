@@ -10009,10 +10009,14 @@ WHERE
   names_params.guid_resources = resources.guid AND
   (resources.name = '%s' or resources.name = '%s' or resources.name = '%s') 
   and objects.guid = '%s'
+  order by abonents.name
     """ %(name_res[0], name_res[1], name_res[2], obj_guid)
     #print sQuery
     cursor.execute(sQuery)  
-    data_table = cursor.fetchall()    
+    data_table = cursor.fetchall()
+    # print obj_guid
+    # if (obj_guid=='8ddd2788-4a65-4fed-a13c-feb7ed360cd4'):
+    #   print data_table[0][0]
     return data_table
   
 def get_meters_by_type( type_name):

@@ -904,7 +904,7 @@ def tree_data_json_v2(request):
     elif (pre_url.find('heat') > -1):   
         tree_data_json=tree_data_json_heat(request)
     elif (pre_url.find('water') > -1):   
-        tree_data_json=tree_data_json_water(request)
+        tree_data_json=tree_data_json_water_v2(request)
     else:
         tree_data_json=tree_data_json_all(request)
     #print tree_data_json
@@ -1231,6 +1231,63 @@ def tree_data_json_heat(request):
         
     return tree_data_json
 
+
+def tree_data_json_water_v2(request):    
+    name_res = ['ХВС', 'ГВС', 'Импульс']
+    #-------------- get data new tree
+    max_level = Objects.objects.aggregate(Max('level'))['level__max'] # Max number of levels
+    if max_level < 3:
+        all_level_0 = Objects.objects.filter(level=0)#.filter(~Q(name = 'Вода'))      
+        tree_data = []       
+        #print u'Объекты уровня 0 \n', all_level_0
+        for l0 in range(len(all_level_0)):
+            #print all_level_0[l0].name
+            filter_level_1 = Objects.objects.filter(level=1).filter(guid_parent = all_level_0[l0].guid)           
+            children_data_l1 = []
+            for l1 in range(len(filter_level_1)):                            
+                children_data_l2 = []
+                #print '-->', filter_level_1[l1].name                           
+                filter_level_2 = Objects.objects.filter(level=2).filter(guid_parent = filter_level_1[l1].guid).order_by('name')
+                for l2 in range(len(filter_level_2)):
+                    abonents_data = []
+                    #print 'test1', 'filter_level_1[l1].guid', filter_level_1[l1].guid                     
+                    filter_level_abonents = common_sql.get_water_abonents_by_obj_guid(filter_level_2[l2].guid, name_res)                    
+                    #print '--->',filter_level_2[l2].name
+                    #print len(filter_level_abonents)
+                    for abon in range(len(filter_level_abonents)):
+                        meters_data = []
+                        #print filter_level_abonents[abon][1], filter_level_abonents[abon][1]
+                        list_of_meters =  common_sql.get_meters_by_abons_guid_and_res(filter_level_abonents[abon][1], filter_level_abonents[abon][2])
+                        
+                        #list_of_meters = common_sql.get_meters_by_abons_guid_and_res(filter_level_abonents[abon][1], name_res)
+                        for meter in range(len(list_of_meters)):
+                            list_of_level_meters = {"key":u"meter-"+str(meter), "title": list_of_meters[meter][2]}
+                            meters_data.append(list_of_level_meters)
+                        list_of_level_abonents = {"key":u"abonent-"+str(l2), "title": filter_level_abonents[abon][0], "children":meters_data}
+                        abonents_data.append(list_of_level_abonents)              
+                    if len(filter_level_abonents) > 0:
+                        list_of_level_2 = {"key":u"level2-"+str(l1), "title": filter_level_2[l2].name, "children":abonents_data}
+                        children_data_l2.append(list_of_level_2)
+
+                list_of_level_1 = {"key":u"level1-"+str(l1), "title": filter_level_1[l1].name, "children":children_data_l2, "folder":bool(children_data_l2)}
+                children_data_l1.append(list_of_level_1)
+            list_of_level_0 = {"key":u"level0-"+str(l0), "title": all_level_0[l0].name, "children":children_data_l1, "folder":bool(children_data_l1)}
+            tree_data.append(list_of_level_0)
+
+        # Получаем информацию по балансным группам
+            balance_groups_list = []
+            dt_balanse_group = common_sql.get_balance_groups_by_res(name_res[2])
+            for x in range (len(dt_balanse_group)):
+                balance_groups_list.append({"key": u"group-"+str(x), "title": dt_balanse_group[x][0]})
+                     
+        #tree_data.append({"key": u"group" + str(1000), "title": u"Группы 80020", "children":groups_80020_list , "folder":bool(True)})
+        tree_data.append({"key": u"group" + str(1000), "title": u"Группы", "children":balance_groups_list , "folder":bool(True)})
+        
+        tree_data_json = json.dumps(tree_data,)
+        
+    return tree_data_json
+
+
 def tree_data_json_water(request):
     #print 'water'
     name_res = ['ХВС', 'ГВС', 'Импульс']
@@ -1246,14 +1303,17 @@ def tree_data_json_water(request):
             children_data_l1 = []
             for l1 in range(len(filter_level_1)):                            
                 children_data_l2 = []                             
-                filter_level_2 = Objects.objects.filter(level=2).filter(guid_parent = filter_level_1[l1].guid)                 
+                filter_level_2 = Objects.objects.filter(level=2).filter(guid_parent = filter_level_1[l1].guid)
+                #print  filter_level_1    
+                #print filter_level_1[l1].name             
                 for l2 in range(len(filter_level_2)):
+                    #print filter_level_2[l2].name
                     abonents_data = []
                     filter_level_abonents = []
                     filter_level_abonents = common_sql.get_water_abonents_by_obj_guid(filter_level_2[l2].guid, name_res)
+                    # if filter_level_1[l1].name == 'Подъезд 1 Вода':
+                    #     print 'filter_level_2[l2].guid: ', filter_level_2[l2].guid, 'filter_level_2[l2].name', filter_level_2[l2].name, 'len(filter_level_abonents)', len(filter_level_abonents)
                     
-                    #print filter_level_2[l2].name, 'abonentov: ', str(len(filter_level_abonents))
-                    #print filter_level_abonents
                     for abon in range(len(filter_level_abonents)):
                         meters_data = []                                                
                         list_of_meters =  common_sql.get_meters_by_abons_guid_and_res(filter_level_abonents[abon][1], filter_level_abonents[abon][2])
@@ -1267,10 +1327,20 @@ def tree_data_json_water(request):
                     if len(filter_level_abonents) > 0:
                         list_of_level_2 = {"key":u"level2-"+str(l1), "title": filter_level_2[l2].name, "children":abonents_data}
                         children_data_l2.append(list_of_level_2)
-                #print filter_level_2
+                    # if filter_level_1[l1].name == 'Подъезд 1 Вода':
+                    #     print 'abons: ', len(list_of_level_2)
+                        #print 'len(filter_level_abonents): ', len (filter_level_abonents)
+                
                 if len(list_of_level_2) > 0:
                     list_of_level_1 = {"key":u"level1-"+str(l1), "title": filter_level_1[l1].name, "children":children_data_l2, "folder":bool(children_data_l2)}
                     children_data_l1.append(list_of_level_1)
+                else:
+                    list_of_level_1 = {"key":u"level1-"+str(l1), "title": filter_level_1[l1].name }
+                    children_data_l1.append(list_of_level_1)
+
+                                    
+                    
+                    #print 'len(list_of_level_1)', len(list_of_level_1)
             list_of_level_0 = {"key":u"level0-"+str(l0), "title": all_level_0[l0].name, "children":children_data_l1, "folder":bool(children_data_l1)}
             tree_data.append(list_of_level_0)
 

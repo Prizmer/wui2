@@ -727,6 +727,7 @@ def add_link_meter_port_from_excel_cfg_electric(sender, instance, created, **kwa
                 pass
             
 def add_link_taken_params(sender, instance, created, **kwargs):
+    #print 'link taken params'
     dtAll=GetTableFromExcel(cfg_excel_name,cfg_sheet_name) #получили из excel все строки до первой пустой строки (проверка по колонке А)
     if (dtAll[1][1] == u'Объект'): #вода
         add_link_abonents_taken_params2(sender, instance, created, **kwargs)
@@ -2574,7 +2575,8 @@ def service_balance_load(request):
     
     return render_to_response("service/service_balance_load.html", args)
 
-def add_current_taken_params_pulsar16m(request):    
+def add_current_taken_params_pulsar16m(request):   
+    # НАДО ДОДЕЛАТЬ LINK_ABONENTS_TAKEN_PARAMS 
     result = "Прогрузка прошла не успешно"
     args={}
     dt_pulsar16m=common_sql.get_meters_by_type( u'Пульсар 16M')
