@@ -8204,12 +8204,12 @@ def report_water_by_date(request):
     #meters_name         = request.session['obj_title']
     electric_data_end   = request.GET.get('electric_data_end')           
     obj_key             = request.GET.get('obj_key')
-    
+    dc=u'daily'
     data_table = []
     if (bool(is_abonent_level.search(obj_key))): 
-        data_table = common_sql.get_data_table_water_by_date(meters_name, parent_name, electric_data_end, True)
+        data_table = common_sql.get_data_table_water_by_date(meters_name, parent_name, electric_data_end, True, dc)
     elif (bool(is_object_level_2.search(obj_key))):
-        data_table = common_sql.get_data_table_water_by_date(meters_name, parent_name, electric_data_end, False)
+        data_table = common_sql.get_data_table_water_by_date(meters_name, parent_name, electric_data_end, False, dc)
 
     #zamenyem None na N/D vezde
     if len(data_table)>0: 

@@ -1246,13 +1246,13 @@ def tree_data_json_water_v2(request):
             children_data_l1 = []
             for l1 in range(len(filter_level_1)):                            
                 children_data_l2 = []
-                print '-->', filter_level_1[l1].name                           
+                #print '-->', filter_level_1[l1].name                           
                 filter_level_2 = Objects.objects.filter(level=2).filter(guid_parent = filter_level_1[l1].guid).order_by('name')
                 for l2 in range(len(filter_level_2)):
                     abonents_data = []
                     #print 'test1', 'filter_level_1[l1].guid', filter_level_1[l1].guid                     
                     filter_level_abonents = common_sql.get_water_abonents_by_obj_guid(filter_level_2[l2].guid, name_res)                    
-                    print '--->',filter_level_2[l2].name, filter_level_2[l2].guid
+                    #print '--->',filter_level_2[l2].name, filter_level_2[l2].guid
                     #print len(filter_level_abonents)
                     for abon in range(len(filter_level_abonents)):
                         meters_data = []
@@ -13044,24 +13044,23 @@ def pulsar_water_period_2(request):
             request.session["electric_data_start"]   = electric_data_start   = request.GET['electric_data_start']              
     if (bool(is_abonent_level.search(obj_key))):
         data_table = common_sql.get_data_table_pulsar_water_for_period(obj_parent_title, obj_title, electric_data_start, electric_data_end, True)
-        data_table_graphic = common_sql.get_data_table_water_pulsar1_between_dates(obj_title, obj_parent_title,electric_data_start, electric_data_end)
+        data_table_graphic = common_sql.get_data_table_water_pulsar1_between_dates(obj_title, obj_parent_title,electric_data_start, electric_data_end, True)
                       
     elif (bool(is_object_level_2.search(obj_key))):
         data_table = common_sql.get_data_table_pulsar_water_for_period(obj_parent_title, obj_title, electric_data_start,electric_data_end, False)
+        data_table_graphic = common_sql.get_data_table_water_pulsar1_between_dates(obj_title, obj_parent_title,electric_data_start, electric_data_end, False)
               
     if len(data_table)>0: 
         data_table=common_sql.ChangeNull(data_table, None)
     
     AllData=[]
     Xcoord=[]
-    
-    if (len( data_table_graphic) >0) & (bool(is_abonent_level.search(obj_key))):
+    #print data_table_graphic
+    if (len( data_table_graphic) >0):
         Xcoord=makeOneCoords(data_table_graphic,0) #label 
-    
-        AllData=[{str("data"):makeOneCoords(data_table_graphic,12), str("label"):str("potreblenie T0"), str("backgroundColor"): get_rgba_color(5)},
-             {str("data"):makeOneCoords(data_table_graphic,13), str("label"):str("potreblenie T1"),  str("backgroundColor"): get_rgba_color(1)},
-             {str("data"):makeOneCoords(data_table_graphic,14), str("label"):str("potreblenie T2"),  str("backgroundColor"): get_rgba_color(10)},
-             {str("data"):makeOneCoords(data_table_graphic,15), str("label"):str("potreblenie T3"),  str("backgroundColor"): get_rgba_color(8)}]
+        
+        AllData=[{str("data"):makeOneCoords(data_table_graphic,5), str("label"):str("GVS"), str("backgroundColor"): get_rgba_color(1)},
+             {str("data"):makeOneCoords(data_table_graphic,6), str("label"):str("HVS"),  str("backgroundColor"): get_rgba_color(5)}]
                  
     
     args['data_table'] = data_table
@@ -13077,7 +13076,7 @@ def pulsar_water_period_2(request):
     args['label'] = Xcoord
     args['AllData']=AllData
 
-    return render_to_response("data_table/water/57.html", args)
+    return render_to_response("data_table/water/73.html", args)
     
 def comment(request):
     args = {}
