@@ -10026,9 +10026,15 @@ def get_meters_by_abons_guid_and_res(abon_guid, res):
     data_table=[]  
     if res == 'ХВС':
         condition =  "(resources.name = 'ХВС' or resources.name = 'ГВС')"
-    elif res == 'Импульс':
-      condition =  "resources.name = 'Импульс'"
-    else: return data_table
+    
+    else: condition =  "(resources.name = '%s')"%res
+
+    # if res == 'ХВС':
+    #     condition =  "(resources.name = 'ХВС' or resources.name = 'ГВС')"
+    # elif res == 'Импульс':
+    #   condition =  "resources.name = 'Импульс'"
+    # else: return data_table
+
     sQuery="""SELECT   
   abonents.name,
   meters.name,
