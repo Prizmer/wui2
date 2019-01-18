@@ -1740,10 +1740,10 @@ generate_series('%s'::timestamp without time zone, '%s'::timestamp without time 
 left join
 (
 SELECT z1.daily_date, z1.name_objects as obj_name,  
-sum(Case when z1.params_name = '%s' then z1.value_daily*z1.ktn*z1.ktt*z1.a  end) as t0,
-sum(Case when z1.params_name = '%s' then z1.value_daily*z1.ktn*z1.ktt*z1.a  end) as t1,
-sum(Case when z1.params_name = '%s' then z1.value_daily*z1.ktn*z1.ktt*z1.a  end) as t2,
-sum(Case when z1.params_name = '%s' then z1.value_daily*z1.ktn*z1.ktt*z1.a  end) as t3
+sum(Case when z1.params_name = '%s' then z1.value_daily*z1.ktn*z1.ktt  end) as t0,
+sum(Case when z1.params_name = '%s' then z1.value_daily*z1.ktn*z1.ktt  end) as t1,
+sum(Case when z1.params_name = '%s' then z1.value_daily*z1.ktn*z1.ktt  end) as t2,
+sum(Case when z1.params_name = '%s' then z1.value_daily*z1.ktn*z1.ktt  end) as t3
 
                         FROM
                         (SELECT daily_values.date as daily_date,
@@ -1788,6 +1788,7 @@ on z4.c_date=z2.daily_date
 ) z3
 order by c_date
     """%(data_start, data_end,params[0],params[1],params[2],params[3],params[4],obj_title,data_start, data_end )
+    #print sQuery
     return sQuery
 def get_data_table_electric_between_for_obj(obj_title, obj_parent_title,data_start, data_end):
     data_table = []
