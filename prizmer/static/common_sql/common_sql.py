@@ -1740,10 +1740,10 @@ generate_series('%s'::timestamp without time zone, '%s'::timestamp without time 
 left join
 (
 SELECT z1.daily_date, z1.name_objects as obj_name,  
-sum(Case when z1.params_name = '%s' then z1.value_daily*z1.ktn*z1.ktt  end) as t0,
-sum(Case when z1.params_name = '%s' then z1.value_daily*z1.ktn*z1.ktt  end) as t1,
-sum(Case when z1.params_name = '%s' then z1.value_daily*z1.ktn*z1.ktt  end) as t2,
-sum(Case when z1.params_name = '%s' then z1.value_daily*z1.ktn*z1.ktt  end) as t3
+sum(Case when z1.params_name = '%s' then z1.value_daily  end) as t0,
+sum(Case when z1.params_name = '%s' then z1.value_daily  end) as t1,
+sum(Case when z1.params_name = '%s' then z1.value_daily  end) as t2,
+sum(Case when z1.params_name = '%s' then z1.value_daily  end) as t3
 
                         FROM
                         (SELECT daily_values.date as daily_date,
@@ -2097,7 +2097,8 @@ order by z3.ab_name ASC""" % (params[0],params[1],params[2],params[3], params[4]
                             params[0],params[1],params[2],params[3], params[4], params[5],obj_title,  date_start, res,obj_title)
     if dm=='monthly' or dm=='daily' or dm=='current':
         sQuery=sQuery.replace('daily',dm)
-    #print sQuery
+    #
+    # print sQuery
     return sQuery
 
 def get_data_table_electric_parametr_by_period_v2(isAbon,obj_title, obj_parent_title, electric_data_start, electric_data_end, params, res, dm):
