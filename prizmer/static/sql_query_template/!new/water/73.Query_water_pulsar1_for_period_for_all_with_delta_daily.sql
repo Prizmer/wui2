@@ -1,4 +1,4 @@
-﻿Select z3.c_date,z3.obj_name, z3.gvs,z3.hvs,
+﻿Select z3.c_date,z3.obj_name,z3.obj_name, z3.gvs,z3.hvs,
 round((z3.gvs-lag(gvs)over (order by c_date))::numeric,3)  as delta_gvs,
 round((z3.hvs-lag(hvs) over (order by c_date))::numeric,3) as delta_hvs
 from
