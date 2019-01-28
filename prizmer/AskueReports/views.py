@@ -13583,3 +13583,118 @@ def electric_period_graphic_activ_reactiv_report(request):
     
     response['Content-Disposition'] = 'attachment;filename="%s.%s"' % (output_name.replace('"', '\"'), file_ext)    
     return response
+
+def electric_restored_activ_reactiv_daily_report(request):
+    
+    response = StringIO.StringIO()
+    wb = Workbook()
+    ws = wb.active
+    obj_title           = request.session['obj_title']
+    electric_data_end   = request.session['electric_data_end']
+    #electric_data_start   = request.session['electric_data_start']
+# Шапка отчета    
+    ws.merge_cells('A2:H2')
+    ws['A2'] = obj_title+'. Значения профиля показаний восстановленное посредством получасовых срезов без учёта Кт на ' + electric_data_end
+    
+    ws.merge_cells('A4:A5')
+    ws['A4'] = 'Дата'
+    ws['A4'].style = ali_grey
+    ws['A5'].style = ali_grey
+    
+    ws.merge_cells('B4:B5')
+    ws['B4'] = 'Заводской номер'
+    ws['B4'].style = ali_grey
+    ws['B5'].style = ali_grey
+    
+    ws.merge_cells('C4:C5')
+    ws['C4'] = 'T0 A+, кВт*ч'
+    ws['C4'].style = ali_grey
+    ws['C5'].style = ali_grey
+
+    ws.merge_cells('D4:D5')
+    ws['D4'] = 'T0 R+, кВт*ч'
+    ws['D4'].style = ali_grey
+    ws['D5'].style = ali_grey
+    
+    ws.row_dimensions[5].height = 41
+    ws.column_dimensions['A'].width = 35
+    ws.column_dimensions['B'].width = 17    
+# Шапка отчета конец
+    
+#Запрашиваем данные для отчета
+    data_table=[]
+    is_abonent_level = re.compile(r'abonent')
+    is_object_level_2 = re.compile(r'level2')
+    obj_title           = request.GET['obj_title']
+    obj_key             = request.GET['obj_key']
+    obj_parent_title    = request.GET['obj_parent_title']            
+    electric_data_end   = request.GET['electric_data_end']
+        
+    d= datetime.datetime.strptime(electric_data_end, "%d.%m.%Y")
+    electric_data_start=datetime.date(d.year, d.month, 1)
+    if (bool(is_abonent_level.search(obj_key))):   #             
+        params=[u'T0 A+',u'T0 R+', u'Электричество']
+        dt = common_sql.get_data_table_electric_between(obj_title, obj_parent_title,electric_data_start, electric_data_end, params)
+        #print dt
+        i=len(dt) - 1
+        #print dt[i][5], dt[i][6]
+        if not(dt[i][5] == u'Н/Д') and not(dt[i][6] == u'Н/Д'):
+            data_table=[dt[i]] # на дату есть срез, простов выводим daily_value 
+        else:
+            for row in reversed(dt):
+                #print row
+                #print row[5],row[6]
+                if (row[5] == u'Н/Д') or (row[6] == u'Н/Д'): #activ-5, reactiv-6                        
+                    continue
+                else: #начинаем суммировать получасовки
+                    date = row[0]
+                    activ = row[5]
+                    reactiv = row[6]
+                    date2 = d - datetime.timedelta(days=1)
+                    data_table = common_sql.get_restored_activ_reactiv(obj_title, obj_parent_title, date, activ,reactiv,date2,electric_data_end)
+                    break
+
+    else:
+        pass
+            
+# Заполняем отчет значениями
+    for row in range(6, len(data_table)+6):
+        try:
+            ws.cell('A%s'%(row)).value = '%s' % (data_table[row-6][0])  # Наименование канала
+            ws.cell('A%s'%(row)).style = ali_white
+        except:
+            ws.cell('A%s'%(row)).style = ali_white
+            next
+        
+        try:
+            ws.cell('B%s'%(row)).value = '%s' % (data_table[row-6][4])  # заводской номер
+            ws.cell('B%s'%(row)).style = ali_white
+        except:
+            ws.cell('B%s'%(row)).style = ali_white
+            next
+            
+        try:
+            ws.cell('C%s'%(row)).value = '%s' % (data_table[row-6][5])  # дата
+            ws.cell('C%s'%(row)).style = ali_white
+        except:
+            ws.cell('C%s'%(row)).style = ali_white
+            next
+
+        try:
+            ws.cell('D%s'%(row)).value = '%s' % (data_table[row-6][6])  # дата
+            ws.cell('D%s'%(row)).style = ali_white
+        except:
+            ws.cell('D%s'%(row)).style = ali_white
+            next
+
+# Сохраняем в ecxel    
+    wb.save(response)
+    response.seek(0)
+    response = HttpResponse(response.read(), content_type="application/vnd.ms-excel")
+    #response['Content-Disposition'] = "attachment; filename=profil.xlsx"
+    
+    output_name = u'vosstanovlen_activ_reactiv_'+u' - ' +electric_data_end
+    file_ext = u'xlsx'
+    
+    response['Content-Disposition'] = 'attachment;filename="%s.%s"' % (output_name.replace('"', '\"'), file_ext)    
+    return response

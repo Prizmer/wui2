@@ -14491,3 +14491,62 @@ def water_current_impulse(request):
     args['obj_title'] = meters_name 
       
     return render_to_response("data_table/water/96.html", args)
+
+def electric_restored_activ_reactiv_daily(request):
+    args = {}
+    is_abonent_level = re.compile(r'abonent')
+    is_object_level_2 = re.compile(r'level2')
+    data_table = []
+    obj_title = u'Не выбран'
+    obj_key = u'Не выбран'
+    obj_parent_title = u'Не выбран'
+    is_electric_monthly = u''
+    is_electric_daily = u''
+    is_electric_current = u''
+    is_electric_delta = u''    
+    electric_data_end = u''
+
+    if request.is_ajax():        
+        if request.method == 'GET':
+            request.session["obj_title"]           = obj_title           = request.GET['obj_title']
+            request.session["obj_key"]             = obj_key             = request.GET['obj_key']
+            request.session["obj_parent_title"]    = obj_parent_title    = request.GET['obj_parent_title']
+            request.session["is_electric_monthly"] = is_electric_monthly = request.GET['is_electric_monthly']
+            request.session["is_electric_daily"]   = is_electric_daily   = request.GET['is_electric_daily']
+            request.session["is_electric_current"] = is_electric_current = request.GET['is_electric_current']
+            request.session["is_electric_delta"]   = is_electric_delta   = request.GET['is_electric_delta']            
+            request.session["electric_data_end"]   = electric_data_end   = request.GET['electric_data_end']
+        
+        d= datetime.datetime.strptime(electric_data_end, "%d.%m.%Y")
+        electric_data_start=datetime.date(d.year, d.month, 1)
+        if (bool(is_abonent_level.search(obj_key))):   #             
+            params=[u'T0 A+',u'T0 R+', u'Электричество']
+            dt = common_sql.get_data_table_electric_between(obj_title, obj_parent_title,electric_data_start, electric_data_end, params)
+            #print dt
+            i=len(dt) - 1
+            #print dt[i][5], dt[i][6]
+            if not(dt[i][5] == u'Н/Д') and not(dt[i][6] == u'Н/Д'):
+                data_table=[dt[i]] # на дату есть срез, простов выводим daily_value 
+                #print data_table
+            else:
+                for row in reversed(dt):
+                    #print row
+                    #print row[5],row[6]
+                    if (row[5] == u'Н/Д') or (row[6] == u'Н/Д'): #activ-5, reactiv-6                        
+                        continue
+                    else: #начинаем суммировать получасовки
+                        date = row[0]
+                        activ = row[5]
+                        reactiv = row[6]
+                        date2 = d - datetime.timedelta(days=1)
+                        data_table = common_sql.get_restored_activ_reactiv(obj_title, obj_parent_title, date, activ,reactiv,date2,electric_data_end)
+                        break
+
+        else:
+            pass
+    
+    args['data_table'] = data_table
+    args['electric_data_end'] = electric_data_end
+    args['obj_title'] = obj_title 
+      
+    return render_to_response("data_table/electric/98.html", args)

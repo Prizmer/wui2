@@ -123,6 +123,8 @@ urlpatterns = patterns('',
     url(r'^94/$', views.report_water_digital_pulsar_res_status),
 
     url(r'^95/$', views.electric_period_graphic_activ_reactiv_report), #отчёт профиль r+ a+ за период с дельтами
+
+    url(r'^98/$', views.electric_restored_activ_reactiv_daily_report), #отчёт профиль r+ a+ на дату восстанволеный через получасовки
     
     #---- Test urls
 

@@ -10163,3 +10163,54 @@ order by meters.name
     cursor.execute(sQuery)  
     data_table = cursor.fetchall()    
     return data_table
+
+def get_restored_activ_reactiv(obj_title, obj_parent_title, date_st,activ,reactiv,date2, date_end):
+    #дата с которой есть данные - показания аткивнки - показания реактивки - дата до которой нужны показания
+    cursor = connection.cursor()
+    data_table=[]   
+    sQuery="""
+Select '%s','%s', z.obj_name, z.ab_name, z.factory_number_manual,
+%s+sum(z.sum_30_t0) as sum_t0,
+%s+sum(z.sum_30_tr0) as sum_tr0
+from 
+
+(SELECT 
+  objects.name as obj_name, 
+  abonents.name as ab_name, 
+  various_values.date, 
+ meters.factory_number_manual,
+  sum(Case when names_params.name = 'A+ Профиль' then various_values.value  end) as sum_30_t0,
+  sum(Case when names_params.name = 'R+ Профиль' then various_values.value end) as sum_30_tr0
+FROM 
+  public.abonents, 
+  public.objects, 
+  public.link_abonents_taken_params, 
+  public.taken_params, 
+  public.various_values, 
+  public.params,
+  public.names_params,
+  public.meters
+WHERE 
+  abonents.guid_objects = objects.guid AND
+  link_abonents_taken_params.guid_taken_params = taken_params.guid AND
+  link_abonents_taken_params.guid_abonents = abonents.guid AND
+  taken_params.guid_params = params.guid AND
+  various_values.id_taken_params = taken_params.id AND
+  names_params.guid = params.guid_names_params AND 
+   taken_params.guid_meters = meters.guid AND 
+  various_values.date between '%s' and '%s' and
+                        abonents.name = '%s' AND 
+                        objects.name = '%s' 
+  
+  group by objects.name, 
+  abonents.name,  
+  various_values.date,
+  factory_number_manual
+  order by date
+  ) z
+group by z.obj_name, z.ab_name, z.factory_number_manual
+    """ %(date_end,date_end, activ, reactiv, date_st, date2, obj_title, obj_parent_title)
+    #print sQuery
+    cursor.execute(sQuery)  
+    data_table = cursor.fetchall()    
+    return data_table
