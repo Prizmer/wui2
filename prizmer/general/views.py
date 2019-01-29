@@ -13801,8 +13801,6 @@ def electric_res_status(request):
             dt_no_data_meters=common_sql.ChangeNull(dt_no_data_meters, None)
             dtAll_no_data_meters.append(dt_no_data_meters)
       
-   
-    
     
     args['dtAll_statistic'] = dtAll_statistic
     args['dtAll_no_data_meters'] = dtAll_no_data_meters
@@ -14510,11 +14508,7 @@ def electric_restored_activ_reactiv_daily(request):
         if request.method == 'GET':
             request.session["obj_title"]           = obj_title           = request.GET['obj_title']
             request.session["obj_key"]             = obj_key             = request.GET['obj_key']
-            request.session["obj_parent_title"]    = obj_parent_title    = request.GET['obj_parent_title']
-            request.session["is_electric_monthly"] = is_electric_monthly = request.GET['is_electric_monthly']
-            request.session["is_electric_daily"]   = is_electric_daily   = request.GET['is_electric_daily']
-            request.session["is_electric_current"] = is_electric_current = request.GET['is_electric_current']
-            request.session["is_electric_delta"]   = is_electric_delta   = request.GET['is_electric_delta']            
+            request.session["obj_parent_title"]    = obj_parent_title    = request.GET['obj_parent_title']            
             request.session["electric_data_end"]   = electric_data_end   = request.GET['electric_data_end']
         
         d= datetime.datetime.strptime(electric_data_end, "%d.%m.%Y")
@@ -14524,10 +14518,10 @@ def electric_restored_activ_reactiv_daily(request):
             dt = common_sql.get_data_table_electric_between(obj_title, obj_parent_title,electric_data_start, electric_data_end, params)
             #print dt
             i=len(dt) - 1
-            #print dt[i][5], dt[i][6]
+
             if not(dt[i][5] == u'Н/Д') and not(dt[i][6] == u'Н/Д'):
-                data_table=[dt[i]] # на дату есть срез, простов выводим daily_value 
-                #print data_table
+                data_table=[dt[i]] # на дату есть срез, просто выводим daily_value        
+            
             else:
                 for row in reversed(dt):
                     #print row
@@ -14541,10 +14535,22 @@ def electric_restored_activ_reactiv_daily(request):
                         date2 = d - datetime.timedelta(days=1)
                         data_table = common_sql.get_restored_activ_reactiv(obj_title, obj_parent_title, date, activ,reactiv,date2,electric_data_end)
                         break
+                #если на 1 число нет суточных, то берем месячные
+                if ((dt[0][5] == u'Н/Д') or (dt[0][6] == u'Н/Д')) and len(data_table)<1:
+                    #print 'monthly'
+                    dt_monthly = common_sql.get_dt_monthly_activ_reactiv(obj_title, obj_parent_title, electric_data_end)
+                    if len(dt_monthly)>0:
+                        activ = dt_monthly[4]
+                        reactiv = dt_monthly[5]
+                        date2 = d - datetime.timedelta(days=1)
+                        data_table = common_sql.get_restored_activ_reactiv(obj_title, obj_parent_title, date, activ,reactiv,date2,electric_data_end)
 
+            if(datetime.datetime.now().date() < d.date()):
+                data_table = []
         else:
             pass
     
+
     args['data_table'] = data_table
     args['electric_data_end'] = electric_data_end
     args['obj_title'] = obj_title 

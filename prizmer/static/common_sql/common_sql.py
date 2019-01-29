@@ -8897,7 +8897,7 @@ on electric_abons.ab_name=z2.name_abonents
 where  electric_abons.obj_name= '%s' 
 and z2.t0 is null
    
-ORDER BY electric_abons.ab_name ASC """%(my_params[0],my_params[1],my_params[2],my_params[3],my_params[4],obj_title,electric_data_end,obj_title)
+ORDER BY electric_abons.obj_name, electric_abons.ab_name ASC """%(my_params[0],my_params[1],my_params[2],my_params[3],my_params[4],obj_title,electric_data_end,obj_title)
     return sQuery
     
 def get_electric_no_data(obj_title, electric_data_end):
@@ -9047,7 +9047,7 @@ left join
 on z2.number_manual=heat_abons.factory_number_manual
 where heat_abons.obj_name='%s'
 and (z2.energy is null or z2.volume is null)
-order by heat_abons.ab_name
+order by heat_abons.obj_name, heat_abons.ab_name
     """%(my_params[0],my_params[1],my_params[2],my_params[3], obj_title,my_params[4],electric_data_end, obj_title)
     return sQuery    
 def get_heat_no_data(obj_title,  electric_data_end):
@@ -9965,7 +9965,7 @@ left join
 on z2.number_manual=water_pulsar_abons.factory_number_manual
 where water_pulsar_abons.obj_name='%s'
   and value_daily is null
-  order by obj_name
+  order by obj_name, water_pulsar_abons.ab_name
   """%(obj, my_params[0],my_params[1], electric_data_end, obj)
   #print sQuery
   return sQuery
@@ -10210,6 +10210,60 @@ WHERE
   ) z
 group by z.obj_name, z.ab_name, z.factory_number_manual
     """ %(date_end,date_end, activ, reactiv, date_st, date2, obj_title, obj_parent_title)
+    #print sQuery
+    cursor.execute(sQuery)  
+    data_table = cursor.fetchall()    
+    return data_table
+
+def get_dt_monthly_activ_reactiv(obj_title, obj_parent_title, date_end):
+    #дата с которой есть данные - показания аткивнки - показания реактивки - дата до которой нужны показания
+    cursor = connection.cursor()
+    data_table=[]   
+    sQuery="""
+SELECT z1.monthly_date, z1.name_objects, z1.name_abonents, z1.number_manual, 
+sum(Case when z1.params_name = 'T0 A+' then z1.value_monthly  end) as t0,
+sum(Case when z1.params_name = 'T0 R+' then z1.value_monthly  end) as tr0,
+
+z1.ktn, z1.ktt, z1.a 
+                        FROM
+                        (SELECT monthly_values.date as monthly_date, 
+                        objects.name as name_objects, 
+                        abonents.name as name_abonents, 
+                        meters.factory_number_manual as number_manual, 
+                        monthly_values.value as value_monthly, 
+                        names_params.name as params_name,
+                        link_abonents_taken_params.coefficient as ktt,
+                         link_abonents_taken_params.coefficient_2 as ktn,
+                          link_abonents_taken_params.coefficient_3 as a
+                        FROM
+                         public.monthly_values, 
+                         public.link_abonents_taken_params, 
+                         public.taken_params, 
+                         public.abonents, 
+                         public.objects, 
+                         public.names_params, 
+                         public.params, 
+                         public.meters,
+                         public.types_meters,
+                         public.resources			
+                        WHERE
+                        taken_params.guid = link_abonents_taken_params.guid_taken_params AND 
+                        taken_params.id = monthly_values.id_taken_params AND 
+                        taken_params.guid_params = params.guid AND 
+                        taken_params.guid_meters = meters.guid AND 
+                        abonents.guid = link_abonents_taken_params.guid_abonents AND 
+                        objects.guid = abonents.guid_objects AND 
+                        names_params.guid = params.guid_names_params AND
+                        params.guid_names_params=names_params.guid and 
+                        types_meters.guid=meters.guid_types_meters and
+                        names_params.guid_resources=resources.guid and
+                        resources.name='Электричество' and
+                        abonents.name = '%s' AND 
+                        objects.name = '%s' AND                      
+                        monthly_values.date = '%s'
+                        ) z1                      
+group by z1.name_objects, z1.monthly_date, z1.name_objects, z1.name_abonents, z1.number_manual, z1.ktn, z1.ktt, z1.a
+    """ %( obj_title, obj_parent_title, date_end)
     #print sQuery
     cursor.execute(sQuery)  
     data_table = cursor.fetchall()    
