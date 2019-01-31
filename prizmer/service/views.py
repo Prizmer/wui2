@@ -1589,10 +1589,11 @@ else:
 #_____________________________________________________________________________________________________________
 #from general.models import  Meters, TypesMeters, LinkAbonentsTakenParams, TakenParams, Params
 def rename_taken_params(sender, instance, **kwargs):
+    #print 'rename taken params'
     try:   
         #переименовываем taken_params
         guid_meter=instance.guid
-        #print guid_meter
+        #print instance.values()
         new_val=instance.name
         old_val= Meters.objects.get(guid=guid_meter).name    
         common_sql.update_table_with_replace('taken_params', 'name', 'guid_meters', guid_meter, old_val, new_val)
@@ -2063,29 +2064,107 @@ def load_water_port(request):
     args["tcp_ip_status"]=tcp_ip_status
 
     return render_to_response("service/service_water.html", args)
-  
-def change_electric_meters(request):
+
+def change_meters_v2(request):
     args={}
 
-    old_meter=u''
-    new_meter=u''
+    old_meter=u' '
+    new_meter=u' '
     change_meter_status=u"Функция в разработке"
     if request.is_ajax():
-        if request.method == 'GET':
-            
+        if request.method == 'GET':            
             request.session["old_meter"]    = old_meter    = request.GET.get('old_meter')
             request.session["new_meter"]    = new_meter   = request.GET.get('new_meter')
             if (not old_meter or old_meter==None or new_meter==None or not new_meter):
                 change_meter_status=u"Заполните обе ячейки"
             else:
-                change_meter_status=ChangeMeters(old_meter, new_meter)
-
+                change_meter_status=ChangeMeters_v2(old_meter, new_meter)
                 
-    #change_meter_status=unicode(old_meter)+unicode(new_meter)
+    #print 'old_meter, new_meter', old_meter, new_meter
+    if old_meter is None or new_meter is None or change_meter_status.find(u'Счётчик заменён')>-1:
+        old_meter=u' '
+        new_meter=u' '
     args["change_meter_status"]=change_meter_status
+    args["old_meter"] = old_meter
+    args["new_meter"] = new_meter
 
     return render_to_response("service/service_change_electric.html", args)
+
+# def change_meters(request):
+#     args={}
+#     old_meter=u''
+#     new_meter=u''
+#     change_meter_status=u"Заполните обе ячейки"
+#     if request.is_ajax():
+#         if request.method == 'GET':
+            
+#             request.session["old_meter"]    = old_meter    = request.GET.get('old_meter')
+#             request.session["new_meter"]    = new_meter   = request.GET.get('new_meter')
+#             if (not old_meter or old_meter==None or new_meter==None or not new_meter):
+#                 change_meter_status=u"Заполните обе ячейки"
+#             else:
+#                 change_meter_status=ChangeMeters(old_meter, new_meter)
+#     #print 'old_meter, new_meter', old_meter, new_meter
+#     args["change_meter_status"]=change_meter_status
+#     args["old_meter"] = old_meter
+#     args["new_meter"] = new_meter
+#     return render_to_response("service/service_change_electric.html", args)
   
+def isInt(s):
+    try:
+        int(s)
+        return True
+    except ValueError:
+        return False
+
+def rename_taken_params_by_guid(guid_meter, old_met, new_met):
+    #print 'rename taken params'
+    try:  
+        common_sql.update_table_with_replace('taken_params', 'name', 'guid_meters', guid_meter, old_met, new_met)
+    except Meters.DoesNotExist:
+        return False
+
+    try:
+    #переименовываем link_abonents_taken_params
+        for row in TakenParams.objects.filter(guid_meters=guid_meter):
+            guid_taken_params= row.guid
+            common_sql.update_table_with_replace('link_abonents_taken_params', 'name', 'guid_taken_params', guid_taken_params, old_met, new_met)
+    except TakenParams.DoesNotExist:
+        return False
+
+def ChangeMeters_v2(old_meter, new_meter):
+    result=u""
+    # Проверяем существуют ли такие счётчики, в норме первый должен быть, а второй нет
+    isExistOldMeter=SimpleCheckIfExist('meters','factory_number_manual',old_meter,"","","")
+    isExistNewMeter=SimpleCheckIfExist('meters','factory_number_manual',new_meter,"","","")
+    if not isExistOldMeter:
+        return u"Замена невозможна. Номера старого счётчика нет в базе"
+    if isExistNewMeter:
+        return u"Замена невозможна. Новый счётчик уже существует в базе"
+    
+    if not(isInt(old_meter)) or not(isInt(new_meter)):
+        return u'Замена невозможна. Номера счётчиков должны быть числами'
+    #print 'old_meter, new_meter', old_meter, new_meter
+    old_met_obj=Meters.objects.filter(factory_number_manual=old_meter)    
+    #Просто меняем meters 
+    new_name = unicode(old_met_obj[0].name).replace(unicode(old_meter), unicode(new_meter))
+    new_num = unicode(old_met_obj[0].factory_number_manual).replace(unicode(old_meter), unicode(new_meter))
+    #делаем проверку,если сетевой равен заводскому, то меняем, иначе не трогаем
+    new_address = old_met_obj[0].address
+    if old_met_obj[0].address == old_met_obj[0].factory_number_manual:        
+        new_address = unicode(old_met_obj[0].address).replace(unicode(old_meter), unicode(new_meter))    
+    
+    #print old_met_obj.values()
+    #print 'old_met_obj.guid', old_met_obj[0].guid
+    
+    rename_taken_params_by_guid(old_met_obj[0].guid, old_meter, new_meter)
+    old_met_obj.update(name=new_name, factory_number_manual = new_num, address = new_address)
+    
+
+    result = u'Счётчик заменён, если необходимо изменить сетевой адрес сделайте это через панель администратора'
+    
+    return result
+
 def ChangeMeters(old_meter, new_meter):
     result=u""
     isExistOldMeter=SimpleCheckIfExist('meters','factory_number_manual',old_meter,"","","")
