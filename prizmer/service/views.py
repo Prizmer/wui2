@@ -315,8 +315,9 @@ def GetTableFromExcel(sPath,sSheet):
         L=ws[u'l%s'%(row)].value
         M=ws[u'm%s'%(row)].value
         N=ws[u'n%s'%(row)].value
+        O=ws[u'o%s'%(row)].value
         
-        vals =[A,B,C,D,E,F,G,H,I,J,K,L,M,N]
+        vals =[A,B,C,D,E,F,G,H,I,J,K,L,M,N,O]
         dt.append(vals)
         row+=1
     return dt
@@ -460,6 +461,7 @@ def LoadElectricMeters(sPath, sSheet):
         NumLic=unicode(dtAll[i][5]) #номер лицевого счёта, тут используется как пароль для м-230-ум
         Group=unicode(dtAll[i][12])
         attr1=unicode(dtAll[i][13])
+        attr2=unicode(dtAll[i][14])
 #        print obj_l2
 #        print abon
 #        print meter
@@ -498,7 +500,7 @@ def LoadElectricMeters(sPath, sSheet):
                 writeToLog(u'Device added' + ' --->   ' + u'М-230-УМ')
                 
             elif unicode(type_meter) == u'Эльф 1.08':
-                add_meter = Meters(name = unicode(type_meter) + u' ' + unicode(meter), address = unicode(adr), factory_number_manual = unicode(meter), guid_types_meters = TypesMeters.objects.get(guid = u"1c5a8a80-1c51-4733-8332-4ed8d510a650") )
+                add_meter = Meters(name = unicode(type_meter) + u' ' + unicode(meter), address = unicode(adr), factory_number_manual = unicode(meter), guid_types_meters = TypesMeters.objects.get(guid = u"1c5a8a80-1c51-4733-8332-4ed8d510a650"), attr1=unicode(attr1), attr2=unicode(attr2) )
                 add_meter.save()
                 writeToLog(u'Device added' + ' --->   ' + u'Эльф 1.08')
             elif unicode(type_meter) == u'СПГ762-1':
@@ -770,8 +772,8 @@ def add_taken_param(sender, instance, created, **kwargs): # Добавляем �
         add_param.save()
     
     #Код ошибки
-        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"7175f6c7-b816-40f6-86f4-e08a309c08f6")) # код ошибки
-        add_param.save()
+        # add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"7175f6c7-b816-40f6-86f4-e08a309c08f6")) # код ошибки
+        # add_param.save()
 
     # Ток
         #add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"aee312b0-adb1-4be9-9879-b3a3598f9b29")) # Ia текущее
@@ -793,10 +795,10 @@ def add_taken_param(sender, instance, created, **kwargs): # Добавляем �
         #add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"e7617c95-7e42-4cfa-9acd-5bc119261c6d")) # Q Реактивная мощность
         #add_param.save()
     #Получасовки
-        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"6af9ddce-437a-4e07-bd70-6cf9dcc10b31")) # A+ 30-мин. срез мощности
-        add_param.save()
-        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"66e997c0-8128-40a7-ae65-7e8993fbea61")) # R+ 30-мин. срез мощности
-        add_param.save()
+        # add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"6af9ddce-437a-4e07-bd70-6cf9dcc10b31")) # A+ 30-мин. срез мощности
+        # add_param.save()
+        # add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"66e997c0-8128-40a7-ae65-7e8993fbea61")) # R+ 30-мин. срез мощности
+        # add_param.save()
     elif instance.guid_types_meters.name == u'Меркурий 233':
         #Добавляем параметры для Меркурия 233
         pass
@@ -1103,12 +1105,12 @@ def add_taken_param(sender, instance, created, **kwargs): # Добавляем �
         # "Канал 1"      Импульсный вход 1 текущий
         #add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"6e7f0d37-df5c-4850-991e-b5d7cb793924"))
         #add_param.save()
-        # "Канал 1"      Импульсный вход 1 суточный
-#        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"9af27a62-d6c8-4b67-bd36-da7103e0b1f1"))
-#        add_param.save()
-        # "Канал 2"      Импульсный вход 2 суточный
-#        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"86acc33d-7bea-4977-a5b5-c5858ce9a09d"))
-#        add_param.save()
+        #"Канал 1"      Импульсный вход 1 суточный
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"9af27a62-d6c8-4b67-bd36-da7103e0b1f1"))
+        add_param.save()
+        #"Канал 2"      Импульсный вход 2 суточный
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"86acc33d-7bea-4977-a5b5-c5858ce9a09d"))
+        add_param.save()
         # "Канал 2"      Импульсный вход 2 текущий
         #add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"de7bfdfd-c17f-4a7c-942d-b28e85db33cb"))
         #add_param.save()
@@ -2065,159 +2067,7 @@ def load_water_port(request):
 
     return render_to_response("service/service_water.html", args)
 
-def change_meters_v2(request):
-    args={}
 
-    old_meter=u' '
-    new_meter=u' '
-    change_meter_status=u"Функция в разработке"
-    if request.is_ajax():
-        if request.method == 'GET':            
-            request.session["old_meter"]    = old_meter    = request.GET.get('old_meter')
-            request.session["new_meter"]    = new_meter   = request.GET.get('new_meter')
-            if (not old_meter or old_meter==None or new_meter==None or not new_meter):
-                change_meter_status=u"Заполните обе ячейки"
-            else:
-                change_meter_status=ChangeMeters_v2(old_meter, new_meter)
-                
-    #print 'old_meter, new_meter', old_meter, new_meter
-    if old_meter is None or new_meter is None or change_meter_status.find(u'Счётчик заменён')>-1:
-        old_meter=u' '
-        new_meter=u' '
-    args["change_meter_status"]=change_meter_status
-    args["old_meter"] = old_meter
-    args["new_meter"] = new_meter
-
-    return render_to_response("service/service_change_electric.html", args)
-
-# def change_meters(request):
-#     args={}
-#     old_meter=u''
-#     new_meter=u''
-#     change_meter_status=u"Заполните обе ячейки"
-#     if request.is_ajax():
-#         if request.method == 'GET':
-            
-#             request.session["old_meter"]    = old_meter    = request.GET.get('old_meter')
-#             request.session["new_meter"]    = new_meter   = request.GET.get('new_meter')
-#             if (not old_meter or old_meter==None or new_meter==None or not new_meter):
-#                 change_meter_status=u"Заполните обе ячейки"
-#             else:
-#                 change_meter_status=ChangeMeters(old_meter, new_meter)
-#     #print 'old_meter, new_meter', old_meter, new_meter
-#     args["change_meter_status"]=change_meter_status
-#     args["old_meter"] = old_meter
-#     args["new_meter"] = new_meter
-#     return render_to_response("service/service_change_electric.html", args)
-  
-def isInt(s):
-    try:
-        int(s)
-        return True
-    except ValueError:
-        return False
-
-def rename_taken_params_by_guid(guid_meter, old_met, new_met):
-    #print 'rename taken params'
-    try:  
-        common_sql.update_table_with_replace('taken_params', 'name', 'guid_meters', guid_meter, old_met, new_met)
-    except Meters.DoesNotExist:
-        return False
-
-    try:
-    #переименовываем link_abonents_taken_params
-        for row in TakenParams.objects.filter(guid_meters=guid_meter):
-            guid_taken_params= row.guid
-            common_sql.update_table_with_replace('link_abonents_taken_params', 'name', 'guid_taken_params', guid_taken_params, old_met, new_met)
-    except TakenParams.DoesNotExist:
-        return False
-
-def ChangeMeters_v2(old_meter, new_meter):
-    result=u""
-    # Проверяем существуют ли такие счётчики, в норме первый должен быть, а второй нет
-    isExistOldMeter=SimpleCheckIfExist('meters','factory_number_manual',old_meter,"","","")
-    isExistNewMeter=SimpleCheckIfExist('meters','factory_number_manual',new_meter,"","","")
-    if not isExistOldMeter:
-        return u"Замена невозможна. Номера старого счётчика нет в базе"
-    if isExistNewMeter:
-        return u"Замена невозможна. Новый счётчик уже существует в базе"
-    
-    if not(isInt(old_meter)) or not(isInt(new_meter)):
-        return u'Замена невозможна. Номера счётчиков должны быть числами'
-    #print 'old_meter, new_meter', old_meter, new_meter
-    old_met_obj=Meters.objects.filter(factory_number_manual=old_meter)    
-    #Просто меняем meters 
-    new_name = unicode(old_met_obj[0].name).replace(unicode(old_meter), unicode(new_meter))
-    new_num = unicode(old_met_obj[0].factory_number_manual).replace(unicode(old_meter), unicode(new_meter))
-    #делаем проверку,если сетевой равен заводскому, то меняем, иначе не трогаем
-    new_address = old_met_obj[0].address
-    if old_met_obj[0].address == old_met_obj[0].factory_number_manual:        
-        new_address = unicode(old_met_obj[0].address).replace(unicode(old_meter), unicode(new_meter))    
-    
-    #print old_met_obj.values()
-    #print 'old_met_obj.guid', old_met_obj[0].guid
-    
-    rename_taken_params_by_guid(old_met_obj[0].guid, old_meter, new_meter)
-    old_met_obj.update(name=new_name, factory_number_manual = new_num, address = new_address)
-    
-
-    result = u'Счётчик заменён, если необходимо изменить сетевой адрес сделайте это через панель администратора'
-    
-    return result
-
-def ChangeMeters(old_meter, new_meter):
-    result=u""
-    isExistOldMeter=SimpleCheckIfExist('meters','factory_number_manual',old_meter,"","","")
-    isExistNewMeter=SimpleCheckIfExist('meters','factory_number_manual',new_meter,"","","")
-    if not isExistOldMeter:
-        return u"Номера старого счётчика нет в базе"
-    if isExistNewMeter:
-        return u"Новый счётчик уже существует а базе"
-    
-    dtOldMeter=GetSimpleTable('meters','factory_number_manual', old_meter)
-    guidOldMeter=unicode(dtOldMeter[0][0])
-    
-    dtTakenParams=GetSimpleTable('taken_params','guid_meters', guidOldMeter)
-    
-    oldName=unicode(dtOldMeter[0][1])
-    newName=oldName.replace(old_meter,new_meter) #поменять на срез+ добавление или формировать полность по новой
-    old_factory_number_manual=unicode(dtOldMeter[0][5])
-    new_factory_number_manual=old_factory_number_manual.replace(old_meter,new_meter)  #поменять на срез+ добавление или формировать полность по новой
-    old_address=unicode(dtOldMeter[0][2])
-    new_address=old_address.replace(old_meter,new_meter)
-    
-    if UpdateTable('meters','guid', guidOldMeter, 'name', newName, 'factory_number_manual', new_factory_number_manual,'address', new_address):
-        result=u"Счётчик "+unicode(old_meter)+ " успешно заменён на "+unicode(new_meter)
-    #print result
-    con=0
-    for i in range(len(dtTakenParams)):
-        dtTakenParams[i]=list(dtTakenParams[i])
-        guidTaken=unicode(dtTakenParams[i][1])
-        dtLinkAbonentsTakenParams=GetSimpleTable('link_abonents_taken_params','guid_taken_params', guidTaken)
-        oldTakenParamName=unicode(dtTakenParams[i][4])
-        #newTakenParamName=oldTakenParamName.replace(old_meter,new_meter)
-        OldLinkAbonentTakenParamName=unicode(dtLinkAbonentsTakenParams[0][1])
-        #newLinkAbonentTakenParamName= OldLinkAbonentTakenParamName.replace(old_meter,new_meter)
-        #get_taken_param_by_abonent_from_excel_cfg(instance.name)).name + u" " + instance.guid_params.guid_names_params.name + u" " + instance.guid_params.guid_types_params.name
-        #"Квартира 0103 - М-230 21949676"
-        if (OldLinkAbonentTakenParamName.find('М-230')):
-            typeMeter=u'М-230'
-        if (OldLinkAbonentTakenParamName.find('Саяны Комбик')):
-            typeMeter=u'Саяны Комбик'  
-        newLinkAbonentTakenParamName=OldLinkAbonentTakenParamName.split('-')[0]+ u' - '+ typeMeter +u' ' + unicode(new_meter)
-        
-        # "М-230 22633939 Меркурий 230 T0 A+ Суточный -- adress: 0  channel: 0"
-        #"Саяны Комбик 4443 Саяны Комбик Q Система1 Суточный -- adress: 0  channel: 1"
-        n=oldTakenParamName.find(old_meter)
-        s=oldTakenParamName[n+len(old_meter):]
-        newTakenParamName= typeMeter + u' ' + unicode(new_meter) + s
-        #print newTakenParamName
-#        print newLinkAbonentTakenParamName
-        if UpdateTable('link_abonents_taken_params','guid_taken_params', guidTaken, 'name', newLinkAbonentTakenParamName,"","","","") and UpdateTable('taken_params','guid', guidTaken, 'name',newTakenParamName,"","","",""):
-            con+=1
-    result+=u"; Изменено связей:"+unicode(con)
-    
-    return result
     
 def UpdateTable(table,whereFieled, whereValue,field1,value1,field2,value2,field3,value3):
     isOk=False
@@ -2288,115 +2138,9 @@ def load_tcp_ip_water_ports_from_excel(sPath, sheet):
         writeToLog( result)
         row+=1
     return IsAdded
-    
-def replace_electric_meters(request):
-    args={}
 
-    meter1=u''
-    meter2=u''
-    change_meter_status=u""
-    replace_meter_status=u'НЕ удалось поменять счётчики местами'
-    if request.is_ajax():
-        if request.method == 'GET':                        
-            request.session["meter1"]    = meter1    = request.GET.get('meter1')
-            request.session["meter2"]    = meter2   = request.GET.get('meter2')
-            
-            if (not meter1 or meter1==None or meter2==None or not meter2):
-                replace_meter_status=u"Заполните обе ячейки"
-            else:                
-                replace_meter_status=ReplaceMeters(meter1, meter2)
 
-    args["change_meter_status"]=change_meter_status
-    args["replace_meter_status"]=replace_meter_status
-    return render_to_response("service/service_change_electric.html", args)
-    
-def ReplaceMeters(meter1, meter2):
-    result=u''
-    
-    isExistOldMeter=SimpleCheckIfExist('meters','factory_number_manual',meter1,"","","")
-    isExistNewMeter=SimpleCheckIfExist('meters','factory_number_manual',meter2,"","","")
-    if not isExistOldMeter:
-        return u"Номера первого счётчика нет в базе"
-    if not isExistNewMeter:
-        return u"Номера второго счётчика нет в базе"
-        
-#  objects.guid as obj_guid,      0 
-#  objects.name as obj_name,      1
-#  abonents.guid as ab_guid,      2 
-#  abonents.name as ab_name,      3
-#  link_abonents_taken_params.guid as link_ab_taken_guid,       4
-#  link_abonents_taken_params.name as link_ab_taken_name,       5
-#  taken_params.guid as taken_guid,       6
-#  taken_params.name as taken_name,       7
-#  meters.guid as meter_guid,             8
-#  meters.name as meter_name,             9
-#  meters.address as meter_adr,           10
-#  meters.factory_number_manual           11
-        
-    dtAllTakenMeter1=GetSimpleTable('all_taken_params','factory_number_manual', meter1)
-    guidAbonent1=unicode(dtAllTakenMeter1[0][2])
-    abName1=unicode(dtAllTakenMeter1[0][3])
-    
-    dtAllTakenMeter2=GetSimpleTable('all_taken_params','factory_number_manual', meter2)    
-    guidAbonent2=unicode(dtAllTakenMeter2[0][2])
-    abName2=unicode(dtAllTakenMeter2[0][3])
-    
-    nameParam1=unicode(dtAllTakenMeter1[0][7])
-    nameParam2=unicode(dtAllTakenMeter2[0][7])
-        
-    typeMeter1=getTypeMeter(nameParam1)
-    typeMeter2=getTypeMeter(nameParam2)
-    
-    if len(typeMeter1)<1 or len(typeMeter2)<1:
-        return u'Для этого типа счётчика ещё нет функции обработки'
-    if typeMeter1 !=typeMeter2:
-        return u'Типы счётчиков не совпадают'
-    
-    result+=changeConnectionMeterAbonent(dtAllTakenMeter1, typeMeter1, meter1, meter2, guidAbonent2, abName2)
-    result+=changeConnectionMeterAbonent(dtAllTakenMeter2, typeMeter1, meter2, meter1, guidAbonent1, abName1) 
-           
-        
-    return result
 
-def getTypeMeter(nameParam1):
-    typeMeter1=u''
-    if (nameParam1.find('М-230') or nameParam1.find('Меркурий 230')):
-        typeMeter1=u'М-230'
-    elif (nameParam1.find('Саяны Комбик')):
-        typeMeter1=u'Саяны Комбик' 
-    elif (nameParam1.find('М-200') or nameParam1.find('Меркурий 200')):
-        typeMeter1=u"Меркурий 200"
-    return  typeMeter1
-
-def changeConnectionMeterAbonent(dtAllTakenMeter1, typeMeter, meter1, meter2, guidAbonent2, abName2):
-    result=u''
-    #guidMeter1=unicode(dtAllTakenMeter1[0][8])
-    #guidAbonent1=unicode(dtAllTakenMeter1[0][1])
-    #meterName1=unicode(dtAllTakenMeter1[0][9])
-    #abName1=unicode(dtAllTakenMeter1[0][2])
-    con1=0
-    for i in range(len(dtAllTakenMeter1)):
-        dtAllTakenMeter1[i]=list(dtAllTakenMeter1[i])
-        guidParam1=unicode(dtAllTakenMeter1[i][6])   
-        nameParam1=unicode(dtAllTakenMeter1[i][7])
-        guidLinkAbonentParam1=unicode(dtAllTakenMeter1[i][4])
-        #nameLinkAbonentParam1=unicode(dtAllTakenMeter1[i][5])
-        
-        newTakenParamName1= makeNewTakenParamName(nameParam1, meter1, meter2, typeMeter)
-        newLinkAbonentTakenParamName1=makeLinkabonentTakenParamName(abName2,typeMeter,meter2)
-        print newTakenParamName1        
-        print newLinkAbonentTakenParamName1
-        
-        isUpdateTakenParam=UpdateTable('taken_params','guid', guidParam1, 'name',newTakenParamName1,"","","","")
-        isUpdateLinkAbonTakenParam=UpdateTable('link_abonents_taken_params','guid', guidLinkAbonentParam1, 'guid_abonents', guidAbonent2,'name', newLinkAbonentTakenParamName1,"","")   
-        if isUpdateTakenParam and isUpdateLinkAbonTakenParam:
-            con1+=1
-            print con1
-      
-    if (con1>0):
-        result+=u' Счётчик '+meter1+u' привязан к абоненту '+abName2+'. Изменено привязок: '+unicode(con1)
-    else: result+=u' Что-то пошло не так, ни одной привязки не изменено! '+meter1
-    return result
 
 def makeLinkabonentTakenParamName(abName,typeMeter,new_meter):
     #"Квартира 0103 - М-230 21949676"   
@@ -2494,7 +2238,7 @@ FROM
 WHERE 
   %s.guid_%s = %s.guid AND
   %s.%s = '%s' AND 
-  %s.%s = '%s'"""%(table1, table1, table2,table1, table2,table2,table1,field1,val1,table2,field2,val2)
+  %s.%s = '%s'"""%(table1, table1, table2,  table1, table2,    table2,table1,field1,val1,table2,field2,val2)
     #print sQuery
     cursor.execute(sQuery)
     dt = cursor.fetchall()
@@ -2757,3 +2501,357 @@ def add_current_taken_params_pulsar16m(request):
     args['pulsar16m_status'] = result
     return render_to_response("service/service_get_info.html", args)
 
+
+""" def replace_electric_meters(request):
+    args={}
+
+    meter1=u''
+    meter2=u''
+    change_meter_status=u""
+    replace_meter_status=u'НЕ удалось поменять счётчики местами'
+    if request.is_ajax():
+        if request.method == 'GET':                        
+            request.session["meter1"]    = meter1    = request.GET.get('meter1')
+            request.session["meter2"]    = meter2   = request.GET.get('meter2')
+            
+            if (not meter1 or meter1==None or meter2==None or not meter2):
+                replace_meter_status=u"Заполните обе ячейки"
+            else:                
+                replace_meter_status=ReplaceMeters(meter1, meter2)
+
+    args["change_meter_status"]=change_meter_status
+    args["replace_meter_status"]=replace_meter_status
+    return render_to_response("service/service_change_electric.html", args)
+    
+def ReplaceMeters(meter1, meter2):
+    result=u''
+    
+    isExistOldMeter=SimpleCheckIfExist('meters','factory_number_manual',meter1,"","","")
+    isExistNewMeter=SimpleCheckIfExist('meters','factory_number_manual',meter2,"","","")
+    if not isExistOldMeter:
+        return u"Номера первого счётчика нет в базе"
+    if not isExistNewMeter:
+        return u"Номера второго счётчика нет в базе"
+        
+#  objects.guid as obj_guid,      0 
+#  objects.name as obj_name,      1
+#  abonents.guid as ab_guid,      2 
+#  abonents.name as ab_name,      3
+#  link_abonents_taken_params.guid as link_ab_taken_guid,       4
+#  link_abonents_taken_params.name as link_ab_taken_name,       5
+#  taken_params.guid as taken_guid,       6
+#  taken_params.name as taken_name,       7
+#  meters.guid as meter_guid,             8
+#  meters.name as meter_name,             9
+#  meters.address as meter_adr,           10
+#  meters.factory_number_manual           11
+        
+    dtAllTakenMeter1=GetSimpleTable('all_taken_params','factory_number_manual', meter1)
+    guidAbonent1=unicode(dtAllTakenMeter1[0][2])
+    abName1=unicode(dtAllTakenMeter1[0][3])
+    
+    dtAllTakenMeter2=GetSimpleTable('all_taken_params','factory_number_manual', meter2)    
+    guidAbonent2=unicode(dtAllTakenMeter2[0][2])
+    abName2=unicode(dtAllTakenMeter2[0][3])
+    
+    nameParam1=unicode(dtAllTakenMeter1[0][7])
+    nameParam2=unicode(dtAllTakenMeter2[0][7])
+        
+    typeMeter1=getTypeMeter(nameParam1)
+    typeMeter2=getTypeMeter(nameParam2)
+    
+    if len(typeMeter1)<1 or len(typeMeter2)<1:
+        return u'Для этого типа счётчика ещё нет функции обработки'
+    if typeMeter1 !=typeMeter2:
+        return u'Типы счётчиков не совпадают'
+    
+    result+=changeConnectionMeterAbonent(dtAllTakenMeter1, typeMeter1, meter1, meter2, guidAbonent2, abName2)
+    result+=changeConnectionMeterAbonent(dtAllTakenMeter2, typeMeter1, meter2, meter1, guidAbonent1, abName1) 
+           
+        
+    return result
+
+def getTypeMeter(nameParam1):
+    typeMeter1=u''
+    if (nameParam1.find('М-230') or nameParam1.find('Меркурий 230')):
+        typeMeter1=u'М-230'
+    elif (nameParam1.find('Саяны Комбик')):
+        typeMeter1=u'Саяны Комбик' 
+    elif (nameParam1.find('М-200') or nameParam1.find('Меркурий 200')):
+        typeMeter1=u"Меркурий 200"
+    return  typeMeter1 """
+
+
+def change_meters_v2(request):
+    args={}
+
+    old_meter=u' '
+    new_meter=u' '
+    change_meter_status=u"Функция в разработке"
+    if request.is_ajax():
+        if request.method == 'GET':            
+            request.session["old_meter"]    = old_meter    = request.GET.get('old_meter')
+            request.session["new_meter"]    = new_meter   = request.GET.get('new_meter')
+            if (not old_meter or old_meter==None or new_meter==None or not new_meter):
+                change_meter_status=u"Заполните обе ячейки"
+            else:
+                change_meter_status=ChangeMeters_v2(old_meter, new_meter)
+                
+    #print 'old_meter, new_meter', old_meter, new_meter
+    if old_meter is None or new_meter is None or change_meter_status.find(u'Счётчик заменён')>-1:
+        old_meter=u' '
+        new_meter=u' '
+    args["change_meter_status"]=change_meter_status
+    args["old_meter"] = old_meter
+    args["new_meter"] = new_meter
+
+    return render_to_response("service/service_change_electric.html", args)
+
+# def change_meters(request):
+#     args={}
+#     old_meter=u''
+#     new_meter=u''
+#     change_meter_status=u"Заполните обе ячейки"
+#     if request.is_ajax():
+#         if request.method == 'GET':
+            
+#             request.session["old_meter"]    = old_meter    = request.GET.get('old_meter')
+#             request.session["new_meter"]    = new_meter   = request.GET.get('new_meter')
+#             if (not old_meter or old_meter==None or new_meter==None or not new_meter):
+#                 change_meter_status=u"Заполните обе ячейки"
+#             else:
+#                 change_meter_status=ChangeMeters(old_meter, new_meter)
+#     #print 'old_meter, new_meter', old_meter, new_meter
+#     args["change_meter_status"]=change_meter_status
+#     args["old_meter"] = old_meter
+#     args["new_meter"] = new_meter
+#     return render_to_response("service/service_change_electric.html", args)
+  
+def isInt(s):
+    try:
+        int(s)
+        return True
+    except ValueError:
+        return False
+
+def rename_taken_params_by_guid(guid_meter, old_met, new_met):
+    #print 'rename taken params'
+    try:  
+        common_sql.update_table_with_replace('taken_params', 'name', 'guid_meters', guid_meter, old_met, new_met)
+    except Meters.DoesNotExist:
+        return False
+    try:
+    #переименовываем link_abonents_taken_params
+        for row in TakenParams.objects.filter(guid_meters=guid_meter):
+            guid_taken_params= row.guid
+            common_sql.update_table_with_replace('link_abonents_taken_params', 'name', 'guid_taken_params', guid_taken_params, old_met, new_met)
+    except TakenParams.DoesNotExist:
+        return False
+
+def ChangeMeters_v2(old_meter, new_meter):
+    result=u""
+    # Проверяем существуют ли такие счётчики, в норме первый должен быть, а второй нет
+    isExistOldMeter=SimpleCheckIfExist('meters','factory_number_manual',old_meter,"","","")
+    isExistNewMeter=SimpleCheckIfExist('meters','factory_number_manual',new_meter,"","","")
+    if not isExistOldMeter:
+        return u"Замена невозможна. Номера старого счётчика нет в базе"
+    if isExistNewMeter:
+        return u"Замена невозможна. Новый счётчик уже существует в базе"
+    
+    if not(isInt(old_meter)) or not(isInt(new_meter)):
+        return u'Замена невозможна. Номера счётчиков должны быть числами'
+    #print 'old_meter, new_meter', old_meter, new_meter
+    old_met_obj=Meters.objects.filter(factory_number_manual=old_meter)    
+    #Просто меняем meters 
+    new_name = unicode(old_met_obj[0].name).replace(unicode(old_meter), unicode(new_meter))
+    new_num = unicode(old_met_obj[0].factory_number_manual).replace(unicode(old_meter), unicode(new_meter))
+    #делаем проверку,если сетевой равен заводскому, то меняем, иначе не трогаем
+    new_address = old_met_obj[0].address
+    if old_met_obj[0].address == old_met_obj[0].factory_number_manual:        
+        new_address = unicode(old_met_obj[0].address).replace(unicode(old_meter), unicode(new_meter))    
+    
+    #print old_met_obj.values()
+    #print 'old_met_obj.guid', old_met_obj[0].guid
+    
+    rename_taken_params_by_guid(old_met_obj[0].guid, old_meter, new_meter)
+    old_met_obj.update(name=new_name, factory_number_manual = new_num, address = new_address)
+    
+    result = u'Счётчик заменён, если необходимо изменить сетевой адрес сделайте это через панель администратора'
+    
+    return result
+
+
+def replace_electric_meters_v2(request):
+    args={}
+
+    meter1=u''
+    meter2=u''
+    change_meter_status=u""
+    replace_meter_status=u'НЕ удалось поменять счётчики местами'
+    if request.is_ajax():
+        if request.method == 'GET':                        
+            request.session["meter1"]    = meter1    = request.GET.get('meter1')
+            request.session["meter2"]    = meter2   = request.GET.get('meter2')
+            
+            if (not meter1 or meter1==None or meter2==None or not meter2):
+                replace_meter_status=u"Заполните обе ячейки"
+            else:                
+                replace_meter_status=ReplaceMeters_v2(meter1, meter2)
+    
+    if meter1 is None or meter2 is None or replace_meter_status.find(u'успешно')>-1:
+        meter1=u' '
+        meter2=u' '
+        
+    args["change_meter_status"]=change_meter_status
+    args["replace_meter_status"]=replace_meter_status
+    args["meter1"]=meter1
+    args["meter2"]=meter2
+    return render_to_response("service/service_change_electric.html", args)
+
+
+def ReplaceMeters_v2(meter1, meter2):
+    result=u''
+    
+    isExistOldMeter=SimpleCheckIfExist('meters','factory_number_manual',meter1,"","","")
+    isExistNewMeter=SimpleCheckIfExist('meters','factory_number_manual',meter2,"","","")
+    if not isExistOldMeter:
+        return u"Замена невозможна. Номера первого счётчика нет в базе"
+    if not isExistNewMeter:
+        return u"Замена невозможна. Номера второго счётчика нет в базе"
+    
+    if not(isInt(meter1)) or not(isInt(meter2)):
+        return u'Замена невозможна. Номера счётчиков должны быть числами'
+    
+    obj1 = Meters.objects.filter(factory_number_manual = meter1)
+    obj2 = Meters.objects.filter(factory_number_manual = meter2)
+    guid_type1 = obj1[0].guid_types_meters
+    guid_type2 = obj2[0].guid_types_meters
+    if not(guid_type1 == guid_type2):
+        return u'Замена невозможна. Счётчики должны быть одного типа'
+    
+    guid_meter1 = obj1[0].guid
+    guid_meter2 = obj2[0].guid
+
+    dt_ip1=GetSimpleTable('link_meters_tcpip_settings','guid_meters', guid_meter1)
+    dt_ip2=GetSimpleTable('link_meters_tcpip_settings','guid_meters', guid_meter2)
+    if len(dt_ip1)>0 and len(dt_ip2)>0:
+        if dt_ip1[0][2]!=dt_ip2[0][2]:
+            result = result + u'Счётчики принадлежат разным подсетям (!) '
+    
+    #сделать запрос на update с replace в link_abonents_taken_params
+    # надо менять привязку к абоненту и имя привязки
+#   abonents.guid, 
+#   abonents.name, 
+#   link_abonents_taken_params.guid, 
+#   link_abonents_taken_params.name,  
+#   meters.guid, 
+#   meters.name,
+#   taken_params.guid,
+#   taken_params.name
+    dt_link1 = common_sql.get_link_abonents_taken_params_by_meter_guid(guid_meter1)
+    dt_link2 = common_sql.get_link_abonents_taken_params_by_meter_guid(guid_meter2)
+    
+    guid_abonent1 = dt_link1[0][0]
+    guid_abonent2 = dt_link2[0][0]
+    
+    for row in dt_link1:
+        common_sql.update_table_with_replace('link_abonents_taken_params', 'name', 'guid', row[2], meter1, meter2)
+        common_sql.update_table_with_replace('link_abonents_taken_params', 'guid_abonents', 'guid', row[2], guid_abonent1, guid_abonent2)
+        common_sql.update_table_with_replace('taken_params', 'name', 'guid', row[6], meter1, meter2)
+
+    for row in dt_link2:
+        common_sql.update_table_with_replace('link_abonents_taken_params', 'name', 'guid', row[2], meter2, meter1)
+        common_sql.update_table_with_replace('link_abonents_taken_params', 'guid_abonents', 'guid', row[2], guid_abonent2, guid_abonent1)
+        common_sql.update_table_with_replace('taken_params', 'name', 'guid', row[6], meter2, meter1)
+    
+    result = result + u' Привязки счётчиков успешно изменены '
+    
+           
+        
+    return result
+
+""" def ChangeMeters(old_meter, new_meter):
+    result=u""
+    isExistOldMeter=SimpleCheckIfExist('meters','factory_number_manual',old_meter,"","","")
+    isExistNewMeter=SimpleCheckIfExist('meters','factory_number_manual',new_meter,"","","")
+    if not isExistOldMeter:
+        return u"Номера старого счётчика нет в базе"
+    if isExistNewMeter:
+        return u"Новый счётчик уже существует а базе"
+    
+    dtOldMeter=GetSimpleTable('meters','factory_number_manual', old_meter)
+    guidOldMeter=unicode(dtOldMeter[0][0])
+    
+    dtTakenParams=GetSimpleTable('taken_params','guid_meters', guidOldMeter)
+    
+    oldName=unicode(dtOldMeter[0][1])
+    newName=oldName.replace(old_meter,new_meter) #поменять на срез+ добавление или формировать полность по новой
+    old_factory_number_manual=unicode(dtOldMeter[0][5])
+    new_factory_number_manual=old_factory_number_manual.replace(old_meter,new_meter)  #поменять на срез+ добавление или формировать полность по новой
+    old_address=unicode(dtOldMeter[0][2])
+    new_address=old_address.replace(old_meter,new_meter)
+    
+    if UpdateTable('meters','guid', guidOldMeter, 'name', newName, 'factory_number_manual', new_factory_number_manual,'address', new_address):
+        result=u"Счётчик "+unicode(old_meter)+ " успешно заменён на "+unicode(new_meter)
+    #print result
+    con=0
+    for i in range(len(dtTakenParams)):
+        dtTakenParams[i]=list(dtTakenParams[i])
+        guidTaken=unicode(dtTakenParams[i][1])
+        dtLinkAbonentsTakenParams=GetSimpleTable('link_abonents_taken_params','guid_taken_params', guidTaken)
+        oldTakenParamName=unicode(dtTakenParams[i][4])
+        #newTakenParamName=oldTakenParamName.replace(old_meter,new_meter)
+        OldLinkAbonentTakenParamName=unicode(dtLinkAbonentsTakenParams[0][1])
+        #newLinkAbonentTakenParamName= OldLinkAbonentTakenParamName.replace(old_meter,new_meter)
+        #get_taken_param_by_abonent_from_excel_cfg(instance.name)).name + u" " + instance.guid_params.guid_names_params.name + u" " + instance.guid_params.guid_types_params.name
+        #"Квартира 0103 - М-230 21949676"
+        if (OldLinkAbonentTakenParamName.find('М-230')):
+            typeMeter=u'М-230'
+        if (OldLinkAbonentTakenParamName.find('Саяны Комбик')):
+            typeMeter=u'Саяны Комбик'  
+        newLinkAbonentTakenParamName=OldLinkAbonentTakenParamName.split('-')[0]+ u' - '+ typeMeter +u' ' + unicode(new_meter)
+        
+        # "М-230 22633939 Меркурий 230 T0 A+ Суточный -- adress: 0  channel: 0"
+        #"Саяны Комбик 4443 Саяны Комбик Q Система1 Суточный -- adress: 0  channel: 1"
+        n=oldTakenParamName.find(old_meter)
+        s=oldTakenParamName[n+len(old_meter):]
+        newTakenParamName= typeMeter + u' ' + unicode(new_meter) + s
+        #print newTakenParamName
+#        print newLinkAbonentTakenParamName
+        if UpdateTable('link_abonents_taken_params','guid_taken_params', guidTaken, 'name', newLinkAbonentTakenParamName,"","","","") and UpdateTable('taken_params','guid', guidTaken, 'name',newTakenParamName,"","","",""):
+            con+=1
+    result+=u"; Изменено связей:"+unicode(con)
+    
+    return result """
+
+
+""" 
+def changeConnectionMeterAbonent(dtAllTakenMeter1, typeMeter, meter1, meter2, guidAbonent2, abName2):
+    result=u''
+    #guidMeter1=unicode(dtAllTakenMeter1[0][8])
+    #guidAbonent1=unicode(dtAllTakenMeter1[0][1])
+    #meterName1=unicode(dtAllTakenMeter1[0][9])
+    #abName1=unicode(dtAllTakenMeter1[0][2])
+    con1=0
+    for i in range(len(dtAllTakenMeter1)):
+        dtAllTakenMeter1[i]=list(dtAllTakenMeter1[i])
+        guidParam1=unicode(dtAllTakenMeter1[i][6])   
+        nameParam1=unicode(dtAllTakenMeter1[i][7])
+        guidLinkAbonentParam1=unicode(dtAllTakenMeter1[i][4])
+        #nameLinkAbonentParam1=unicode(dtAllTakenMeter1[i][5])
+        
+        newTakenParamName1= makeNewTakenParamName(nameParam1, meter1, meter2, typeMeter)
+        newLinkAbonentTakenParamName1=makeLinkabonentTakenParamName(abName2,typeMeter,meter2)
+        print newTakenParamName1        
+        print newLinkAbonentTakenParamName1
+        
+        isUpdateTakenParam=UpdateTable('taken_params','guid', guidParam1, 'name',newTakenParamName1,"","","","")
+        isUpdateLinkAbonTakenParam=UpdateTable('link_abonents_taken_params','guid', guidLinkAbonentParam1, 'guid_abonents', guidAbonent2,'name', newLinkAbonentTakenParamName1,"","")   
+        if isUpdateTakenParam and isUpdateLinkAbonTakenParam:
+            con1+=1
+            print con1
+      
+    if (con1>0):
+        result+=u' Счётчик '+meter1+u' привязан к абоненту '+abName2+'. Изменено привязок: '+unicode(con1)
+    else: result+=u' Что-то пошло не так, ни одной привязки не изменено! '+meter1
+    return result """

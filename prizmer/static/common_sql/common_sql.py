@@ -10268,3 +10268,32 @@ group by z1.name_objects, z1.monthly_date, z1.name_objects, z1.name_abonents, z1
     cursor.execute(sQuery)  
     data_table = cursor.fetchall()    
     return data_table
+
+def get_link_abonents_taken_params_by_meter_guid(guid_meter):
+    cursor = connection.cursor()
+    data_table=[]   
+    sQuery="""
+     SELECT 
+  abonents.guid, 
+  abonents.name, 
+  link_abonents_taken_params.guid, 
+  link_abonents_taken_params.name,  
+  meters.guid, 
+  meters.name,  
+  taken_params.guid,
+  taken_params.name
+FROM 
+  public.abonents, 
+  public.link_abonents_taken_params, 
+  public.taken_params, 
+  public.meters
+WHERE 
+  link_abonents_taken_params.guid_taken_params = taken_params.guid AND
+  link_abonents_taken_params.guid_abonents = abonents.guid AND
+  meters.guid = taken_params.guid_meters AND
+  meters.guid = '%s'
+    """ %(guid_meter)
+    #print sQuery
+    cursor.execute(sQuery)  
+    data_table = cursor.fetchall()    
+    return data_table
