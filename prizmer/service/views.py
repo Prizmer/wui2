@@ -551,6 +551,10 @@ def LoadElectricMeters(sPath, sSheet):
                 add_meter = Meters(name = unicode(type_meter) + u' ' + unicode(meter), address = unicode(adr), factory_number_manual = unicode(meter), guid_types_meters = TypesMeters.objects.get(guid = u"84fb7a85-ab91-4e93-9154-76ddee35a316") )
                 add_meter.save()
                 writeToLog(u'Device added' + ' --->   ' + u'Карат 307')
+            elif unicode(type_meter) == u'Danfoss SonoSelect':
+                add_meter = Meters(name = unicode(type_meter) + u' ' + unicode(meter), address = unicode(adr), factory_number_manual = unicode(meter), guid_types_meters = TypesMeters.objects.get(guid = u"aa491ede-e00b-4e1d-a8ba-1ef61dba1caa") )
+                add_meter.save()
+                writeToLog(u'Device added' + ' --->   ' + u'Danfoss SonoSelect')
             else:
                 writeToLog(u'Не найдено совпадение с существующим типом прибора')
                 met-=1
@@ -1566,6 +1570,50 @@ def add_taken_param(sender, instance, created, **kwargs): # Добавляем �
         #Масса 
         add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"eb617f04-14a3-403c-90e8-286412872232"))
         add_param.save()
+    elif instance.guid_types_meters.name == u'Danfoss SonoSelect':
+        print u'Добавляем параметры для счётчика Danfoss SonoSelect'
+        #Суточные 
+        #Объём     
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"83ba885f-1881-45db-9d63-52195e67cf64"))
+        add_param.save()
+        #Энергия  
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"510ba9e6-c18b-4982-9763-2ad86c8a8245"))
+        add_param.save()
+        #Т вход
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"a8940b63-2002-4a28-b671-a455419c1229"))
+        add_param.save()
+        #Т выход    
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"db1ed365-e85e-4547-aef6-89fed020898f"))
+        add_param.save()
+
+        #Месячные
+        #Объём     
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"3c763ebc-6ad4-4193-967f-f352bfae92c5"))
+        add_param.save()
+        #Энергия  
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"7a5d6dd3-3a34-40e4-90af-0c00252b978d"))
+        add_param.save()
+        #Т вход
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"caf11a15-27ff-4c0d-9b18-d55028e4840b"))
+        add_param.save()
+        #Т выход    
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"f76371c9-5ecd-44b2-835e-5fc4cdce7141"))
+        add_param.save()
+
+        #Текущие 
+        #Объём     
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"097122a4-b7d0-4700-add2-bc99a58347d0"))
+        add_param.save()
+        #Энергия  
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"af254ed7-d4ab-4293-8aaf-8bb13c81efb7"))
+        add_param.save()
+        #Т вход
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"caf11a15-27ff-4c0d-9b18-d55028e4840b"))
+        add_param.save()
+        #Т выход    
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"1d246b01-7fd8-441e-af1b-9851acf5f104"))
+        add_param.save()
+
     else:
         pass
         #print u'Тип счётчика не определен'
