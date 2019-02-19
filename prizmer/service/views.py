@@ -1725,7 +1725,7 @@ def add_link_abonents_taken_params(sender, instance, created, **kwargs):
     if get_taken_param_by_abonent_from_excel_cfg(instance.name) is not None:
         writeToLog(u'Совпадение')
         try:
-            add_link_abonents_taken_param = LinkAbonentsTakenParams (name = Abonents.objects.get(name= get_taken_param_by_abonent_from_excel_cfg(instance.name)).name + u" " + instance.guid_params.guid_names_params.name + u" " + instance.guid_params.guid_types_params.name ,coefficient=1, coefficient_2 = 1, guid_abonents = Abonents.objects.get(name= get_taken_param_by_abonent_from_excel_cfg(unicode(instance.name))) , guid_taken_params = instance )
+            common_sql.InsertInLinkAbonentsTakenParams(name = Abonents.objects.get(name= get_taken_param_by_abonent_from_excel_cfg(instance.name)).name + u" " + instance.guid_params.guid_names_params.name + u" " + instance.guid_params.guid_types_params.name ,coefficient=1, coefficient_2 = 1,coefficient_3 = 1, guid_abonents = Abonents.objects.get(name= get_taken_param_by_abonent_from_excel_cfg(unicode(instance.name))) , guid_taken_params = instance )
             add_link_abonents_taken_param.save()
         except:
             pass
@@ -1757,7 +1757,7 @@ def add_link_abonents_taken_params2(sender, instance, created, **kwargs):
                 linkName=abon+u' Канал '+channel+' Суточный'
                 writeToLog(linkName)
                 try:
-                    add_link_abonents_taken_param = LinkAbonentsTakenParams (name = linkName,coefficient=1, coefficient_2 = 1, guid_abonents = Abonents.objects.get(guid=guidAbon) , guid_taken_params = instance )
+                    common_sql.InsertInLinkAbonentsTakenParams(name = linkName,coefficient=1, coefficient_2 = 1,coefficient_3 = 1, guid_abonents = Abonents.objects.get(guid=guidAbon) , guid_taken_params = instance )
                     add_link_abonents_taken_param.save()
                     writeToLog(u'Связь добавлена: '+abon+u' -- '+taken_param)
                 except:
@@ -1784,7 +1784,7 @@ def add_link_abonents_taken_params2(sender, instance, created, **kwargs):
 #    if get_taken_param_by_abonent_from_excel_cfg(instance.name) is not None:
 #        print u'Совпадение'
 #        try:
-#            add_link_abonents_taken_param = LinkAbonentsTakenParams (name = Abonents.objects.get(name= get_taken_param_by_abonent_from_excel_cfg(instance.name)).name + u" " + instance.guid_params.guid_names_params.name + u" " + instance.guid_params.guid_types_params.name ,coefficient=1, coefficient_2 = 1, guid_abonents = Abonents.objects.get(name= get_taken_param_by_abonent_from_excel_cfg(unicode(instance.name))) , guid_taken_params = instance )
+#            common_sql.InsertInLinkAbonentsTakenParams(name = Abonents.objects.get(name= get_taken_param_by_abonent_from_excel_cfg(instance.name)).name + u" " + instance.guid_params.guid_names_params.name + u" " + instance.guid_params.guid_types_params.name ,coefficient=1, coefficient_2 = 1,coefficient_3 = 1, guid_abonents = Abonents.objects.get(name= get_taken_param_by_abonent_from_excel_cfg(unicode(instance.name))) , guid_taken_params = instance )
 #            add_link_abonents_taken_param.save()
 #        except:
 #            pass
@@ -1815,7 +1815,7 @@ def add_link_abonent_taken_params_from_excel_cfg_electric(sender, instance, crea
             if unicode(meter) == instance.guid_meters.factory_number_manual:
                 writeToLog(u'Абонент найден' + u' ' + unicode(instance.name))
                 #print guid_abonent_by_excel 
-                add_link_abonents_taken_param = LinkAbonentsTakenParams (name = unicode(dtAll[i][3]) + u' - ' +  unicode(instance.guid_meters.name)  ,coefficient=unicode(dtAll[i][9]), coefficient_2 = 1, guid_abonents = Abonents.objects.get(guid =guid_abonent_by_excel[0][0]), guid_taken_params = instance)
+                common_sql.InsertInLinkAbonentsTakenParams(name = unicode(dtAll[i][3]) + u' - ' +  unicode(instance.guid_meters.name)  ,coefficient=unicode(dtAll[i][9]), coefficient_2 = 1, guid_abonents = Abonents.objects.get(guid =guid_abonent_by_excel[0][0]), guid_taken_params = instance)
                 add_link_abonents_taken_param.save()
             else:
                 pass
@@ -2065,7 +2065,7 @@ def LoadWaterPulsar(sPath, sSheet):
                 #print guid_taken_param
                 #print TakenParams.objects.get(guid=guid_taken_param) 
                 #"миномес ГВС, №68208 Канал 5 Суточный"
-                add_link_abonents_taken_param = LinkAbonentsTakenParams (name = abonent_name+u' Канал '+chanel+u' Суточный',coefficient=1, coefficient_2 = 1, guid_abonents = Abonents.objects.get(guid =guidAbon), guid_taken_params = TakenParams.objects.get(guid=guid_taken_param) )
+                common_sql.InsertInLinkAbonentsTakenParams(name = abonent_name+u' Канал '+chanel+u' Суточный',coefficient=1, coefficient_2 = 1,coefficient_3 = 1, guid_abonents = Abonents.objects.get(guid =guidAbon), guid_taken_params = TakenParams.objects.get(guid=guid_taken_param) )
                 add_link_abonents_taken_param.save()
                 writeToLog(u'Abonent connected with taken param')
                 con+=1
@@ -2452,56 +2452,124 @@ def add_current_taken_params_pulsar16m(request):
     args={}
     dt_pulsar16m=common_sql.get_meters_by_type( u'Пульсар 16M')
     count16m=0
-    for puls in dt_pulsar16m:  
+    for puls in dt_pulsar16m:
+        print u'счётчик', puls[1]
+        guid_meter = puls[0]
     # Текущие
       #Канал 1
         add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = Meters.objects.get(guid=puls[0]), guid_params = Params.objects.get(guid = u"e3f1325e-3018-40ba-b94a-ab6d6ac093e9"))
         add_param.save()
+        dt_abonent = common_sql.get_abonent_by_meter_and_pulsar_chanel(guid_meter, 1)
+        if len(dt_abonent)>0:
+            common_sql.InsertInLinkAbonentsTakenParams(name = dt_abonent[0][1] + u" Канал 1 Текущий", coefficient=1, coefficient_2 = 1,coefficient_3 = 1, guid_abonents = dt_abonent[0][0], guid_taken_params = add_param.guid )               
+        #common_sql.InsertInLinkAbonentsTakenParams(  ,coefficient=1, coefficient_2 = 1,coefficient_3 = 1,guid_abonents = dt_abonent[0][0] , guid_taken_params = add_param.guid )
+        #add_link_abonents_taken_param.save()
+
       #Канал 2
         add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = Meters.objects.get(guid=puls[0]), guid_params = Params.objects.get(guid = u"5a6b0338-c15d-4224-a04f-a10fc73c5fc7"))
         add_param.save()
+        dt_abonent = common_sql.get_abonent_by_meter_and_pulsar_chanel(guid_meter, 2)
+        if len(dt_abonent)>0:
+            common_sql.InsertInLinkAbonentsTakenParams(name = dt_abonent[0][1] + u" Канал 2 Текущий", coefficient=1, coefficient_2 = 1,coefficient_3 = 1,guid_abonents = dt_abonent[0][0] , guid_taken_params = add_param.guid )
+        
       #Канал 3
         add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = Meters.objects.get(guid=puls[0]), guid_params = Params.objects.get(guid = u"48a42afe-d9ac-4180-a733-6dd5f9d9ca80"))
         add_param.save()
+        dt_abonent = common_sql.get_abonent_by_meter_and_pulsar_chanel(guid_meter, 3)
+        if len(dt_abonent)>0:
+            common_sql.InsertInLinkAbonentsTakenParams(name = dt_abonent[0][1] + u" Канал 3 Текущий"  ,coefficient=1, coefficient_2 = 1,coefficient_3 = 1,guid_abonents = dt_abonent[0][0] , guid_taken_params = add_param.guid )
+        
       #Канал 4
         add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = Meters.objects.get(guid=puls[0]), guid_params = Params.objects.get(guid = u"01a5419c-c701-4185-95b6-457b8c9ca2d0"))
         add_param.save()
+        dt_abonent = common_sql.get_abonent_by_meter_and_pulsar_chanel(guid_meter, 4)        
+        if len(dt_abonent)>0:
+            common_sql.InsertInLinkAbonentsTakenParams(name = dt_abonent[0][1] + u" Канал 4 Текущий"  ,coefficient=1, coefficient_2 = 1,coefficient_3 = 1,guid_abonents = dt_abonent[0][0] , guid_taken_params = add_param.guid )
+        
       #Канал 5
         add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = Meters.objects.get(guid=puls[0]), guid_params = Params.objects.get(guid = u"85c4295e-bc6a-46ec-9866-0bf9f77c6904"))
         add_param.save()
+        dt_abonent = common_sql.get_abonent_by_meter_and_pulsar_chanel(guid_meter, 1)
+        if len(dt_abonent)>0:
+            common_sql.InsertInLinkAbonentsTakenParams(name = dt_abonent[0][1] + u" Канал 5 Текущий"  ,coefficient=1, coefficient_2 = 1,coefficient_3 = 1,guid_abonents = dt_abonent[0][0] , guid_taken_params = add_param.guid )
+        
       #Канал 6
         add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = Meters.objects.get(guid=puls[0]), guid_params = Params.objects.get(guid = u"68270d0a-5043-4ea2-9b61-4adaa298abad"))
         add_param.save()
+        dt_abonent = common_sql.get_abonent_by_meter_and_pulsar_chanel(guid_meter, 6)
+        if len(dt_abonent)>0:
+            common_sql.InsertInLinkAbonentsTakenParams(name = dt_abonent[0][1] + u" Канал 6 Текущий"  ,coefficient=1, coefficient_2 = 1,coefficient_3 = 1,guid_abonents = dt_abonent[0][0] , guid_taken_params = add_param.guid )
+        
       #Канал 7
         add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = Meters.objects.get(guid=puls[0]), guid_params = Params.objects.get(guid = u"cd489c4b-6e74-4c65-bfee-c0fa78a853bf"))
         add_param.save()
+        dt_abonent = common_sql.get_abonent_by_meter_and_pulsar_chanel(guid_meter, 7)
+        if len(dt_abonent)>0:
+            common_sql.InsertInLinkAbonentsTakenParams(name = dt_abonent[0][1] + u" Канал 7 Текущий"  ,coefficient=1, coefficient_2 = 1,coefficient_3 = 1,guid_abonents = dt_abonent[0][0] , guid_taken_params = add_param.guid )
+       
       #Канал 8
         add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = Meters.objects.get(guid=puls[0]), guid_params = Params.objects.get(guid = u"f29062a4-ab60-4117-8f85-0cdec634c797"))
         add_param.save()
+        dt_abonent = common_sql.get_abonent_by_meter_and_pulsar_chanel(guid_meter, 8)
+        if len(dt_abonent)>0:
+            common_sql.InsertInLinkAbonentsTakenParams(name = dt_abonent[0][1] + u" Канал 8 Текущий"  ,coefficient=1, coefficient_2 = 1,coefficient_3 = 1,guid_abonents = dt_abonent[0][0] , guid_taken_params = add_param.guid )
+        
       #Канал 9
         add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = Meters.objects.get(guid=puls[0]), guid_params = Params.objects.get(guid = u"e8521cd7-2f38-4619-935d-8fe86234dbe7"))
         add_param.save()
+        dt_abonent = common_sql.get_abonent_by_meter_and_pulsar_chanel(guid_meter, 9)
+        if len(dt_abonent)>0:
+            common_sql.InsertInLinkAbonentsTakenParams(name = dt_abonent[0][1] + u" Канал 9 Текущий"  ,coefficient=1, coefficient_2 = 1,coefficient_3 = 1,guid_abonents = dt_abonent[0][0] , guid_taken_params = add_param.guid )
+        
       #Канал 10
         add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = Meters.objects.get(guid=puls[0]), guid_params = Params.objects.get(guid = u"1349b747-41ca-4ba8-a690-69c649129f44"))
         add_param.save()
+        dt_abonent = common_sql.get_abonent_by_meter_and_pulsar_chanel(guid_meter, 10)
+        if len(dt_abonent)>0:
+            common_sql.InsertInLinkAbonentsTakenParams(name = dt_abonent[0][1] + u" Канал 10 Текущий"  ,coefficient=1, coefficient_2 = 1,coefficient_3 = 1,guid_abonents = dt_abonent[0][0] , guid_taken_params = add_param.guid )
+        
       #Канал 11
         add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = Meters.objects.get(guid=puls[0]), guid_params = Params.objects.get(guid = u"99ab1a30-fde8-4b81-9f9e-2f731516ce1b"))
         add_param.save()
+        dt_abonent = common_sql.get_abonent_by_meter_and_pulsar_chanel(guid_meter, 11)
+        if len(dt_abonent)>0:
+            common_sql.InsertInLinkAbonentsTakenParams(name = dt_abonent[0][1] + u" Канал 11 Текущий"  ,coefficient=1, coefficient_2 = 1,coefficient_3 = 1,guid_abonents = dt_abonent[0][0] , guid_taken_params = add_param.guid )
+        
       #Канал 12
         add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = Meters.objects.get(guid=puls[0]), guid_params = Params.objects.get(guid = u"c7f6a397-833d-4020-9d2b-38c19bec272c"))
         add_param.save()
+        dt_abonent = common_sql.get_abonent_by_meter_and_pulsar_chanel(guid_meter, 12)
+        if len(dt_abonent)>0:
+            common_sql.InsertInLinkAbonentsTakenParams(name = dt_abonent[0][1] + u" Канал 12 Текущий"  ,coefficient=1, coefficient_2 = 1,coefficient_3 = 1,guid_abonents = dt_abonent[0][0] , guid_taken_params = add_param.guid )
+        
       #Канал 13
         add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = Meters.objects.get(guid=puls[0]), guid_params = Params.objects.get(guid = u"4413bffb-1832-4900-9351-5ac3666dd8b0"))
         add_param.save()
+        dt_abonent = common_sql.get_abonent_by_meter_and_pulsar_chanel(guid_meter, 13)
+        if len(dt_abonent)>0:
+            common_sql.InsertInLinkAbonentsTakenParams(name = dt_abonent[0][1] + u" Канал 13 Текущий"  ,coefficient=1, coefficient_2 = 1,coefficient_3 = 1,guid_abonents = dt_abonent[0][0] , guid_taken_params = add_param.guid )
+        
       #Канал 14
         add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = Meters.objects.get(guid=puls[0]), guid_params = Params.objects.get(guid = u"6280490b-123d-4e27-bef9-19fd7dc2cf54"))
         add_param.save()
+        dt_abonent = common_sql.get_abonent_by_meter_and_pulsar_chanel(guid_meter, 14)
+        if len(dt_abonent)>0:
+            common_sql.InsertInLinkAbonentsTakenParams(name = dt_abonent[0][1] + u" Канал 14 Текущий"  ,coefficient=1, coefficient_2 = 1,coefficient_3 = 1,guid_abonents = dt_abonent[0][0] , guid_taken_params = add_param.guid )
+        
       #Канал 15
         add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = Meters.objects.get(guid=puls[0]), guid_params = Params.objects.get(guid = u"93891c5a-1c8f-4906-b7f0-961dc8ad3c9f"))
         add_param.save()
+        dt_abonent = common_sql.get_abonent_by_meter_and_pulsar_chanel(guid_meter, 15)
+        if len(dt_abonent)>0:
+            common_sql.InsertInLinkAbonentsTakenParams(name = dt_abonent[0][1] + u" Канал 15 Текущий"  ,coefficient=1, coefficient_2 = 1,coefficient_3 = 1,guid_abonents = dt_abonent[0][0] , guid_taken_params = add_param.guid )
+        
       #Канал 16
         add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = Meters.objects.get(guid=puls[0]), guid_params = Params.objects.get(guid = u"22dd3a17-a828-44e0-80d9-db075ba120ae"))
         add_param.save()
+        dt_abonent = common_sql.get_abonent_by_meter_and_pulsar_chanel(guid_meter, 16)
+        if len(dt_abonent)>0:
+            common_sql.InsertInLinkAbonentsTakenParams(name = dt_abonent[0][1] + u" Канал 16 Текущий"  ,coefficient=1, coefficient_2 = 1,coefficient_3 = 1,guid_abonents = dt_abonent[0][0] , guid_taken_params = add_param.guid )
+        
 
         count16m+=1
 
@@ -2509,38 +2577,79 @@ def add_current_taken_params_pulsar16m(request):
     count10m=0
     for puls in dt_pulsar10m:        
         #Добавляем параметры для Пульсар10 
-    
+        print u'счётчик', puls[1]
+        guid_meter = puls[0]
     # Текущие
       #Канал 1
         add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = Meters.objects.get(guid=puls[0]), guid_params = Params.objects.get(guid = u"32dad392-ca1e-4110-8f2c-a86b02e26fb3"))
         add_param.save()
+        dt_abonent = common_sql.get_abonent_by_meter_and_pulsar_chanel(guid_meter, 1)
+        if len(dt_abonent)>0:
+            common_sql.InsertInLinkAbonentsTakenParams(name = dt_abonent[0][1] + u" Канал 1 Текущий"  ,coefficient=1, coefficient_2 = 1,coefficient_3 = 1,guid_abonents = dt_abonent[0][0] , guid_taken_params = add_param.guid )
+        
       #Канал 2
         add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = Meters.objects.get(guid=puls[0]), guid_params = Params.objects.get(guid = u"3e13694b-7cb5-4417-a091-af8a7db34dc7"))
         add_param.save()
+        dt_abonent = common_sql.get_abonent_by_meter_and_pulsar_chanel(guid_meter, 2)
+        if len(dt_abonent)>0:
+            common_sql.InsertInLinkAbonentsTakenParams(name = dt_abonent[0][1] + u" Канал 2 Текущий"  ,coefficient=1, coefficient_2 = 1,coefficient_3 = 1,guid_abonents = dt_abonent[0][0] , guid_taken_params = add_param.guid )
+        
       #Канал 3
         add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = Meters.objects.get(guid=puls[0]), guid_params = Params.objects.get(guid = u"1023b35b-3cbf-4519-aac3-3bf1ebae07c1"))
         add_param.save()
+        dt_abonent = common_sql.get_abonent_by_meter_and_pulsar_chanel(guid_meter, 3)
+        if len(dt_abonent)>0:
+            common_sql.InsertInLinkAbonentsTakenParams(name = dt_abonent[0][1] + u" Канал 3 Текущий"  ,coefficient=1, coefficient_2 = 1,coefficient_3 = 1,guid_abonents = dt_abonent[0][0] , guid_taken_params = add_param.guid )
+        
       #Канал 4
         add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = Meters.objects.get(guid=puls[0]), guid_params = Params.objects.get(guid = u"eea27ade-44cd-4e66-8298-00a4a6ad915a"))
         add_param.save()
+        dt_abonent = common_sql.get_abonent_by_meter_and_pulsar_chanel(guid_meter, 4)
+        if len(dt_abonent)>0:
+            common_sql.InsertInLinkAbonentsTakenParams(name = dt_abonent[0][1] + u" Канал 4 Текущий"  ,coefficient=1, coefficient_2 = 1,coefficient_3 = 1,guid_abonents = dt_abonent[0][0] , guid_taken_params = add_param.guid )
+        
       #Канал 5
         add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = Meters.objects.get(guid=puls[0]), guid_params = Params.objects.get(guid = u"25e09d4d-3a48-4381-ad5d-b783c03c4d35"))
         add_param.save()
+        dt_abonent = common_sql.get_abonent_by_meter_and_pulsar_chanel(guid_meter, 5)
+        if len(dt_abonent)>0:
+            common_sql.InsertInLinkAbonentsTakenParams(name = dt_abonent[0][1] + u" Канал 5 Текущий"  ,coefficient=1, coefficient_2 = 1,coefficient_3 = 1,guid_abonents = dt_abonent[0][0] , guid_taken_params = add_param.guid )
+        
       #Канал 6
         add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = Meters.objects.get(guid=puls[0]), guid_params = Params.objects.get(guid = u"069898ea-9d74-4571-b719-e8e6f1513c12"))
         add_param.save()
+        dt_abonent = common_sql.get_abonent_by_meter_and_pulsar_chanel(guid_meter, 6)
+        if len(dt_abonent)>0:
+            common_sql.InsertInLinkAbonentsTakenParams(name = dt_abonent[0][1] + u" Канал 6 Текущий"  ,coefficient=1, coefficient_2 = 1,coefficient_3 = 1,guid_abonents = dt_abonent[0][0] , guid_taken_params = add_param.guid )
+        
       #Канал 7
         add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = Meters.objects.get(guid=puls[0]), guid_params = Params.objects.get(guid = u"084aa5f4-75d5-41f6-b0d6-9f2403eacd2c"))
         add_param.save()
+        dt_abonent = common_sql.get_abonent_by_meter_and_pulsar_chanel(guid_meter, 7)
+        if len(dt_abonent)>0:
+            common_sql.InsertInLinkAbonentsTakenParams(name = dt_abonent[0][1] + u" Канал 7 Текущий"  ,coefficient=1, coefficient_2 = 1,coefficient_3 = 1,guid_abonents = dt_abonent[0][0] , guid_taken_params = add_param.guid )
+        
       #Канал 8
         add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = Meters.objects.get(guid=puls[0]), guid_params = Params.objects.get(guid = u"786ed8b8-aed1-478c-ae75-99caf1358cf0"))
         add_param.save()
+        dt_abonent = common_sql.get_abonent_by_meter_and_pulsar_chanel(guid_meter, 8)
+        if len(dt_abonent)>0:
+            common_sql.InsertInLinkAbonentsTakenParams(name = dt_abonent[0][1] + u" Канал 8 Текущий"  ,coefficient=1, coefficient_2 = 1,coefficient_3 = 1,guid_abonents = dt_abonent[0][0] , guid_taken_params = add_param.guid )
+        
       #Канал 9
         add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = Meters.objects.get(guid=puls[0]), guid_params = Params.objects.get(guid = u"6fc4c39c-9a43-4cb7-a066-c40fd2ca47e5"))
         add_param.save()
+        dt_abonent = common_sql.get_abonent_by_meter_and_pulsar_chanel(guid_meter, 9)
+        if len(dt_abonent)>0:
+            common_sql.InsertInLinkAbonentsTakenParams(name = dt_abonent[0][1] + u" Канал 9 Текущий"  ,coefficient=1, coefficient_2 = 1,coefficient_3 = 1,guid_abonents = dt_abonent[0][0] , guid_taken_params = add_param.guid )
+        
       #Канал 10
         add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = Meters.objects.get(guid=puls[0]), guid_params = Params.objects.get(guid = u"8b2aa40a-cd91-4e22-b9d1-596e49e5f839"))
         add_param.save()
+        dt_abonent = common_sql.get_abonent_by_meter_and_pulsar_chanel(guid_meter, 10)
+        if len(dt_abonent)>0:
+            common_sql.InsertInLinkAbonentsTakenParams(name = dt_abonent[0][1] + u" Канал 10 Текущий"  ,coefficient=1, coefficient_2 = 1,coefficient_3 = 1,guid_abonents = dt_abonent[0][0] , guid_taken_params = add_param.guid )
+        
 
         count10m+=1
 
@@ -2548,86 +2657,6 @@ def add_current_taken_params_pulsar16m(request):
     #print result
     args['pulsar16m_status'] = result
     return render_to_response("service/service_get_info.html", args)
-
-
-""" def replace_electric_meters(request):
-    args={}
-
-    meter1=u''
-    meter2=u''
-    change_meter_status=u""
-    replace_meter_status=u'НЕ удалось поменять счётчики местами'
-    if request.is_ajax():
-        if request.method == 'GET':                        
-            request.session["meter1"]    = meter1    = request.GET.get('meter1')
-            request.session["meter2"]    = meter2   = request.GET.get('meter2')
-            
-            if (not meter1 or meter1==None or meter2==None or not meter2):
-                replace_meter_status=u"Заполните обе ячейки"
-            else:                
-                replace_meter_status=ReplaceMeters(meter1, meter2)
-
-    args["change_meter_status"]=change_meter_status
-    args["replace_meter_status"]=replace_meter_status
-    return render_to_response("service/service_change_electric.html", args)
-    
-def ReplaceMeters(meter1, meter2):
-    result=u''
-    
-    isExistOldMeter=SimpleCheckIfExist('meters','factory_number_manual',meter1,"","","")
-    isExistNewMeter=SimpleCheckIfExist('meters','factory_number_manual',meter2,"","","")
-    if not isExistOldMeter:
-        return u"Номера первого счётчика нет в базе"
-    if not isExistNewMeter:
-        return u"Номера второго счётчика нет в базе"
-        
-#  objects.guid as obj_guid,      0 
-#  objects.name as obj_name,      1
-#  abonents.guid as ab_guid,      2 
-#  abonents.name as ab_name,      3
-#  link_abonents_taken_params.guid as link_ab_taken_guid,       4
-#  link_abonents_taken_params.name as link_ab_taken_name,       5
-#  taken_params.guid as taken_guid,       6
-#  taken_params.name as taken_name,       7
-#  meters.guid as meter_guid,             8
-#  meters.name as meter_name,             9
-#  meters.address as meter_adr,           10
-#  meters.factory_number_manual           11
-        
-    dtAllTakenMeter1=GetSimpleTable('all_taken_params','factory_number_manual', meter1)
-    guidAbonent1=unicode(dtAllTakenMeter1[0][2])
-    abName1=unicode(dtAllTakenMeter1[0][3])
-    
-    dtAllTakenMeter2=GetSimpleTable('all_taken_params','factory_number_manual', meter2)    
-    guidAbonent2=unicode(dtAllTakenMeter2[0][2])
-    abName2=unicode(dtAllTakenMeter2[0][3])
-    
-    nameParam1=unicode(dtAllTakenMeter1[0][7])
-    nameParam2=unicode(dtAllTakenMeter2[0][7])
-        
-    typeMeter1=getTypeMeter(nameParam1)
-    typeMeter2=getTypeMeter(nameParam2)
-    
-    if len(typeMeter1)<1 or len(typeMeter2)<1:
-        return u'Для этого типа счётчика ещё нет функции обработки'
-    if typeMeter1 !=typeMeter2:
-        return u'Типы счётчиков не совпадают'
-    
-    result+=changeConnectionMeterAbonent(dtAllTakenMeter1, typeMeter1, meter1, meter2, guidAbonent2, abName2)
-    result+=changeConnectionMeterAbonent(dtAllTakenMeter2, typeMeter1, meter2, meter1, guidAbonent1, abName1) 
-           
-        
-    return result
-
-def getTypeMeter(nameParam1):
-    typeMeter1=u''
-    if (nameParam1.find('М-230') or nameParam1.find('Меркурий 230')):
-        typeMeter1=u'М-230'
-    elif (nameParam1.find('Саяны Комбик')):
-        typeMeter1=u'Саяны Комбик' 
-    elif (nameParam1.find('М-200') or nameParam1.find('Меркурий 200')):
-        typeMeter1=u"Меркурий 200"
-    return  typeMeter1 """
 
 
 def change_meters_v2(request):
@@ -2655,25 +2684,7 @@ def change_meters_v2(request):
 
     return render_to_response("service/service_change_electric.html", args)
 
-# def change_meters(request):
-#     args={}
-#     old_meter=u''
-#     new_meter=u''
-#     change_meter_status=u"Заполните обе ячейки"
-#     if request.is_ajax():
-#         if request.method == 'GET':
-            
-#             request.session["old_meter"]    = old_meter    = request.GET.get('old_meter')
-#             request.session["new_meter"]    = new_meter   = request.GET.get('new_meter')
-#             if (not old_meter or old_meter==None or new_meter==None or not new_meter):
-#                 change_meter_status=u"Заполните обе ячейки"
-#             else:
-#                 change_meter_status=ChangeMeters(old_meter, new_meter)
-#     #print 'old_meter, new_meter', old_meter, new_meter
-#     args["change_meter_status"]=change_meter_status
-#     args["old_meter"] = old_meter
-#     args["new_meter"] = new_meter
-#     return render_to_response("service/service_change_electric.html", args)
+
   
 def isInt(s):
     try:
@@ -2818,88 +2829,3 @@ def ReplaceMeters_v2(meter1, meter2):
         
     return result
 
-""" def ChangeMeters(old_meter, new_meter):
-    result=u""
-    isExistOldMeter=SimpleCheckIfExist('meters','factory_number_manual',old_meter,"","","")
-    isExistNewMeter=SimpleCheckIfExist('meters','factory_number_manual',new_meter,"","","")
-    if not isExistOldMeter:
-        return u"Номера старого счётчика нет в базе"
-    if isExistNewMeter:
-        return u"Новый счётчик уже существует а базе"
-    
-    dtOldMeter=GetSimpleTable('meters','factory_number_manual', old_meter)
-    guidOldMeter=unicode(dtOldMeter[0][0])
-    
-    dtTakenParams=GetSimpleTable('taken_params','guid_meters', guidOldMeter)
-    
-    oldName=unicode(dtOldMeter[0][1])
-    newName=oldName.replace(old_meter,new_meter) #поменять на срез+ добавление или формировать полность по новой
-    old_factory_number_manual=unicode(dtOldMeter[0][5])
-    new_factory_number_manual=old_factory_number_manual.replace(old_meter,new_meter)  #поменять на срез+ добавление или формировать полность по новой
-    old_address=unicode(dtOldMeter[0][2])
-    new_address=old_address.replace(old_meter,new_meter)
-    
-    if UpdateTable('meters','guid', guidOldMeter, 'name', newName, 'factory_number_manual', new_factory_number_manual,'address', new_address):
-        result=u"Счётчик "+unicode(old_meter)+ " успешно заменён на "+unicode(new_meter)
-    #print result
-    con=0
-    for i in range(len(dtTakenParams)):
-        dtTakenParams[i]=list(dtTakenParams[i])
-        guidTaken=unicode(dtTakenParams[i][1])
-        dtLinkAbonentsTakenParams=GetSimpleTable('link_abonents_taken_params','guid_taken_params', guidTaken)
-        oldTakenParamName=unicode(dtTakenParams[i][4])
-        #newTakenParamName=oldTakenParamName.replace(old_meter,new_meter)
-        OldLinkAbonentTakenParamName=unicode(dtLinkAbonentsTakenParams[0][1])
-        #newLinkAbonentTakenParamName= OldLinkAbonentTakenParamName.replace(old_meter,new_meter)
-        #get_taken_param_by_abonent_from_excel_cfg(instance.name)).name + u" " + instance.guid_params.guid_names_params.name + u" " + instance.guid_params.guid_types_params.name
-        #"Квартира 0103 - М-230 21949676"
-        if (OldLinkAbonentTakenParamName.find('М-230')):
-            typeMeter=u'М-230'
-        if (OldLinkAbonentTakenParamName.find('Саяны Комбик')):
-            typeMeter=u'Саяны Комбик'  
-        newLinkAbonentTakenParamName=OldLinkAbonentTakenParamName.split('-')[0]+ u' - '+ typeMeter +u' ' + unicode(new_meter)
-        
-        # "М-230 22633939 Меркурий 230 T0 A+ Суточный -- adress: 0  channel: 0"
-        #"Саяны Комбик 4443 Саяны Комбик Q Система1 Суточный -- adress: 0  channel: 1"
-        n=oldTakenParamName.find(old_meter)
-        s=oldTakenParamName[n+len(old_meter):]
-        newTakenParamName= typeMeter + u' ' + unicode(new_meter) + s
-        #print newTakenParamName
-#        print newLinkAbonentTakenParamName
-        if UpdateTable('link_abonents_taken_params','guid_taken_params', guidTaken, 'name', newLinkAbonentTakenParamName,"","","","") and UpdateTable('taken_params','guid', guidTaken, 'name',newTakenParamName,"","","",""):
-            con+=1
-    result+=u"; Изменено связей:"+unicode(con)
-    
-    return result """
-
-
-""" 
-def changeConnectionMeterAbonent(dtAllTakenMeter1, typeMeter, meter1, meter2, guidAbonent2, abName2):
-    result=u''
-    #guidMeter1=unicode(dtAllTakenMeter1[0][8])
-    #guidAbonent1=unicode(dtAllTakenMeter1[0][1])
-    #meterName1=unicode(dtAllTakenMeter1[0][9])
-    #abName1=unicode(dtAllTakenMeter1[0][2])
-    con1=0
-    for i in range(len(dtAllTakenMeter1)):
-        dtAllTakenMeter1[i]=list(dtAllTakenMeter1[i])
-        guidParam1=unicode(dtAllTakenMeter1[i][6])   
-        nameParam1=unicode(dtAllTakenMeter1[i][7])
-        guidLinkAbonentParam1=unicode(dtAllTakenMeter1[i][4])
-        #nameLinkAbonentParam1=unicode(dtAllTakenMeter1[i][5])
-        
-        newTakenParamName1= makeNewTakenParamName(nameParam1, meter1, meter2, typeMeter)
-        newLinkAbonentTakenParamName1=makeLinkabonentTakenParamName(abName2,typeMeter,meter2)
-        print newTakenParamName1        
-        print newLinkAbonentTakenParamName1
-        
-        isUpdateTakenParam=UpdateTable('taken_params','guid', guidParam1, 'name',newTakenParamName1,"","","","")
-        isUpdateLinkAbonTakenParam=UpdateTable('link_abonents_taken_params','guid', guidLinkAbonentParam1, 'guid_abonents', guidAbonent2,'name', newLinkAbonentTakenParamName1,"","")   
-        if isUpdateTakenParam and isUpdateLinkAbonTakenParam:
-            con1+=1
-            print con1
-      
-    if (con1>0):
-        result+=u' Счётчик '+meter1+u' привязан к абоненту '+abName2+'. Изменено привязок: '+unicode(con1)
-    else: result+=u' Что-то пошло не так, ни одной привязки не изменено! '+meter1
-    return result """

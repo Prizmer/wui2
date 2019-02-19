@@ -155,7 +155,11 @@ urlpatterns = patterns('',
     url(r'^95/$', views.electric_period_graphic_activ_reactiv), #график потребления электроэнергии по дням 3 тарифа R+ A+
     url(r'^96/$', views.water_current_impulse), #текущие по воде-импульсные ПУ
     
+    url(r'^97/$', views.heat_danfoss_period), #потребление по теплу данфосс -доделать
+
     url(r'^98/$', views.electric_restored_activ_reactiv_daily), #восстановленый суточный срез из получасовок
+
+    url(r'^100/$', views.heat_danfoss_daily), #показания по теплу данфосс - доделать
    #---- Test urls
     url(r'^addnum/$', views.add_numbers),
     

@@ -14559,6 +14559,7 @@ def electric_restored_activ_reactiv_daily(request):
 
 def heat_danfoss_period(request):
     # НЕ ДОДЕЛАНО
+    
     args = {}
     is_abonent_level = re.compile(r'abonent')
     is_object_level_2 = re.compile(r'level2')

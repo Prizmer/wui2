@@ -10297,3 +10297,49 @@ WHERE
     cursor.execute(sQuery)  
     data_table = cursor.fetchall()    
     return data_table
+
+def get_abonent_by_meter_and_pulsar_chanel(guid_meter, address):
+    cursor = connection.cursor()
+    data_table=[]   
+    sQuery="""
+    SELECT   
+  abonents.guid, 
+  abonents.name, 
+  params.name, 
+  params.param_address
+FROM 
+  public.abonents, 
+  public.link_abonents_taken_params, 
+  public.taken_params, 
+  public.meters, 
+  public.types_meters, 
+  public.params
+WHERE 
+  link_abonents_taken_params.guid_abonents = abonents.guid AND
+  link_abonents_taken_params.guid_taken_params = taken_params.guid AND
+  taken_params.guid_meters = meters.guid AND
+  taken_params.guid_params = params.guid AND
+  meters.guid_types_meters = types_meters.guid AND
+  meters.guid = '%s' and
+  params.param_address = %s
+ORDER BY
+  meters.name ASC, 
+  params.name ASC
+    """ %(guid_meter, address)
+    #print sQuery
+    cursor.execute(sQuery)  
+    data_table = cursor.fetchall()    
+    return data_table
+
+def InsertInLinkAbonentsTakenParams(name, coefficient, guid_abonents, guid_taken_params, coefficient_2, coefficient_3):
+    cursor = connection.cursor()
+    sQuery="""
+   INSERT INTO link_abonents_taken_params(
+            guid, name, coefficient, guid_abonents, guid_taken_params, coefficient_2, coefficient_3)
+    VALUES (uuid_in(md5(random()::text || clock_timestamp()::text)::cstring), '%s',%s, '%s', '%s',%s,%s)
+    """ %(name, coefficient, guid_abonents, guid_taken_params, coefficient_2, coefficient_3)
+    #print sQuery
+    cursor.execute(sQuery)
+    connection.commit() 
+    
+    return True  
