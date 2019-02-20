@@ -10343,3 +10343,30 @@ def InsertInLinkAbonentsTakenParams(name, coefficient, guid_abonents, guid_taken
     connection.commit() 
     
     return True  
+
+def get_count_current_params_by_meters_guid(guid_meter):
+    cursor = connection.cursor()
+    data_table=[]   
+    sQuery="""
+   SELECT 
+  Count(types_params.name), 
+  types_meters.name
+FROM 
+  public.meters, 
+  public.taken_params, 
+  public.params, 
+  public.types_params, 
+  public.types_meters
+WHERE 
+  meters.guid_types_meters = types_meters.guid AND
+  taken_params.guid_meters = meters.guid AND
+  taken_params.guid_params = params.guid AND
+  params.guid_types_params = types_params.guid AND
+  meters.guid = '%s' AND 
+  types_params.name = 'Текущий'
+  Group by types_meters.name
+    """ %(guid_meter)
+    #print sQuery
+    cursor.execute(sQuery)  
+    data_table = cursor.fetchall()    
+    return data_table

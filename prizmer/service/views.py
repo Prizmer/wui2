@@ -2450,11 +2450,17 @@ def add_current_taken_params_pulsar16m(request):
     # НАДО ДОДЕЛАТЬ LINK_ABONENTS_TAKEN_PARAMS 
     result = "Прогрузка прошла не успешно"
     args={}
+    
     dt_pulsar16m=common_sql.get_meters_by_type( u'Пульсар 16M')
     count16m=0
     for puls in dt_pulsar16m:
         print u'счётчик', puls[1]
         guid_meter = puls[0]
+        dt_current_count = common_sql.get_count_current_params_by_meters_guid(guid_meter)
+        if len(dt_current_count)>0: continue
+        # if dt_current_count[0][1] == 'Пульсар 16M':
+        #     if dt_current_count[0][0] >=16: continue
+        
     # Текущие
       #Канал 1
         add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = Meters.objects.get(guid=puls[0]), guid_params = Params.objects.get(guid = u"e3f1325e-3018-40ba-b94a-ab6d6ac093e9"))
@@ -2489,7 +2495,7 @@ def add_current_taken_params_pulsar16m(request):
       #Канал 5
         add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = Meters.objects.get(guid=puls[0]), guid_params = Params.objects.get(guid = u"85c4295e-bc6a-46ec-9866-0bf9f77c6904"))
         add_param.save()
-        dt_abonent = common_sql.get_abonent_by_meter_and_pulsar_chanel(guid_meter, 1)
+        dt_abonent = common_sql.get_abonent_by_meter_and_pulsar_chanel(guid_meter, 5)
         if len(dt_abonent)>0:
             common_sql.InsertInLinkAbonentsTakenParams(name = dt_abonent[0][1] + u" Канал 5 Текущий"  ,coefficient=1, coefficient_2 = 1,coefficient_3 = 1,guid_abonents = dt_abonent[0][0] , guid_taken_params = add_param.guid )
         
@@ -2579,6 +2585,8 @@ def add_current_taken_params_pulsar16m(request):
         #Добавляем параметры для Пульсар10 
         print u'счётчик', puls[1]
         guid_meter = puls[0]
+        dt_current_count = common_sql.get_count_current_params_by_meters_guid(guid_meter)
+        if len(dt_current_count)>0: continue
     # Текущие
       #Канал 1
         add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = Meters.objects.get(guid=puls[0]), guid_params = Params.objects.get(guid = u"32dad392-ca1e-4110-8f2c-a86b02e26fb3"))
