@@ -2447,7 +2447,7 @@ def service_balance_load(request):
     return render_to_response("service/service_balance_load.html", args)
 
 def add_current_taken_params_pulsar16m(request):   
-    # НАДО ДОДЕЛАТЬ LINK_ABONENTS_TAKEN_PARAMS 
+    
     result = "Прогрузка прошла не успешно"
     args={}
     
