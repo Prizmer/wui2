@@ -294,6 +294,20 @@ def GetSimpleTable(table,fieldName,value):
     dt = cursor.fetchall()
     return dt
     
+def GetSimpleCrossTable(table1,fieldName1,value1,table2,fieldName2, value2):
+    dt=[]
+    cursor = connection.cursor()
+    sQuery="""
+        Select *
+        from %s, %s
+        where %s.guid_%s=%s.guid and
+        %s.%s='%s' and
+        %s.%s='%s'
+        """%(table1,table2, table2, table1,table1, table1, fieldName1, value1,table2, fieldName2, value2)
+    #print sQuery
+    cursor.execute(sQuery)
+    dt = cursor.fetchall()
+    return dt
 
 def GetTableFromExcel(sPath,sSheet):
     wb = load_workbook(filename = sPath)
@@ -690,14 +704,15 @@ def add_link_meter_port_from_excel_cfg_electric(sender, instance, created, **kwa
         #print u'Обрабатываем строку ' + unicode(dtAll[i][6])+' - '+unicode(dtAll[i][7])
         meter=dtAll[i][6] #счётчик
         #print dtAll[0][11], dtAll[0][12]
-        PortType=dtAll[0][11] # com или tcp-ip
+        PortType=unicode(dtAll[0][12]) # com или tcp-ip
         #print 'i=',i,' len=', len(dtAll)
         ip_adr=unicode(dtAll[i][10]).strip()
         ip_port=unicode(dtAll[i][11]).strip()
         # Привязка к tpc порту
         if meter is not None:
             if unicode(meter) == instance.factory_number_manual :
-                if unicode(PortType) == u'Com-port':
+                if PortType == u'Com-port':
+                    print 'dtAll[i][12]', dtAll[i][12]
                     guid_com_port_from_excel = connection.cursor()
                     guid_com_port_from_excel.execute("""SELECT 
                                                       comport_settings.guid
@@ -706,7 +721,7 @@ def add_link_meter_port_from_excel_cfg_electric(sender, instance, created, **kwa
                                                     WHERE 
                                                       comport_settings.name = '%s';"""%(unicode(dtAll[i][12])))
                     guid_com_port_from_excel = guid_com_port_from_excel.fetchall()
-            
+                    #print guid_com_port_from_excel
                     guid_com_port = ComportSettings.objects.get(guid=guid_com_port_from_excel[0][0])
                     add_com_port_link = LinkMetersComportSettings(guid_meters = instance, guid_comport_settings = guid_com_port)
                     add_com_port_link.save()
@@ -1815,8 +1830,12 @@ def add_link_abonent_taken_params_from_excel_cfg_electric(sender, instance, crea
             if unicode(meter) == instance.guid_meters.factory_number_manual:
                 writeToLog(u'Абонент найден' + u' ' + unicode(instance.name))
                 #print guid_abonent_by_excel 
-                common_sql.InsertInLinkAbonentsTakenParams(name = unicode(dtAll[i][3]) + u' - ' +  unicode(instance.guid_meters.name)  ,coefficient=unicode(dtAll[i][9]), coefficient_2 = 1, guid_abonents = Abonents.objects.get(guid =guid_abonent_by_excel[0][0]), guid_taken_params = instance)
-                add_link_abonents_taken_param.save()
+                dtAbon = GetSimpleCrossTable('objects', 'name', obj, 'abonents','name', abon)
+                #dtAbon=GetSimpleTable('abonents','name', abon)
+                guidAbon=dtAbon[0][4]
+                #print instance.name, instance.guid
+                common_sql.InsertInLinkAbonentsTakenParams(name = unicode(dtAll[i][3]) + u' - ' +  unicode(instance.guid_meters.name)  ,coefficient=unicode(dtAll[i][9]), coefficient_2 = 1, coefficient_3 = 1, guid_abonents = guidAbon, guid_taken_params = instance.guid)
+                #add_link_abonents_taken_param.save()
             else:
                 pass
     
