@@ -2648,7 +2648,7 @@ def add_current_taken_params_pulsar16m(request):
         dt_abonent = common_sql.get_abonent_by_meter_and_pulsar_chanel(guid_meter, 6)
         if len(dt_abonent)>0:
             common_sql.InsertInLinkAbonentsTakenParams(name = dt_abonent[0][1] + u" Канал 6 Текущий"  ,coefficient=1, coefficient_2 = 1,coefficient_3 = 1,guid_abonents = dt_abonent[0][0] , guid_taken_params = add_param.guid )
-        
+         
       #Канал 7
         add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = Meters.objects.get(guid=puls[0]), guid_params = Params.objects.get(guid = u"084aa5f4-75d5-41f6-b0d6-9f2403eacd2c"))
         add_param.save()
