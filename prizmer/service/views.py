@@ -1772,7 +1772,7 @@ def add_link_abonents_taken_params2(sender, instance, created, **kwargs):
                 linkName=abon+u' Канал '+channel+' Суточный'
                 writeToLog(linkName)
                 try:
-                    common_sql.InsertInLinkAbonentsTakenParams(name = linkName,coefficient=1, coefficient_2 = 1,coefficient_3 = 1, guid_abonents = Abonents.objects.get(guid=guidAbon) , guid_taken_params = instance )
+                    common_sql.InsertInLinkAbonentsTakenParams(name = linkName,coefficient=1, coefficient_2 = 1,coefficient_3 = 1, guid_abonents = Abonents.objects.get(guid=guidAbon) , guid_taken_params = instance.guid )
                     add_link_abonents_taken_param.save()
                     writeToLog(u'Связь добавлена: '+abon+u' -- '+taken_param)
                 except:
@@ -2084,9 +2084,10 @@ def LoadWaterPulsar(sPath, sSheet):
                 #print guid_taken_param
                 #print TakenParams.objects.get(guid=guid_taken_param) 
                 #"миномес ГВС, №68208 Канал 5 Суточный"
-                common_sql.InsertInLinkAbonentsTakenParams(name = abonent_name+u' Канал '+chanel+u' Суточный',coefficient=1, coefficient_2 = 1,coefficient_3 = 1, guid_abonents = Abonents.objects.get(guid =guidAbon), guid_taken_params = TakenParams.objects.get(guid=guid_taken_param) )
-                add_link_abonents_taken_param.save()
-                writeToLog(u'Abonent connected with taken param')
+                #print abonent_name, guidAbon, guid_taken_param
+                common_sql.InsertInLinkAbonentsTakenParams(name = abonent_name+u' Канал '+chanel+u' Суточный',coefficient=1, coefficient_2 = 1,coefficient_3 = 1, guid_abonents = guidAbon, guid_taken_params = guid_taken_param)
+                #add_link_abonents_taken_param.save()
+                print u'Abonent connected with taken param'
                 con+=1
     result=u'Прогружено новых пульсаров '+unicode(met)
     if con>0:
