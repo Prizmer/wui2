@@ -12829,8 +12829,8 @@ def makeOneCoords(graphic_data,numField1):
     for i in range(len(graphic_data)):
         graphic_data[i]=list(graphic_data[i]) 
         date=graphic_data[i][numField1]   
-#        print numField1         
-#        print date 
+        #print numField1         
+        #print date 
         if (date==u'Н/Д' or date is None or date==None): 
             labels.append(str(0))
         else:
@@ -13237,6 +13237,15 @@ def balance_daily_electric(request):
     args['AllData']=AllData
     return render_to_response("data_table/electric/76.html", args)
 
+def IsEmptyTable(data_table, empty_field):
+    isEmpty = True
+    for row in data_table:
+        if not(row[empty_field] == None  or row[empty_field] == 'None'):
+            isEmpty = False
+    return isEmpty
+
+
+
 def balance_period_electric(request):
     args = {}
     is_abonent_level = re.compile(r'abonent')
@@ -13269,31 +13278,39 @@ def balance_period_electric(request):
          guid_type_abon=dt_type_abon[i][0]         
              
          if not(bool(is_abonent_level.search(obj_key))):
-
+             print guid_type_abon, dt_type_abon[i][1]
              data_table = common_sql.get_data_table_balance_electric_perid(obj_parent_title, obj_title,electric_data_start, electric_data_end,guid_type_abon)
              type_abon=translate(dt_type_abon[i][1])
+             if IsEmptyTable(data_table, 0):
+                 continue
              #print type_abon             
              if len(data_table)>0: 
                  data_table[0]=list(data_table[0])
                  data_table[0][6]="-"
                  data_table[0]=tuple(data_table[0])
-                 data_table=common_sql.ChangeNull(data_table, None)
+                 data_table=common_sql.ChangeNull(data_table, None)                 
                  dtAll.append(data_table)
                  AllData.append({str("data"):makeOneCoords(data_table,6), str("label"):str(type_abon), str("backgroundColor"): get_rgba_color(i+2)})
                  if i==1:
+                     #print data_table[0]
                      Xcoord=makeOneCoords(data_table,5)
     dt_delta=[]   
     
-    
+    #print len(dtAll)
     if len(dtAll)>0:
         for j in range(1,len(dtAll[0])):
             sumD=0
             vv=0
             for i in range(0,len(dtAll)):
                 #print i, j
-                #print dtAll[i][j][8] 
+                #print dtAll[i][j][1], dtAll[i][j][2],  dtAll[i][j][5], dtAll[i][j][6], dtAll[i][j][8]
                 if (dtAll[i][j][6] == 'Н/Д' or dtAll[i][j][6] == None  or dtAll[i][j][6] == 'None'): 
-                    if (j+1)<len(dtAll[0]): j+=1
+                    break
+                    # print j 
+                    # if (j+1)<len(dtAll[0]): 
+                    #     j+=1
+                    # else: break
+
                               
                 if dtAll[i][j][1] == True:                   
                     sumD+=decimal.Decimal(dtAll[i][j][6])

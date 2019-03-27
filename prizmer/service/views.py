@@ -2075,6 +2075,7 @@ def LoadWaterPulsar(sPath, sSheet):
                 print(u'taken param найден')
                 guid_taken_param=dtTakenParam[0][1]
                 dtLink=GetSimpleTable('link_abonents_taken_params','guid_taken_params',guid_taken_param)
+                print dtLink
                 if (dtLink):
                     result+=u"\n Привязка канала "+chanel+u" Пульсара "+pulsarName+u" уже существует. Перезапись НЕ произведена для счётчика "+abonent_name
                     continue
@@ -2089,7 +2090,7 @@ def LoadWaterPulsar(sPath, sSheet):
                 #add_link_abonents_taken_param.save()
                 print u'Abonent connected with taken param'
                 con+=1
-    result=u'Прогружено новых пульсаров '+unicode(met)
+    result+=u'Прогружено новых пульсаров '+unicode(met)
     if con>0:
         result+=u'Созданы новые связи'
     return result
@@ -2857,3 +2858,5 @@ def ReplaceMeters_v2(meter1, meter2):
         
     return result
 
+def get_electric_template(request):
+    pass
