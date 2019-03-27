@@ -13237,6 +13237,14 @@ def balance_daily_electric(request):
     args['AllData']=AllData
     return render_to_response("data_table/electric/76.html", args)
 
+def CheckIsEmpty(data_table,field):
+    isEmpty = True
+    for row in data_table:
+        if  not(row[field] == None  or row[field] == 'None'):
+            isEmpty = False
+    return isEmpty
+
+
 def balance_period_electric(request):
     args = {}
     is_abonent_level = re.compile(r'abonent')
@@ -13271,6 +13279,8 @@ def balance_period_electric(request):
          if not(bool(is_abonent_level.search(obj_key))):
 
              data_table = common_sql.get_data_table_balance_electric_perid(obj_parent_title, obj_title,electric_data_start, electric_data_end,guid_type_abon)
+             if CheckIsEmpty(data_table,0):
+                 continue
              type_abon=translate(dt_type_abon[i][1])
              #print type_abon             
              if len(data_table)>0: 
@@ -13293,7 +13303,7 @@ def balance_period_electric(request):
                 #print i, j
                 #print dtAll[i][j][8] 
                 if (dtAll[i][j][6] == 'Н/Д' or dtAll[i][j][6] == None  or dtAll[i][j][6] == 'None'): 
-                    if (j+1)<len(dtAll[0]): j+=1
+                    break
                               
                 if dtAll[i][j][1] == True:                   
                     sumD+=decimal.Decimal(dtAll[i][j][6])

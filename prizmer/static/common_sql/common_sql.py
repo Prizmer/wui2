@@ -7867,35 +7867,42 @@ def GetSimpleTable(table,fieldName,value):
 
 def MakeSqlQuery_balance_electric_period(obj_parent_title, obj_title,electric_data_start, electric_data_end, my_params, guid_type_abon):
     sQuery="""
-    select balance_name,type,type_abon,sumT,res_name, date,
+    select balance_name,type,type_abon,sumT,res_name, c_date,
 round((z1.sumT-lag(sumT) over (order by date))::numeric,3) as delta,
 countAbon,
 guid_types_abonents
 from
-(SELECT 
-  balance_groups.name as balance_name, 
-  link_balance_groups_meters.type, 
+(
+Select * 
+from(select c_date::date
+from
+generate_series('%s'::timestamp without time zone, '%s'::timestamp without time zone, interval '1 day') as c_date) z4
+left join 
+(
+SELECT
+  balance_groups.name as balance_name,
+  link_balance_groups_meters.type,
   types_abonents.name as type_abon,
-  sum(daily_values.value * link_abonents_taken_params.coefficient) as sumT, 
+  sum(daily_values.value * link_abonents_taken_params.coefficient) as sumT,
   count(daily_values.value) as countAbon,
-  names_params.name as param_name, 
-  resources.name AS res_name, 
+  names_params.name as param_name,
+  resources.name AS res_name,
   daily_values.date,
   abonents.guid_types_abonents
-FROM 
-  public.abonents, 
-  public.objects, 
-  public.link_abonents_taken_params, 
-  public.link_balance_groups_meters, 
-  public.taken_params, 
-  public.meters, 
-  public.balance_groups, 
-  public.types_abonents, 
-  public.daily_values, 
-  public.params, 
-  public.names_params, 
+FROM
+  public.abonents,
+  public.objects,
+  public.link_abonents_taken_params,
+  public.link_balance_groups_meters,
+  public.taken_params,
+  public.meters,
+  public.balance_groups,
+  public.types_abonents,
+  public.daily_values,
+  public.params,
+  public.names_params,
   public.resources
-WHERE 
+WHERE
   abonents.guid_objects = objects.guid AND
   abonents.guid_types_abonents = types_abonents.guid AND
   link_abonents_taken_params.guid_abonents = abonents.guid AND
@@ -7907,18 +7914,20 @@ WHERE
   daily_values.id_taken_params = taken_params.id AND
   params.guid_names_params = names_params.guid AND
   names_params.guid_resources = resources.guid AND
-  balance_groups.name = '%s' AND 
+  balance_groups.name = '%s' AND
   resources.name='%s' and
-  daily_values.date between '%s' and '%s' AND 
-  names_params.name = '%s' and 
+  daily_values.date between '%s' and '%s' AND
+  names_params.name = '%s' and
   types_abonents.guid='%s'
-  group by  balance_groups.name, 
-  link_balance_groups_meters.type, 
-  types_abonents.name, 
+  group by  balance_groups.name,
+  link_balance_groups_meters.type,
+  types_abonents.name,
   abonents.guid_types_abonents,
-  names_params.name, 
+  names_params.name,
   resources.name,daily_values.date
-  order by types_abonents.name,date) z1"""%(obj_title,my_params[0], electric_data_start, electric_data_end,my_params[1],guid_type_abon)
+  order by types_abonents.name,date)z3
+on z4.c_date=z3.date ) z1
+order by c_date"""%(electric_data_start, electric_data_end,obj_title,my_params[0], electric_data_start, electric_data_end,my_params[1],guid_type_abon)
     #print sQuery
     return sQuery
         
