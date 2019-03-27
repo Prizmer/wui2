@@ -76,7 +76,7 @@ width: 95%;
 
 }
 
-#meters_change_block{
+.meters_change_block{
 	width: 90%; /* Размеры */
     background: #E6E6FA; /* Цвет фона */
     outline: 2px solid #BEBEBE; /* серая рамка */
