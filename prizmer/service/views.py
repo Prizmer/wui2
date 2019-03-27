@@ -2859,4 +2859,15 @@ def ReplaceMeters_v2(meter1, meter2):
     return result
 
 def get_electric_template(request):
-    pass
+    data = None
+
+    with open('static/excel/electric_template_for_load.xlsx', 'rb') as f:
+        data = f.read()
+
+    #return HttpResponse(data, content_type='application/vnd.ms-excel')
+    response = HttpResponse(data, content_type="application/vnd.ms-excel")
+        
+    output_name = u'electric_template_for_load'
+    file_ext = u'xlsx'    
+    response['Content-Disposition'] = 'attachment;filename="%s.%s"' % (output_name.replace('"', '\"'), file_ext)   
+    return response
