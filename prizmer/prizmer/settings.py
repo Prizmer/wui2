@@ -37,7 +37,8 @@ TEMPLATES = [
 #TEMPLATE_DIRS = [os.path.join(BASE_DIR, "templates")]
 STATIC_ROOT = os.path.join(BASE_DIR, "prizmer/static")
 STATIC_URL = '/static/'
-STATICFILES_DIRS = (os.path.join(BASE_DIR, "../prizmer/static"),                                
+STATICFILES_DIRS = (os.path.join(BASE_DIR, "../prizmer/static"),    
+                     os.path.join(BASE_DIR, "../prizmer/static/excel"),                            
 					) 
 
 					

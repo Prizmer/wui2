@@ -2946,6 +2946,7 @@ def get_k_t_n(meter_name):
                           meters.guid = taken_params.guid_meters AND
                           meters.factory_number_manual = %s
                           LIMIT 1;""", [meter_name])
+
     simpleq = simpleq.fetchall()
     return simpleq[0][0]
     
@@ -10377,4 +10378,74 @@ WHERE
     #print sQuery
     cursor.execute(sQuery)  
     data_table = cursor.fetchall()    
+    return data_table
+
+def get_electric_30_by_abonent_for_period(obj_title, obj_parent_title,electric_data_start, electric_data_end, params):
+    cursor = connection.cursor()
+    data_table=[]   
+    sQuery="""
+   Select 
+       meter_name,
+       factory_number_manual,
+       ktt,
+       date,
+       time,
+       c_date,
+       activ,
+       reactiv,
+       '30',
+       (EXTRACT(EPOCH FROM c_date) * 1000)::text as utc,
+       row_number() over(ORDER BY meter_name) num
+from 
+(select c_date
+from
+generate_series('%s 00:00:00'::timestamp without time zone, '%s 23:30:00'::timestamp without time zone, interval '30 minutes') as c_date) as z_date
+Left join
+(SELECT 
+  objects.name as obj_name, 
+  abonents.name as ab_name, 
+  meters.name as meter_name, 
+  meters.factory_number_manual, 
+  link_abonents_taken_params.coefficient as ktt, 
+  various_values.date, 
+  various_values.time,   
+  (various_values.date + various_values.time)::timestamp as date_time,
+  SUM (CASE when names_params.name = '%s' then various_values.value else 0 end) as activ,
+  SUM (CASE when names_params.name = '%s' then various_values.value else 0 end) as reactiv
+FROM 
+  public.abonents, 
+  public.objects, 
+  public.link_abonents_taken_params, 
+  public.taken_params, 
+  public.meters, 
+  public.various_values, 
+  public.params, 
+  public.names_params
+WHERE 
+  abonents.guid_objects = objects.guid AND
+  link_abonents_taken_params.guid_abonents = abonents.guid AND
+  link_abonents_taken_params.guid_taken_params = taken_params.guid AND
+  taken_params.guid_meters = meters.guid AND
+  taken_params.guid_params = params.guid AND
+  various_values.id_taken_params = taken_params.id AND
+  params.guid_names_params = names_params.guid AND
+  various_values.date between '%s' and '%s' AND 
+  abonents.name = '%s' AND 
+  objects.name = '%s'
+  group by 
+  objects.name, 
+  abonents.name, 
+  meters.name, 
+  meters.factory_number_manual, 
+  link_abonents_taken_params.coefficient, 
+  various_values.date, 
+  various_values.time
+  ORDER BY
+  various_values.date ASC, 
+  various_values.time ASC) z1
+  on z1.date_time = z_date.c_date
+    """ %(electric_data_start, electric_data_end,params[0], params[1], electric_data_start, electric_data_end, obj_title, obj_parent_title)
+    #print sQuery
+    cursor.execute(sQuery)  
+    data_table = cursor.fetchall()
     return data_table

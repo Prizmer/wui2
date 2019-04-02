@@ -158,6 +158,8 @@ urlpatterns = patterns('',
     url(r'^97/$', views.heat_danfoss_period), #потребление по теплу данфосс -доделать
 
     url(r'^98/$', views.electric_restored_activ_reactiv_daily), #восстановленый суточный срез из получасовок
+    
+    url(r'^99/$', views.electric_period_30), #вывод всех получасовок за период
 
     url(r'^100/$', views.heat_danfoss_daily), #показания по теплу данфосс - доделать
    #---- Test urls

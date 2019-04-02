@@ -6,6 +6,7 @@ from django.shortcuts import render_to_response, HttpResponse
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
 from django import forms
+from django.contrib.auth.decorators import login_required
 from django.core.context_processors import csrf
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.csrf import csrf_exempt
@@ -66,6 +67,7 @@ def writeToLog(msg):
     #print msg
     logger.info('['+log_date+']: '+unicode(msg))
 
+@login_required(login_url='/auth/login/') 
 def choose_service(request):
     args={}
     directory=os.path.join(BASE_DIR,'static\\cfg\\')
@@ -2859,15 +2861,22 @@ def ReplaceMeters_v2(meter1, meter2):
     return result
 
 def get_electric_template(request):
-    data = None
+    from django.contrib.staticfiles import finders
+    result_url = finders.find('electric_template_for_load.xlsx')
+    print '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
+    print result_url
+    if result_url == None:
+        response = HttpResponse('Образец не найден', content_type="text/plain")
+        output_name = u'empty'
+        file_ext = u'txt'    
+        response['Content-Disposition'] = 'attachment;filename="%s.%s"' % (output_name.replace('"', '\"'), file_ext)  
+        return response
+    else:
+        with open(result_url, 'rb') as f:
+            response = HttpResponse(f.read(), content_type="application/vnd.ms-excel")
+            output_name = u'electric_template_for_load'
+            file_ext = u'xlsx'    
+            response['Content-Disposition'] = 'attachment;filename="%s.%s"' % (output_name.replace('"', '\"'), file_ext)
+            return response
+        f.close()  
 
-    with open('static/excel/electric_template_for_load.xlsx', 'rb') as f:
-        data = f.read()
-
-    #return HttpResponse(data, content_type='application/vnd.ms-excel')
-    response = HttpResponse(data, content_type="application/vnd.ms-excel")
-        
-    output_name = u'electric_template_for_load'
-    file_ext = u'xlsx'    
-    response['Content-Disposition'] = 'attachment;filename="%s.%s"' % (output_name.replace('"', '\"'), file_ext)   
-    return response
