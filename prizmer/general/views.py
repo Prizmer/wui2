@@ -12829,8 +12829,8 @@ def makeOneCoords(graphic_data,numField1):
     for i in range(len(graphic_data)):
         graphic_data[i]=list(graphic_data[i]) 
         date=graphic_data[i][numField1]   
-#        print numField1         
-#        print date 
+        #print numField1, date         
+        #print date 
         if (date==u'Н/Д' or date is None or date==None): 
             labels.append(str(0))
         else:
@@ -12838,8 +12838,12 @@ def makeOneCoords(graphic_data,numField1):
             if type(date)==datetime.date:
                 labels.append(date.strftime("%d-%m-%Y"))
             elif type(date)==float or type(date)==decimal.Decimal:
-                labels.append(str(date))
+                labels.append(str(date))            
+            elif type(date)==datetime.datetime:
+                labels.append(date.strftime("%d-%m-%Y %H:%M"))
             elif type(date)==unicode:
+                labels.append(str(translate(date)))
+            else:
                 labels.append(str(translate(date)))
             
     #print labels
@@ -13237,13 +13241,13 @@ def balance_daily_electric(request):
     args['AllData']=AllData
     return render_to_response("data_table/electric/76.html", args)
 
-def CheckIsEmpty(data_table,field):
+def IsEmptyTable(data_table, empty_field):
     isEmpty = True
     for row in data_table:
-        if  not(row[field] == None  or row[field] == 'None'):
+        if not(row[empty_field] == None  or row[empty_field] == 'None'):
+
             isEmpty = False
     return isEmpty
-
 
 def balance_period_electric(request):
     args = {}
@@ -13277,31 +13281,33 @@ def balance_period_electric(request):
          guid_type_abon=dt_type_abon[i][0]         
              
          if not(bool(is_abonent_level.search(obj_key))):
-
+             print guid_type_abon, dt_type_abon[i][1]
              data_table = common_sql.get_data_table_balance_electric_perid(obj_parent_title, obj_title,electric_data_start, electric_data_end,guid_type_abon)
-             if CheckIsEmpty(data_table,0):
-                 continue
+
              type_abon=translate(dt_type_abon[i][1])
+             if IsEmptyTable(data_table, 0):
+                 continue
              #print type_abon             
              if len(data_table)>0: 
                  data_table[0]=list(data_table[0])
                  data_table[0][6]="-"
                  data_table[0]=tuple(data_table[0])
-                 data_table=common_sql.ChangeNull(data_table, None)
+                 data_table=common_sql.ChangeNull(data_table, None)                 
                  dtAll.append(data_table)
                  AllData.append({str("data"):makeOneCoords(data_table,6), str("label"):str(type_abon), str("backgroundColor"): get_rgba_color(i+2)})
                  if i==1:
+                     #print data_table[0]
                      Xcoord=makeOneCoords(data_table,5)
     dt_delta=[]   
     
-    
+    #print len(dtAll)
     if len(dtAll)>0:
         for j in range(1,len(dtAll[0])):
             sumD=0
             vv=0
             for i in range(0,len(dtAll)):
                 #print i, j
-                #print dtAll[i][j][8] 
+                #print dtAll[i][j][1], dtAll[i][j][2],  dtAll[i][j][5], dtAll[i][j][6], dtAll[i][j][8]
                 if (dtAll[i][j][6] == 'Н/Д' or dtAll[i][j][6] == None  or dtAll[i][j][6] == 'None'): 
                     break
                               
@@ -13525,7 +13531,8 @@ def pulsar_heat_period_with_graphic(request):
     
 
     return render_to_response("data_table/heat/81.html", args)
-    
+
+@login_required(login_url='/auth/login/') 
 def instruction_user(request):
     from django.contrib.staticfiles import finders
     result_url = finders.find('User_manual_Prizmer.pdf')
@@ -13536,15 +13543,8 @@ def instruction_user(request):
         return response
     pdf.closed    
 #    
-#    from django.contrib.staticfiles.storage import staticfiles_storage
-#    url = staticfiles_storage.url('User_manual_Prizmer.pdf')
-#    #print url
-#    with open(url, 'rb') as pdf:
-#        response = HttpResponse(pdf.read(), content_type='application/pdf')
-#        response['Content-Disposition'] = 'inline; filename=instruction.pdf'
-#        return response
-#    pdf.closed
-    
+
+@login_required(login_url='/auth/login/') 
 def instruction_admin(request):
     from django.contrib.staticfiles import finders
     result_url = finders.find('Admin_manual_Prizmer.pdf')
@@ -14652,3 +14652,61 @@ def heat_danfoss_daily(request):
     args['obj_title'] = obj_title 
       
     return render_to_response("data_table/heat/100.html", args)
+
+def electric_period_30(request):
+    args = {}
+    is_abonent_level = re.compile(r'abonent')
+    is_object_level_2 = re.compile(r'level2')
+    data_table = []
+    obj_title = u'Не выбран'
+    obj_key = u'Не выбран'
+    obj_parent_title = u'Не выбран'
+    is_electric_monthly = u''
+    is_electric_daily = u''
+    is_electric_current = u''
+    is_electric_delta = u''
+    electric_data_start = u''
+    electric_data_end = u''
+    data_table = []
+    if request.is_ajax():        
+        if request.method == 'GET':
+            request.session["obj_title"]           = obj_title           = request.GET['obj_title']
+            request.session["obj_key"]             = obj_key             = request.GET['obj_key']
+            request.session["obj_parent_title"]    = obj_parent_title    = request.GET['obj_parent_title']            
+            request.session["electric_data_start"] = electric_data_start = request.GET['electric_data_start']
+            request.session["electric_data_end"]   = electric_data_end   = request.GET['electric_data_end']
+              
+            if (bool(is_abonent_level.search(obj_key))):   #  Получасовки по абоненту
+                params=[u'A+ Профиль',u'R+ Профиль']
+                data_table= common_sql.get_electric_30_by_abonent_for_period(obj_title, obj_parent_title,electric_data_start, electric_data_end, params)
+            else:
+                pass
+
+     #zamenyem None na N/D vezde
+    if len(data_table)>0: 
+        data_table=common_sql.ChangeNull(data_table, None)
+    for row in data_table:
+        #print row[0], row[1],row[2],row[3],row[4],row[5],row[6],row[7],row[8],row[9],row[10]
+
+    AllData=[]
+    Xcoord=[]   
+    #print data_table 
+    if (len(data_table) > 0):
+        Xcoord=makeOneCoords(data_table,5) #дата и время     
+        #AllData=[{str("data"):makeOneCoords(data_table,6), str("label"):str("A+"), str("backgroundColor"): get_rgba_color(5)}] 
+        AllData=[{str("data"):makeOneCoords(data_table,6), str("label"):str("A+"), str("backgroundColor"): get_rgba_color(12)},
+              {str("data"):makeOneCoords(data_table,7), str("label"):str("R+"),  str("backgroundColor"): get_rgba_color(9)}]       
+
+    args['data_table'] = data_table
+    args['obj_title'] = obj_title
+    args['obj_key'] = obj_key
+    args['obj_parent_title'] = obj_parent_title
+    args['is_electric_monthly'] = is_electric_monthly
+    args['is_electric_daily'] = is_electric_daily
+    args['is_electric_current'] = is_electric_current
+    args['is_electric_delta'] = is_electric_delta
+    args['electric_data_start'] = electric_data_start
+    args['electric_data_end'] = electric_data_end
+    args['label'] = Xcoord
+    args['AllData']=AllData
+    return render_to_response("data_table/electric/99.html", args)

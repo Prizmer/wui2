@@ -82,6 +82,7 @@ width: 95%;
     outline: 2px solid #BEBEBE; /* серая рамка */
     border: 3px solid #fff; /* Белая рамка */
     border-radius: 10px; /* Радиус скругления */
+	padding: 10px;
 }
 
 #title-structura{
