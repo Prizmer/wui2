@@ -37,4 +37,8 @@ urlpatterns = patterns('',
 
     url(r'^add_current_taken_params_pulsar16m/$', views.add_current_taken_params_pulsar16m), #загрузка формы для прогзузки балансных групп
     url(r'^get_electric_template/$', views.get_electric_template), #возвращает excel форму образец для прогрузочной ведомости
+    url(r'^get_heat_template/$', views.get_heat_template), #возвращает excel форму образец для прогрузочной ведомости
+    url(r'^get_water_digital_template/$', views.get_water_digital_template), #возвращает excel форму образец для прогрузочной ведомости
+    url(r'^get_water_impulse_template/$', views.get_water_impulse_template), #возвращает excel форму образец для прогрузочной ведомости
+    url(r'^get_balance_template/$', views.get_balance_template), #возвращает excel форму образец для прогрузочной ведомости
 )

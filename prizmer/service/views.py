@@ -2855,16 +2855,11 @@ def ReplaceMeters_v2(meter1, meter2):
         common_sql.update_table_with_replace('taken_params', 'name', 'guid', row[6], meter2, meter1)
     
     result = result + u' Привязки счётчиков успешно изменены '
-    
-           
-        
     return result
 
-def get_electric_template(request):
+def get_file(name_file):
     from django.contrib.staticfiles import finders
-    result_url = finders.find('electric_template_for_load.xlsx')
-    print '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-    print result_url
+    result_url = finders.find('%s'%(name_file))
     if result_url == None:
         response = HttpResponse('Образец не найден', content_type="text/plain")
         output_name = u'empty'
@@ -2874,9 +2869,23 @@ def get_electric_template(request):
     else:
         with open(result_url, 'rb') as f:
             response = HttpResponse(f.read(), content_type="application/vnd.ms-excel")
-            output_name = u'electric_template_for_load'
-            file_ext = u'xlsx'    
-            response['Content-Disposition'] = 'attachment;filename="%s.%s"' % (output_name.replace('"', '\"'), file_ext)
+            output_name = name_file
+            #file_ext = u'xlsx'    
+            response['Content-Disposition'] = 'attachment;filename="%s"' % (output_name.replace('"', '\"'))
             return response
-        f.close()  
+        f.close() 
 
+def get_electric_template(request):
+    return get_file('electric_template_for_load.xlsx')
+    
+def get_heat_template(request):
+    return get_file('heat_template_for_load.xlsx')
+
+def get_water_digital_template(request):
+    return get_file('water_digital_template_for_load.xlsx')
+
+def get_water_impulse_template(request):
+    return get_file('water_impulse_template_for_load.xlsx')
+
+def get_balance_template(request):
+    return get_file('balance_template_for_load.xlsx')
