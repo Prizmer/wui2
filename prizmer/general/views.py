@@ -14685,9 +14685,8 @@ def electric_period_30(request):
      #zamenyem None na N/D vezde
     if len(data_table)>0: 
         data_table=common_sql.ChangeNull(data_table, None)
-    for row in data_table:
+    #for row in data_table:
         #print row[0], row[1],row[2],row[3],row[4],row[5],row[6],row[7],row[8],row[9],row[10]
-
     AllData=[]
     Xcoord=[]   
     #print data_table 

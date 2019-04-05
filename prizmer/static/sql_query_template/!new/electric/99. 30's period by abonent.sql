@@ -1,5 +1,4 @@
-﻿Select 
-       
+﻿Select        
        meter_name,
        factory_number_manual,
        ktt,
@@ -9,12 +8,12 @@
        activ,
        reactiv,
        '30',
-       EXTRACT(EPOCH FROM c_date) * 1000 as utc,
+       (EXTRACT(EPOCH FROM c_date) * 1000)::text  as utc,
        row_number() over(ORDER BY meter_name) num
 from 
 (select c_date
 from
-generate_series('28.03.2019 00:00:00'::timestamp without time zone, '29.03.2019 23:30:00'::timestamp without time zone, interval '30 minutes') as c_date) as z_date
+generate_series('28.03.2019 00:00:00'::timestamp without time zone, '02.04.2019 23:30:00'::timestamp without time zone, interval '30 minutes') as c_date) as z_date
 Left join
 (SELECT 
   objects.name as obj_name, 
@@ -44,7 +43,7 @@ WHERE
   taken_params.guid_params = params.guid AND
   various_values.id_taken_params = taken_params.id AND
   params.guid_names_params = names_params.guid AND
-  various_values.date between '28.03.2019' and '29.03.2019' AND 
+  various_values.date between '28.03.2019' and '02.04.2019' AND 
   abonents.name = 'ГРЩ1_ Ввод1' AND 
   objects.name = 'д. 43'
   group by 
