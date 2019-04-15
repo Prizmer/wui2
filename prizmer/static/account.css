@@ -1,0 +1,23 @@
+#logo {
+margin-top: 5px;
+margin-bottom: 0;
+margin-left: 5px;
+width: 10%;
+}
+
+.container {
+	border: solid 1px #C6C2E5  ;
+	background-color: #E8E5FB;
+	text-align: center;
+}
+
+.col-sm-4 {
+	border: solid 1px #C6C2E5  ;
+}
+.row {
+	border: solid 1px #C6C2E5  ;
+}
+.col,.col-2,.col-3, .col-4, .col-5, .col-6,.col-7,.col-8,.col-9,.col-10, .col-11,.col-12
+{
+	border: solid 1px #C6C2E5  ;
+}

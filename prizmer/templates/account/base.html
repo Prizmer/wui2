@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  {% block title %}<title>Личный кабинет</title>{% endblock %}
+  <meta charset="utf-8">
+  {% load staticfiles %} <script src="{%static "jquery.js" %}" type=text/javascript></script>
+  {% load staticfiles %} <link href="{%static "bootstrap-4.3.1-dist/css/bootstrap.css"%}" rel="stylesheet" type="text/css">
+  {% load staticfiles %} <link href="{%static "account.css"%}" rel="stylesheet" type="text/css">
+  {% load staticfiles %} <script src="{%static "bootstrap-4.3.1-dist/js/bootstrap.js"%}" type=text/javascript></script>
+  
+</head>
+
+<body>
+ 
+  <div class="container"> 
+<div class="row">
+   <div class="col-7" > 
+	
+	</div>
+	<div class="col" > 
+	Здравствуйте, {{user_name}}
+	</div>
+  </div>
+	
+    <div class="row">
+	 <div class="col-12">      
+      {% load staticfiles %} <img id="logo" src="{%static "account_prizmer_imgs/logo1.png" %}" alt="ООО Правильные Измерения"> 
+      </div>
+	</div>
+	
+	<div class="row">
+	 <div class="col-12">      
+       Призмер
+      </div>
+	</div>
+	
+    
+    <div class="row">
+      <div class="col-sm-4">      
+      {% load staticfiles %} <img id="electric-ico" src="{%static "account_prizmer_imgs/electr-ico.png" %}" alt="Электроучёт">            	  
+      </div>
+	  
+	  <div class="col-sm-4">      
+	  {% load staticfiles %} <img id="electric-ico" src="{%static "account_prizmer_imgs/heat-ico.png" %}" alt="Теплоучёт">
+      </div>
+	  
+	  <div class="col-sm-4">      
+	  {% load staticfiles %} <img id="electric-ico" src="{%static "account_prizmer_imgs/water-ico.png" %}" alt="Водоучёт">
+      </div>
+	
+    </div>
+  </div>
+
+  
+</body>
+</html>
