@@ -77,6 +77,7 @@ INSTALLED_APPS = (
     'AskueReports',
     'AskueViz',
 	'service',
+	'account_prizmer',
 
 )
 
