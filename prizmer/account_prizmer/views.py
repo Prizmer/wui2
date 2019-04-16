@@ -8,3 +8,12 @@ def account(request):
     args = {}
     args['user_name']=request.user.first_name + ' ' + request.user.last_name
     return render_to_response("account/base.html", args)
+
+def electric_info(request):
+    args = {}
+    dt_electric = [[1,2],[1,3]]
+    args['dt_electric'] = dt_electric
+    from time import sleep
+    sleep(1)
+    print 'after 1'
+    return render_to_response("account/electric_info.html", args)

@@ -10,5 +10,8 @@ urlpatterns = patterns('',
     # url(r'^$', 'prizmer.views.home', name='home'),
     # url(r'^blog/', include('blog.urls')),
     url(r'^$', views.account),
+    url(r'^electric_info', views.electric_info),
+    url(r'^heat_info', views.electric_info),
+    url(r'^water_info', views.electric_info),
 
 )

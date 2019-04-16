@@ -11,8 +11,11 @@ width: 10%;
 	text-align: center;
 }
 
-.col-sm-4 {
+.block-res {
 	border: solid 1px #C6C2E5  ;
+	/*display: flex;*/
+	text-align: center;
+	
 }
 .row {
 	border: solid 1px #C6C2E5  ;
