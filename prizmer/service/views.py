@@ -2042,45 +2042,49 @@ def LoadWaterPulsar(sPath, sSheet):
         isNewPulsar=SimpleCheckIfExist('meters','address', numPulsar,'','','')
         #writeToLog(u'пульсар существует '+ unicode(isNewPulsar)+ typePulsar+ numPulsar)
         if not (isNewAbon):
-            return u"Сначала создайте стурктуру объектов и счётчиков"
+            return u"Нет структуры объектов и счётчиков для "+ obj_l2 + " " +abon
         if not (isNewPulsar):
             print (u'Обрабатываем строку '+unicode(obj_l2) +' '+ unicode(numPulsar))
             if unicode(typePulsar) == u'Пульсар 10M':
                     add_meter = Meters(name = unicode(typePulsar) + u' ' + unicode(numPulsar), address = unicode(numPulsar), factory_number_manual = unicode(numPulsar), guid_types_meters = TypesMeters.objects.get(guid = u"cae994a2-6ab9-4ffa-aac3-f21491a2de0b") )
                     add_meter.save()
-                    print (u'OK Device added в базу')
+                    print (u'OK Device 10M added in DB')
                     met+=1
+                    
             elif unicode(typePulsar) == u'Пульсар 16M':
                    add_meter = Meters(name = unicode(unicode(typePulsar) + u' ' + unicode(numPulsar)), address = unicode(numPulsar),  factory_number_manual = unicode(numPulsar), guid_types_meters = TypesMeters.objects.get(guid = u"7cd88751-d232-410c-a0ef-6354a79112f1") )
                    add_meter.save()
-                   print (u'OK Device added в базу')
+                   print (u'OK Device 16M added in DB')
                    met+=1
+                   
             elif unicode(typePulsar) == u'Пульсар 2M':
                    add_meter = Meters(name = unicode(unicode(typePulsar) + u' ' + unicode(numPulsar)), address = unicode(numPulsar),  factory_number_manual = unicode(numPulsar), guid_types_meters = TypesMeters.objects.get(guid = u"6599be9a-1f4d-4a6e-a3d9-fb054b8d44e8") )
                    add_meter.save()
-                   print (u'OK Device added в базу')
+                   print (u'OK Device 2M added in DB')
                    met+=1
             else:
-                print(u'Такой Пульсар уже есть')
-        else:
-            # надо проверить каналы и подсоединить их 
-            #Пульсар 16M 029571 Пульсар 16M Канал 16 Суточный -- adress: 16  channel: 0
-            chanel=unicode(dtAll[i][4])
-            pulsarName=unicode(dtAll[i][6])
-            abonent_name=unicode(dtAll[i][2])
-            taken_param = pulsarName + u' ' + unicode(dtAll[i][5]) + u' '+ pulsarName + u' ' + u'Канал ' + chanel+ u' Суточный -- adress: ' +chanel+u'  channel: 0'
-            print(taken_param)
-            #Sravnenie(taken_param)
-            dtTakenParam=GetSimpleTable('taken_params','name',taken_param)
-            #writeToLog(bool(dtTakenParam))
-            if dtTakenParam:                
-                print(u'taken param найден')
-                guid_taken_param=dtTakenParam[0][1]
-                dtLink=GetSimpleTable('link_abonents_taken_params','guid_taken_params',guid_taken_param)
-                print dtLink
-                if (dtLink):
-                    result+=u"\n Привязка канала "+chanel+u" Пульсара "+pulsarName+u" уже существует. Перезапись НЕ произведена для счётчика "+abonent_name
-                    continue
+                print(u'Такой Пульсар уже есть')        
+        # надо проверить каналы и подсоединить их 
+        #Пульсар 16M 029571 Пульсар 16M Канал 16 Суточный -- adress: 16  channel: 0
+        chanel=unicode(dtAll[i][4])
+        pulsarName=unicode(dtAll[i][6])
+        abonent_name=unicode(dtAll[i][2])
+        taken_param = pulsarName + u' ' + unicode(dtAll[i][5]) + u' '+ pulsarName + u' ' + u'Канал ' + chanel+ u' Суточный -- adress: ' +chanel+u'  channel: 0'
+        #print "chanel ", chanel
+        print(taken_param)
+        #Sravnenie(taken_param)
+        dtTakenParam=GetSimpleTable('taken_params','name',taken_param)
+        #writeToLog(bool(dtTakenParam))
+        if dtTakenParam:                
+            print(u'taken param найден')
+            guid_taken_param=dtTakenParam[0][1]
+            dtLink=GetSimpleTable('link_abonents_taken_params','guid_taken_params',guid_taken_param)
+            #print dtLink
+            if (dtLink):
+                print 'link is exist '+ chanel + '  '+pulsarName
+                result+=u"\n Привязка канала "+chanel+u" Пульсара "+pulsarName+u" уже существует. Перезапись НЕ произведена для счётчика "+abonent_name
+                continue
+            else:
                 dtAbon=GetSimpleTable('abonents','name', abonent_name)
                 guidAbon=dtAbon[0][0]
                 #print guidAbon
@@ -2094,7 +2098,7 @@ def LoadWaterPulsar(sPath, sSheet):
                 con+=1
     result+=u'Прогружено новых пульсаров '+unicode(met)
     if con>0:
-        result+=u'Созданы новые связи'
+        result+=u'Созданы новые связи '
     return result
 
 #def Sravnenie(takenParam):

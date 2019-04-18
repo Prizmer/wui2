@@ -1,5 +1,5 @@
 from django.contrib import admin
-from general.models import Objects, Abonents, Comments, TypesAbonents, Meters, MonthlyValues, DailyValues, CurrentValues, VariousValues, TypesParams, Params, TakenParams, LinkAbonentsTakenParams, Resources, TypesMeters, Measurement, NamesParams, BalanceGroups, LinkMetersComportSettings, LinkMetersTcpipSettings, ComportSettings, TcpipSettings, LinkBalanceGroupsMeters, Groups80020, LinkGroups80020Meters
+from general.models import Objects, Abonents, Comments, TypesAbonents, Meters, MonthlyValues, DailyValues, CurrentValues, VariousValues, TypesParams, Params, TakenParams, LinkAbonentsTakenParams, Resources, TypesMeters, Measurement, NamesParams, BalanceGroups, LinkMetersComportSettings, LinkMetersTcpipSettings, ComportSettings, TcpipSettings, LinkBalanceGroupsMeters, Groups80020, LinkGroups80020Meters, LinkAbonentsAuthUser
 
 # Register your models here.
 class LinkAbonentsTakenParamsAdmin(admin.ModelAdmin):
@@ -18,6 +18,10 @@ class CommentsAdmin(admin.ModelAdmin):
     search_fields = [u'name']
     date_hierarchy = 'date'
     list_display = (u'name','comment', 'date')
+
+class LinkAbonentsAuthUserAdmin(admin.ModelAdmin):
+    search_fields = [u'name']
+    #list_display = (u'name')
     
 class TakenParamsAdmin(admin.ModelAdmin):
     search_fields = [u'name']
@@ -41,6 +45,7 @@ class LinkGroups80020MetersAdmin(admin.ModelAdmin):
 admin.site.register(Objects, ObjectsAdmin)
 admin.site.register(Abonents, AbonentsAdmin)
 admin.site.register(Comments, CommentsAdmin)
+admin.site.register(LinkAbonentsAuthUser, LinkAbonentsAuthUserAdmin)
 admin.site.register(TypesAbonents)
 admin.site.register(Meters, MetersAdmin)
 admin.site.register(MonthlyValues)
