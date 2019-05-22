@@ -571,6 +571,10 @@ def LoadElectricMeters(sPath, sSheet):
                 add_meter = Meters(name = unicode(type_meter) + u' ' + unicode(meter), address = unicode(adr), factory_number_manual = unicode(meter), guid_types_meters = TypesMeters.objects.get(guid = u"aa491ede-e00b-4e1d-a8ba-1ef61dba1caa") )
                 add_meter.save()
                 writeToLog(u'Device added' + ' --->   ' + u'Danfoss SonoSelect')
+            elif unicode(type_meter) == u'СЭТ-4ТМ.03М':
+                add_meter = Meters(name = unicode(type_meter) + u' ' + unicode(meter), address = unicode(adr), factory_number_manual = unicode(meter), guid_types_meters = TypesMeters.objects.get(guid = u"66b7ce6a-f280-4e54-8c8d-f69f34aabdf9") )
+                add_meter.save()
+                writeToLog(u'Device added' + ' --->   ' + u'СЭТ-4ТМ.03М')
             else:
                 writeToLog(u'Не найдено совпадение с существующим типом прибора')
                 met-=1
@@ -816,10 +820,10 @@ def add_taken_param(sender, instance, created, **kwargs): # Добавляем �
         #add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"e7617c95-7e42-4cfa-9acd-5bc119261c6d")) # Q Реактивная мощность
         #add_param.save()
     #Получасовки
-        # add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"6af9ddce-437a-4e07-bd70-6cf9dcc10b31")) # A+ 30-мин. срез мощности
-        # add_param.save()
-        # add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"66e997c0-8128-40a7-ae65-7e8993fbea61")) # R+ 30-мин. срез мощности
-        # add_param.save()
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"6af9ddce-437a-4e07-bd70-6cf9dcc10b31")) # A+ 30-мин. срез мощности
+        add_param.save()
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"66e997c0-8128-40a7-ae65-7e8993fbea61")) # R+ 30-мин. срез мощности
+        add_param.save()
     elif instance.guid_types_meters.name == u'Меркурий 233':
         #Добавляем параметры для Меркурия 233
         pass
@@ -1075,7 +1079,25 @@ def add_taken_param(sender, instance, created, **kwargs): # Добавляем �
         pass
     elif instance.guid_types_meters.name == u'СЭТ-4ТМ.03М':
         #Добавляем параметры для СЭТ-4ТМ.03М
-        pass
+       
+    # T0 A+
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"e7624c25-9852-4ffd-8777-b2bfd16c29a8")) # A+ T0 месячные
+        add_param.save()
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"aa83b499-6a9e-40e1-b68b-dc84fec8490b")) # A+ T0 суточные
+        add_param.save()
+
+    # T0 R+
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"3d365f91-8bd3-476e-b07e-3f79134f6853")) # R+ T0 месячные
+        add_param.save()
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"087b785e-5d59-4956-9cd3-57706f9557e6")) # R+ T0 суточные
+        add_param.save()
+           
+    #Получасовки
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"4f505e17-7d71-4cf8-9880-c6ce33612e6e")) # A+ 30-мин. срез мощности
+        add_param.save()
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"55abd40d-fb3c-4100-88f2-46d79be7733a")) # R+ 30-мин. срез мощности
+        add_param.save()
+
     elif instance.guid_types_meters.name == u'Меркурий 200':
         #Добавляем параметры для Меркурий 200
 

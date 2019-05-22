@@ -24,3 +24,21 @@ width: 10%;
 {
 	border: solid 1px #C6C2E5  ;
 }
+
+.content{
+	border: solid 2px #C6C2E5;
+	border-collapse:collapse;
+	width: 90%;
+	text-align: center;
+	padding: 3px;
+}
+table, td, th
+{
+text-align: center;
+margin-top: 10px;
+margin: auto;
+width: 90%;
+border:solid 2px #C6C2E5;
+font-size: small;
+padding: 3px;
+}

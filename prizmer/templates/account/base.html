@@ -29,6 +29,73 @@ function getDate() {
   document.getElementById("date_end").value = today;
 }
 
+
+var refreshInfo = function(){
+    setTimeout(function() {
+    var date_start = $('#date_start').val();
+	var date_end = $('#date_end').val(); 	 
+	var period = $('#choice_date').val(); // daily or period
+	
+	$("#spiner").removeClass('d-none');
+	
+	if ($("#collapseElectric").is(":visible"))
+	{
+     $.ajax({
+        type: "GET",
+        url: "/account/electric_info",        
+        data: {date_end:date_end, date_start: date_start, period: period},
+       })
+     	 
+     .done(function( msg ) {
+        $('#electric').html(msg); // Пишем в div ответ от страницы      
+		$("#spiner").addClass('d-none');		
+        });
+	}
+	
+	if ($("#collapseHeat").is(":visible"))
+	{
+	$.ajax({
+        type: "GET",
+        url: "/account/heat_info",      		
+        data: {date_end:date_end, date_start: date_start, period: period},
+       })
+     	 
+     .done(function( msg ) {
+        $('#heat').html(msg); // Пишем в div ответ от страницы       
+		$("#spiner").addClass('d-none'); 
+        });
+	}
+	
+	if ($("#collapseWater").is(":visible"))
+	{	
+	$.ajax({
+        type: "GET",
+        url: "/account/water_info",         
+        data: {date_end:date_end, date_start: date_start, period: period},
+       })
+     	 
+     .done(function( msg ) {
+        $('#water').html(msg); // Пишем в div ответ от страницы
+        $("#spiner").addClass('d-none');		
+			  });			  
+	} 
+  });
+};
+
+ 
+ $(document).ready(function(){
+    $('#choice_date').change(function(){
+		refreshInfo();
+		console.log('refresh');
+		if ($(this).val() == "daily")
+		{ //отображаем 1 календаря
+		  $("#date_start").collapse('hide'); }	
+		else
+		{ //отображаем 2 календарь
+			$("#date_start").collapse('show');}
+    });
+});
+ 
 window.onload = function() {
   getDate(); 
   // При открытии скрытого элемента наступает событие, вызываем в нём обновление информации
@@ -43,63 +110,20 @@ $('#collapseWater').on('shown.bs.collapse', function () {
 })
 }; 
 
-var refreshInfo = function(){
-    setTimeout(function() {
-    var date_start = $('#date_start').val();
-	var date_end = $('#date_end').val(); 	 
-	var period = $('#choice_date').val(); // daily or period
-    //console.log(date_end,date_start, period);
-     $.ajax({
-        type: "GET",
-        url: "/account/electric_info",
-        beforeSend: function(){$("#spiner").collapse('show');},
-        data: {date_end:date_end, date_start: date_start, period: period},
-       })
-     	 
-     .done(function( msg ) {
-        $('#electric').html(msg); // Пишем в div ответ от страницы       
-        });
-	
-	$.ajax({
-        type: "GET",
-        url: "/account/heat_info",       
-        data: {date_end:date_end, date_start: date_start, period: period},
-       })
-     	 
-     .done(function( msg ) {
-        $('#heat').html(msg); // Пишем в div ответ от страницы
-        
-        });
-		
-	$.ajax({
-        type: "GET",
-        url: "/account/water_info",       
-        data: {date_end:date_end, date_start: date_start, period: period},
-       })
-     	 
-     .done(function( msg ) {
-        $('#water').html(msg); // Пишем в div ответ от страницы
-        $("#spiner").collapse('hide');      
-			  });
-  });
-};
 
- 
- $(document).ready(function(){
-    $('#choice_date').change(function(){
+$(document).ready(function(){
+    $('#date_start').change(function(){
 		refreshInfo();
-		
-		if ($(this).val() == "daily")
-		{ //отображаем 1 календаря
-		  $("#date_start").collapse('hide'); }	
-		else
-		{ //отображаем 2 календарь
-			$("#date_start").collapse('show');}
+		console.log('refresh');		
     });
 });
- 
 
-
+$(document).ready(function(){
+    $('#date_end').change(function(){
+		refreshInfo();
+		//console.log('refresh');		
+    });
+});
  
  </script>
 </head>
@@ -109,8 +133,8 @@ var refreshInfo = function(){
   <div class="container">
 <div class="row">
    <div class="col-sm" >
-		<div class="spinner-border collapse" id="spiner" role="status">
-		  
+		<div class="spinner-border d-none" id="spiner" role="status">
+		  <span class="sr-only">Загрузка...</span>
 		</div>  
 	</div>
 	<div class="col-sm-auto align-self-end order-12" >
@@ -134,7 +158,7 @@ var refreshInfo = function(){
 	<div class="form-group col-ms ">    
       <select id="choice_date" class="custom-select mr-sm-2">
         <option selected value="daily">На дату</option>
-        <option value="period">За период</option>
+       <!--  <option value="period">За период</option> -->
       </select>
     </div>
 	<!-- Даты -->	
@@ -173,11 +197,7 @@ var refreshInfo = function(){
 	 <div class="col-sm-4 block-res">
 		<div class="collapse" id="collapseElectric">
 		<div class="card card-body" id = "electric">
-			 Тут будет табличка по электрике
-			 <br> T0
-			 <br> T1
-			 <br> T2
-			 <br> T3
+			 ЭЛЕКТРИКА
 			  </div>
 			 </div>
 	</div>
@@ -185,9 +205,7 @@ var refreshInfo = function(){
 	<div class="col-sm-4 block-res">
 		<div class="collapse" id="collapseHeat">
 			  <div class="card card-body" id = "heat">
-			 Тут будет табличка по Теплу
-			 <br> Энергия
-			 <br> Обём
+			 ТЕПЛО
 			  </div>
 			 </div>
 	</div>
@@ -195,11 +213,7 @@ var refreshInfo = function(){
 	<div class="col-sm-4 block-res">
 		<div class="collapse" id="collapseWater">
 			  <div class="card card-body" id = "water">
-			 Тут будет табличка по Воде
-			 <br> ХВ
-			 <br> ГВ
-			 <br> ХВ
-			 <br> ГВ
+			 ВОДА
 			  </div>
 			 </div>
 	</div>
