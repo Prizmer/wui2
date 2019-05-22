@@ -2507,6 +2507,7 @@ def get_data_table_by_date_monthly_3_zones(obj_title, obj_parent_title, electric
 
 def ChangeNull(data_table, electric_data):
     #обойти в цикле все строки и добавить "Н/Д" в ячейки, где null
+    if data_table == None: return []
     for i in range(len(data_table)):
         data_table[i]=list(data_table[i])
         #if i<10: print data_table[i]
@@ -7159,6 +7160,7 @@ z_heat.ab_name='%s'
 order by z_heat.ab_name
     """%(my_params[0],my_params[1],obj_title,my_params[2],electric_data_end,obj_title,
          obj_title,electric_data_end, obj_title,obj_title,electric_data_end, obj_title, abon)
+    #print sQuery
     return sQuery
 
 
@@ -8836,6 +8838,7 @@ ORDER BY
   where water_abons.obj_name = '%s' and water_abons.ab_name = '%s'
   order by water_abons.ab_name
     """%( my_params[0],my_params[1], electric_data_end, obj_parent_title, obj_title)
+    #print sQuery
     return sQuery 
     
 def get_data_table_water_daily_elf(obj_title, obj_parent_title, electric_data_end, isAbon):
@@ -10449,3 +10452,571 @@ WHERE
     cursor.execute(sQuery)  
     data_table = cursor.fetchall()
     return data_table
+
+def get_electric_daily_by_user(id_user, date_end):
+    cursor = connection.cursor()
+    data_table=[]   
+    sQuery="""
+    WITH electic_info as
+(
+SELECT  
+  resources.name as res_name, 
+  auth_user.username, 
+  auth_user.first_name, 
+  auth_user.last_name, 
+  meters.name as meters_name
+FROM 
+  public.abonents, 
+  public.link_abonents_auth_user, 
+  public.link_abonents_taken_params, 
+  public.taken_params, 
+  public.meters, 
+  public.auth_user, 
+  public.params, 
+  public.names_params, 
+  public.resources
+WHERE 
+  link_abonents_auth_user.guid_abonents = abonents.guid AND
+  link_abonents_auth_user.id_auth_user = auth_user.id AND
+  link_abonents_taken_params.guid_abonents = abonents.guid AND
+  link_abonents_taken_params.guid_taken_params = taken_params.guid AND
+  taken_params.guid_meters = meters.guid AND
+  taken_params.guid_params = params.guid AND
+  params.guid_names_params = names_params.guid AND
+  names_params.guid_resources = resources.guid AND 
+  resources.name = 'Электричество' AND  
+  auth_user.id = %s
+  group by resources.name, 
+  auth_user.username, 
+  auth_user.first_name, 
+  auth_user.last_name, 
+  meters.name
+)
+
+Select electic_info.res_name, electic_info.username, electic_info.first_name, electic_info.last_name, electic_info.meters_name, date, t0,t1,t2,t3
+From electic_info
+LEFT JOIN
+(
+SELECT  
+  resources.name, 
+  auth_user.username, 
+  auth_user.first_name, 
+  auth_user.last_name, 
+  meters.name as meters_name, 
+  daily_values.date, 
+sum(Case when names_params.name = 'T0 A+' then value  end) as t0,
+sum(Case when names_params.name = 'T1 A+' then value  end) as t1,
+sum(Case when names_params.name = 'T2 A+' then value end) as t2,
+sum(Case when names_params.name = 'T3 A+' then value  end) as t3
+FROM 
+  public.abonents, 
+  public.link_abonents_auth_user, 
+  public.link_abonents_taken_params, 
+  public.taken_params, 
+  public.meters, 
+  public.auth_user, 
+  public.params, 
+  public.names_params, 
+  public.resources, 
+  public.daily_values
+WHERE 
+  link_abonents_auth_user.guid_abonents = abonents.guid AND
+  link_abonents_auth_user.id_auth_user = auth_user.id AND
+  link_abonents_taken_params.guid_abonents = abonents.guid AND
+  link_abonents_taken_params.guid_taken_params = taken_params.guid AND
+  taken_params.guid_meters = meters.guid AND
+  taken_params.guid_params = params.guid AND
+  params.guid_names_params = names_params.guid AND
+  names_params.guid_resources = resources.guid AND
+  daily_values.id_taken_params = taken_params.id AND
+  resources.name = 'Электричество' AND 
+  daily_values.date = '%s' AND
+  auth_user.id = %s
+  group by resources.name, 
+  auth_user.username, 
+  auth_user.first_name, 
+  auth_user.last_name, 
+  meters.name, 
+  daily_values.date) as z
+  ON z.meters_name = electic_info.meters_name
+    """ %(id_user, date_end, id_user)
+    #print sQuery
+    cursor.execute(sQuery)  
+    data_table = cursor.fetchall()
+    return data_table
+
+
+
+def MakeHeatQueryByUser(id_user, date_end, params):
+    sQuery="""
+    WITH heat_info as
+(
+SELECT  
+  resources.name, 
+  auth_user.username, 
+  auth_user.first_name, 
+  auth_user.last_name, 
+  meters.name  as meters_name
+FROM 
+  public.abonents, 
+  public.link_abonents_auth_user, 
+  public.link_abonents_taken_params, 
+  public.taken_params, 
+  public.meters, 
+  public.auth_user, 
+  public.params, 
+  public.names_params, 
+  public.resources, 
+  types_meters
+WHERE 
+  link_abonents_auth_user.guid_abonents = abonents.guid AND
+  link_abonents_auth_user.id_auth_user = auth_user.id AND
+  link_abonents_taken_params.guid_abonents = abonents.guid AND
+  link_abonents_taken_params.guid_taken_params = taken_params.guid AND
+  taken_params.guid_meters = meters.guid AND
+  taken_params.guid_params = params.guid AND
+  params.guid_names_params = names_params.guid AND
+  names_params.guid_resources = resources.guid AND
+  params.guid_types_meters = types_meters.guid  AND
+  resources.name = 'Тепло' AND 
+  auth_user.id = %s
+  and types_meters.name = '%s'
+  group by  resources.name, 
+  auth_user.username, 
+  auth_user.first_name, 
+  auth_user.last_name, 
+  meters.name
+)
+
+Select heat_info.username, heat_info.username, heat_info.first_name, heat_info.last_name, heat_info.meters_name, round(z.energy::numeric,2), round(z.volume::numeric,2), round(z.t_in::numeric,0), round(z.t_out::numeric,0)
+From heat_info
+Left JOIN
+(
+SELECT  
+  resources.name, 
+  auth_user.username, 
+  auth_user.first_name, 
+  auth_user.last_name, 
+  meters.name as meters_name, 
+  daily_values.date, 
+
+ sum(Case when names_params.name = '%s' then value  end) as energy,
+            sum(Case when names_params.name = '%s' then value  end) as volume,
+            sum(Case when names_params.name = '%s' then value  end) as t_in,
+            sum(Case when names_params.name = '%s' then value  end) as t_out
+FROM 
+  public.abonents, 
+  public.link_abonents_auth_user, 
+  public.link_abonents_taken_params, 
+  public.taken_params, 
+  public.meters, 
+  public.auth_user, 
+  public.params, 
+  public.names_params, 
+  public.resources, 
+  public.daily_values,
+  types_meters
+WHERE 
+  link_abonents_auth_user.guid_abonents = abonents.guid AND
+  link_abonents_auth_user.id_auth_user = auth_user.id AND
+  link_abonents_taken_params.guid_abonents = abonents.guid AND
+  link_abonents_taken_params.guid_taken_params = taken_params.guid AND
+  taken_params.guid_meters = meters.guid AND
+  taken_params.guid_params = params.guid AND
+  params.guid_names_params = names_params.guid AND
+  names_params.guid_resources = resources.guid AND
+  daily_values.id_taken_params = taken_params.id AND 
+  params.guid_types_meters = types_meters.guid  AND
+  resources.name = 'Тепло' AND 
+  daily_values.date = '%s' AND
+  auth_user.id = %s
+  and types_meters.name = '%s'
+  group by  resources.name, 
+  auth_user.username, 
+  auth_user.first_name, 
+  auth_user.last_name, 
+  meters.name, 
+  daily_values.date
+) z
+ON z.meters_name = heat_info.meters_name
+    """ %( id_user, params[4],   params[0],params[1],params[2],params[3], date_end, id_user, params[4])
+    #print sQuery
+    return sQuery
+
+def get_heat_daily_by_user_pulsar(id_user, date_end):
+    params=[u'Энергия',u'Объем',u'Ti',u'To', u'Пульсар Теплосчётчик']
+    cursor = connection.cursor()
+    data_table=[] 
+    #передаём 4 параметра и тип счётчика, возможно функция подойдёт под другие теплосчётчики 
+    sQuery = MakeHeatQueryByUser(id_user, date_end, params)
+    cursor.execute(sQuery)  
+    data_table = cursor.fetchall()
+    return data_table
+
+def get_heat_daily_by_user_Sayany(id_user, date_end):
+    params=[u'Q Система1' ,u'M Система1',u'T Канал1',u'T Канал2',u'Sayany' ]
+    cursor = connection.cursor()
+    data_table=[] 
+    sQuery = MakeHeatQueryByUser(id_user, date_end, params)
+    #print sQuery
+    cursor.execute(sQuery)  
+    data_table = cursor.fetchall()
+    return data_table
+
+def get_heat_daily_by_user_Elf(id_user, date_end):
+    #Используется стандартная функция, поэтому параметры энергия и объём дублируется вместо не поддерживаемых эльфами температруы вх и вых.
+    params=[u'Энергия',u'Объем',u'Энергия',u'Объем', u'Эльф 1.08']
+    cursor = connection.cursor()
+    data_table=[] 
+    sQuery = MakeHeatQueryByUser(id_user, date_end, params)
+    #print sQuery
+    cursor.execute(sQuery)  
+    data_table = cursor.fetchall()
+    return data_table
+    
+    
+def get_heat_daily_by_user_Karat(id_user, date_end):
+    params=[u'Q Система1', 'M Система1', 'Ti', 'To', u'Карат 307']
+    cursor = connection.cursor()
+    data_table=[] 
+    sQuery = MakeHeatQueryByUser(id_user, date_end, params)
+    #print sQuery
+    cursor.execute(sQuery)  
+    data_table = cursor.fetchall()
+    return data_table
+
+def get_heat_daily_by_user_Danfos(id_user, date_end):
+    pass
+
+def get_electric_period_by_user(id_user, date_start, date_end):
+    pass
+
+def get_heat_period_by_user_pulsar(id_user, date_start, date_end):
+    pass
+
+def MakeDigitalWaterQueryByUser(id_user, date_end, params):
+    sQuery="""
+  WITH water_info as
+(
+  SELECT
+  resources.name as res_name,
+  auth_user.username,
+  auth_user.first_name,
+  auth_user.last_name,
+  meters.name as meters_name
+  
+FROM
+  public.abonents,
+  public.link_abonents_auth_user,
+  public.link_abonents_taken_params,
+  public.taken_params,
+  public.meters,
+  public.auth_user,
+  public.params,
+  public.names_params,
+  public.resources, 
+  types_meters
+WHERE
+  link_abonents_auth_user.guid_abonents = abonents.guid AND
+  link_abonents_auth_user.id_auth_user = auth_user.id AND
+  link_abonents_taken_params.guid_abonents = abonents.guid AND
+  link_abonents_taken_params.guid_taken_params = taken_params.guid AND
+  taken_params.guid_meters = meters.guid AND
+  taken_params.guid_params = params.guid AND
+  params.guid_names_params = names_params.guid AND
+  names_params.guid_resources = resources.guid AND 
+  params.guid_types_meters = types_meters.guid  AND
+  (resources.name = '%s' or resources.name = '%s')AND 
+  auth_user.id = %s
+  and (types_meters.name = '%s' or types_meters.name = '%s')
+  group by  resources.name,
+  auth_user.username,
+  auth_user.first_name,
+  auth_user.last_name,
+  meters.name)
+
+SELECT res_name, water_info.username, water_info.first_name, water_info.last_name, water_info.meters_name, date, value
+From water_info
+LEFT JOIN 
+(
+  SELECT
+  resources.name,
+  auth_user.username,
+  auth_user.first_name,
+  auth_user.last_name,
+  meters.name as meters_name,
+  daily_values.date,
+   daily_values.value
+FROM
+  public.abonents,
+  public.link_abonents_auth_user,
+  public.link_abonents_taken_params,
+  public.taken_params,
+  public.meters,
+  public.auth_user,
+  public.params,
+  public.names_params,
+  public.resources,
+  public.daily_values,
+  types_meters
+WHERE
+  link_abonents_auth_user.guid_abonents = abonents.guid AND
+  link_abonents_auth_user.id_auth_user = auth_user.id AND
+  link_abonents_taken_params.guid_abonents = abonents.guid AND
+  link_abonents_taken_params.guid_taken_params = taken_params.guid AND
+  taken_params.guid_meters = meters.guid AND
+  taken_params.guid_params = params.guid AND
+  params.guid_names_params = names_params.guid AND
+  names_params.guid_resources = resources.guid AND
+  daily_values.id_taken_params = taken_params.id AND
+  params.guid_types_meters = types_meters.guid  AND
+  (resources.name = '%s' or resources.name = '%s')AND
+  daily_values.date = '%s' AND
+  auth_user.id = %s
+  and (types_meters.name = '%s' or types_meters.name = '%s')
+  group by  resources.name,
+  auth_user.username,
+  auth_user.first_name,
+  auth_user.last_name,
+  meters.name,
+  daily_values.date,
+  daily_values.value) as z
+  ON z.meters_name = water_info.meters_name """%(params[0], params[1],id_user,params[2],params[3],   params[0], params[1], date_end,id_user,params[2],params[3])
+    #print sQuery
+    return sQuery
+
+def get_water_digital_daily_by_user(id_user, date_end):
+    params=[u'ХВС',u'ГВС', u'Пульсар ХВС', u'Пульсар ГВС']
+    cursor = connection.cursor()
+    data_table=[] 
+    sQuery = MakeDigitalWaterQueryByUser(id_user, date_end, params)
+    #print sQuery
+    cursor.execute(sQuery)  
+    data_table = cursor.fetchall()
+    return data_table
+
+def  MakeImpulseWaterQueryByUser(id_user, date_end, params):
+    sQuery="""
+    with water_info as
+(SELECT  
+  resources.name as res_name, 
+  auth_user.username, 
+  auth_user.first_name, 
+  auth_user.last_name, 
+  abonents.name as ab_name
+FROM 
+  public.abonents, 
+  public.link_abonents_auth_user, 
+  public.link_abonents_taken_params, 
+  public.taken_params, 
+  public.meters, 
+  public.auth_user, 
+  public.params, 
+  public.names_params, 
+  public.resources, 
+  public.daily_values,
+  types_meters
+WHERE 
+  link_abonents_auth_user.guid_abonents = abonents.guid AND
+  link_abonents_auth_user.id_auth_user = auth_user.id AND
+  link_abonents_taken_params.guid_abonents = abonents.guid AND
+  link_abonents_taken_params.guid_taken_params = taken_params.guid AND
+  taken_params.guid_meters = meters.guid AND
+  taken_params.guid_params = params.guid AND
+  params.guid_names_params = names_params.guid AND
+  names_params.guid_resources = resources.guid AND
+  params.guid_types_meters = types_meters.guid  AND
+  resources.name = '%s' AND   
+  auth_user.id = %s
+  and types_meters.name like '%s'
+  group by  resources.name, 
+  auth_user.username, 
+  auth_user.first_name, 
+  auth_user.last_name, 
+  abonents.name)
+
+SELECT res_name, water_info.username, water_info.first_name, water_info.last_name, water_info.ab_name, date, value
+From water_info
+LEFT JOIN 
+(
+SELECT  
+  resources.name, 
+  auth_user.username, 
+  auth_user.first_name, 
+  auth_user.last_name, 
+  abonents.name as ab_name,
+  daily_values.date, 
+   daily_values.value 
+FROM 
+  public.abonents, 
+  public.link_abonents_auth_user, 
+  public.link_abonents_taken_params, 
+  public.taken_params, 
+  public.meters, 
+  public.auth_user, 
+  public.params, 
+  public.names_params, 
+  public.resources, 
+  public.daily_values,
+  types_meters
+WHERE 
+  link_abonents_auth_user.guid_abonents = abonents.guid AND
+  link_abonents_auth_user.id_auth_user = auth_user.id AND
+  link_abonents_taken_params.guid_abonents = abonents.guid AND
+  link_abonents_taken_params.guid_taken_params = taken_params.guid AND
+  taken_params.guid_meters = meters.guid AND
+  taken_params.guid_params = params.guid AND
+  params.guid_names_params = names_params.guid AND
+  names_params.guid_resources = resources.guid AND
+  daily_values.id_taken_params = taken_params.id AND 
+  params.guid_types_meters = types_meters.guid  AND
+  resources.name = '%s' AND 
+  daily_values.date = '%s' AND
+  auth_user.id = %s
+  and types_meters.name like '%s'
+  group by  resources.name, 
+  auth_user.username, 
+  auth_user.first_name, 
+  auth_user.last_name, 
+  abonents.name,
+  daily_values.date,
+  daily_values.value) as z
+  ON z.ab_name = water_info.ab_name
+   """%(params[0],id_user, params[1],     params[0],date_end,id_user, params[1])
+    return sQuery
+
+def get_water_impulse_daily_by_user(id_user, date_end):
+    params=[u'Импульс', u'%Пульсар%']
+    cursor = connection.cursor()
+    data_table=[] 
+    sQuery = MakeImpulseWaterQueryByUser(id_user, date_end, params)
+    #print sQuery
+    cursor.execute(sQuery)  
+    data_table = cursor.fetchall()
+    return data_table
+
+def MakeElfWaterQueryByUser(id_user, date_end, params):
+    sQuery="""
+    WITH water_elf_info as (
+SELECT 
+  abonents.name as ab_name, 
+  auth_user.username, 
+  auth_user.first_name, 
+  auth_user.last_name, 
+  meters.address, 
+  meters.factory_number_manual,  
+  types_meters.name as type_meter,
+  CASE
+            WHEN params.channel = 2 THEN meters.attr2
+            WHEN params.channel = 1 Then meters.attr1
+   END as meter,
+   CASE
+            WHEN params.channel = 2 THEN '%s'::text
+            WHEN params.channel = 1 Then '%s'::text
+   END as type_res
+FROM 
+  public.abonents, 
+  public.auth_user, 
+  public.link_abonents_auth_user, 
+  public.link_abonents_taken_params, 
+  public.taken_params, 
+  public.meters, 
+  public.types_meters,
+  public.params
+WHERE 
+  taken_params.guid_params = params.guid AND
+  link_abonents_auth_user.guid_abonents = abonents.guid AND
+  link_abonents_auth_user.id_auth_user = auth_user.id AND
+  link_abonents_taken_params.guid_taken_params = taken_params.guid AND
+  link_abonents_taken_params.guid_abonents = abonents.guid AND
+  taken_params.guid_meters = meters.guid AND
+  meters.guid_types_meters = types_meters.guid
+  and (channel=1 or channel=2)
+  and types_meters.name = '%s'
+  and auth_user.id = %s
+Group by abonents.name, 
+  auth_user.username, 
+  auth_user.first_name, 
+  auth_user.last_name, 
+  meters.name, 
+  meters.address, 
+  meters.factory_number_manual, 
+  meters.attr1, 
+  meters.attr2, 
+  types_meters.name,
+  meters.attr2,
+  meters.attr1,
+  params.channel
+)
+
+Select water_elf_info.ab_name, water_elf_info.username, water_elf_info.first_name, water_elf_info.last_name,water_elf_info.meter, water_elf_info.type_res, z.value
+From water_elf_info
+LEFT JOIN 
+(
+SELECT  
+  resources.name, 
+  auth_user.username, 
+  auth_user.first_name, 
+  auth_user.last_name, 
+   CASE
+            WHEN params.channel = 2 THEN meters.attr2
+            WHEN params.channel = 1 Then meters.attr1
+   END as meter,
+   CASE
+            WHEN params.channel = 2 THEN '%s'::text
+            WHEN params.channel = 1 Then '%s'::text
+   END as type_res,
+  daily_values.date, 
+  daily_values.value,
+  abonents.name
+  
+FROM 
+  public.abonents, 
+  public.link_abonents_auth_user, 
+  public.link_abonents_taken_params, 
+  public.taken_params, 
+  public.meters, 
+  public.auth_user, 
+  public.params, 
+  public.names_params, 
+  public.resources, 
+  public.daily_values,
+  types_meters
+WHERE 
+  link_abonents_auth_user.guid_abonents = abonents.guid AND
+  link_abonents_auth_user.id_auth_user = auth_user.id AND
+  link_abonents_taken_params.guid_abonents = abonents.guid AND
+  link_abonents_taken_params.guid_taken_params = taken_params.guid AND
+  taken_params.guid_meters = meters.guid AND
+  taken_params.guid_params = params.guid AND
+  params.guid_names_params = names_params.guid AND
+  names_params.guid_resources = resources.guid AND
+  daily_values.id_taken_params = taken_params.id AND 
+  params.guid_types_meters = types_meters.guid  AND
+  daily_values.date = '%s' 
+  and (channel=1 or channel=2)
+  and types_meters.name = '%s'
+  and auth_user.id = %s
+  group by  resources.name, 
+  auth_user.username, 
+  auth_user.first_name, 
+  auth_user.last_name, 
+  abonents.name,
+  daily_values.date,
+  daily_values.value,
+  types_meters.name,
+  params.channel,
+  meters.attr2,
+  meters.attr1) z
+  on z.meter = water_elf_info.meter"""%(params[0],params[1],params[2], id_user,params[0],params[1],date_end,params[2], id_user)
+    #print sQuery
+    return sQuery
+def get_water_elf_daily_by_user(id_user, date_end):
+    params=[u'ГВ', u'ХВ', u'Эльф 1.08']
+    cursor = connection.cursor()
+    data_table=[] 
+    sQuery = MakeElfWaterQueryByUser(id_user, date_end, params)
+    #print sQuery
+    cursor.execute(sQuery)  
+    data_table = cursor.fetchall()
+    return data_table 

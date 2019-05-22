@@ -11,6 +11,8 @@ from django.db.models.signals import post_save
 import common_sql
 import service 
 
+from django.conf import settings
+
 #from jsonfield import JSONField
 
 def autoconnect(cls):
@@ -66,6 +68,25 @@ class Abonents(models.Model):
         
     def __unicode__(self):
         return self.name
+
+# Для личного кабинета создаём привязку авторизованных пользователей к абонентам, которые им доступны для просмотра
+@autoconnect 
+class LinkAbonentsAuthUser(models.Model):
+    guid = UUIDField(primary_key=True, max_length=38)
+    name = models.CharField(max_length=200)
+    guid_abonents = models.ForeignKey('Abonents', db_column = 'guid_abonents')
+    guid_auth_user = models.ForeignKey(settings.AUTH_USER_MODEL, to_field = 'id', db_column = 'id_auth_user')
+    class Meta:
+        db_table = 'link_abonents_auth_user'
+        verbose_name = u'Привязка абонента к пользователю'
+        verbose_name_plural = u'Привязки абонентов к пользователям'
+        
+    def pre_save(self):
+        self.name =  u'%s - %s' % (self.guid_abonents.name, self.guid_auth_user.last_name)
+       
+    def __unicode__(self):
+        return self.name
+
 @autoconnect 
 class Comments(models.Model):
     guid = UUIDField(primary_key=True, max_length=38)

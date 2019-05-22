@@ -571,6 +571,10 @@ def LoadElectricMeters(sPath, sSheet):
                 add_meter = Meters(name = unicode(type_meter) + u' ' + unicode(meter), address = unicode(adr), factory_number_manual = unicode(meter), guid_types_meters = TypesMeters.objects.get(guid = u"aa491ede-e00b-4e1d-a8ba-1ef61dba1caa") )
                 add_meter.save()
                 writeToLog(u'Device added' + ' --->   ' + u'Danfoss SonoSelect')
+            elif unicode(type_meter) == u'СЭТ-4ТМ.03М':
+                add_meter = Meters(name = unicode(type_meter) + u' ' + unicode(meter), address = unicode(adr), factory_number_manual = unicode(meter), guid_types_meters = TypesMeters.objects.get(guid = u"66b7ce6a-f280-4e54-8c8d-f69f34aabdf9") )
+                add_meter.save()
+                writeToLog(u'Device added' + ' --->   ' + u'СЭТ-4ТМ.03М')
             else:
                 writeToLog(u'Не найдено совпадение с существующим типом прибора')
                 met-=1
@@ -816,10 +820,10 @@ def add_taken_param(sender, instance, created, **kwargs): # Добавляем �
         #add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"e7617c95-7e42-4cfa-9acd-5bc119261c6d")) # Q Реактивная мощность
         #add_param.save()
     #Получасовки
-        # add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"6af9ddce-437a-4e07-bd70-6cf9dcc10b31")) # A+ 30-мин. срез мощности
-        # add_param.save()
-        # add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"66e997c0-8128-40a7-ae65-7e8993fbea61")) # R+ 30-мин. срез мощности
-        # add_param.save()
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"6af9ddce-437a-4e07-bd70-6cf9dcc10b31")) # A+ 30-мин. срез мощности
+        add_param.save()
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"66e997c0-8128-40a7-ae65-7e8993fbea61")) # R+ 30-мин. срез мощности
+        add_param.save()
     elif instance.guid_types_meters.name == u'Меркурий 233':
         #Добавляем параметры для Меркурия 233
         pass
@@ -1075,7 +1079,25 @@ def add_taken_param(sender, instance, created, **kwargs): # Добавляем �
         pass
     elif instance.guid_types_meters.name == u'СЭТ-4ТМ.03М':
         #Добавляем параметры для СЭТ-4ТМ.03М
-        pass
+       
+    # T0 A+
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"e7624c25-9852-4ffd-8777-b2bfd16c29a8")) # A+ T0 месячные
+        add_param.save()
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"aa83b499-6a9e-40e1-b68b-dc84fec8490b")) # A+ T0 суточные
+        add_param.save()
+
+    # T0 R+
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"3d365f91-8bd3-476e-b07e-3f79134f6853")) # R+ T0 месячные
+        add_param.save()
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"087b785e-5d59-4956-9cd3-57706f9557e6")) # R+ T0 суточные
+        add_param.save()
+           
+    #Получасовки
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"4f505e17-7d71-4cf8-9880-c6ce33612e6e")) # A+ 30-мин. срез мощности
+        add_param.save()
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"55abd40d-fb3c-4100-88f2-46d79be7733a")) # R+ 30-мин. срез мощности
+        add_param.save()
+
     elif instance.guid_types_meters.name == u'Меркурий 200':
         #Добавляем параметры для Меркурий 200
 
@@ -2042,45 +2064,49 @@ def LoadWaterPulsar(sPath, sSheet):
         isNewPulsar=SimpleCheckIfExist('meters','address', numPulsar,'','','')
         #writeToLog(u'пульсар существует '+ unicode(isNewPulsar)+ typePulsar+ numPulsar)
         if not (isNewAbon):
-            return u"Сначала создайте стурктуру объектов и счётчиков"
+            return u"Нет структуры объектов и счётчиков для "+ obj_l2 + " " +abon
         if not (isNewPulsar):
             print (u'Обрабатываем строку '+unicode(obj_l2) +' '+ unicode(numPulsar))
             if unicode(typePulsar) == u'Пульсар 10M':
                     add_meter = Meters(name = unicode(typePulsar) + u' ' + unicode(numPulsar), address = unicode(numPulsar), factory_number_manual = unicode(numPulsar), guid_types_meters = TypesMeters.objects.get(guid = u"cae994a2-6ab9-4ffa-aac3-f21491a2de0b") )
                     add_meter.save()
-                    print (u'OK Device added в базу')
+                    print (u'OK Device 10M added in DB')
                     met+=1
+                    
             elif unicode(typePulsar) == u'Пульсар 16M':
                    add_meter = Meters(name = unicode(unicode(typePulsar) + u' ' + unicode(numPulsar)), address = unicode(numPulsar),  factory_number_manual = unicode(numPulsar), guid_types_meters = TypesMeters.objects.get(guid = u"7cd88751-d232-410c-a0ef-6354a79112f1") )
                    add_meter.save()
-                   print (u'OK Device added в базу')
+                   print (u'OK Device 16M added in DB')
                    met+=1
+                   
             elif unicode(typePulsar) == u'Пульсар 2M':
                    add_meter = Meters(name = unicode(unicode(typePulsar) + u' ' + unicode(numPulsar)), address = unicode(numPulsar),  factory_number_manual = unicode(numPulsar), guid_types_meters = TypesMeters.objects.get(guid = u"6599be9a-1f4d-4a6e-a3d9-fb054b8d44e8") )
                    add_meter.save()
-                   print (u'OK Device added в базу')
+                   print (u'OK Device 2M added in DB')
                    met+=1
             else:
-                print(u'Такой Пульсар уже есть')
-        else:
-            # надо проверить каналы и подсоединить их 
-            #Пульсар 16M 029571 Пульсар 16M Канал 16 Суточный -- adress: 16  channel: 0
-            chanel=unicode(dtAll[i][4])
-            pulsarName=unicode(dtAll[i][6])
-            abonent_name=unicode(dtAll[i][2])
-            taken_param = pulsarName + u' ' + unicode(dtAll[i][5]) + u' '+ pulsarName + u' ' + u'Канал ' + chanel+ u' Суточный -- adress: ' +chanel+u'  channel: 0'
-            print(taken_param)
-            #Sravnenie(taken_param)
-            dtTakenParam=GetSimpleTable('taken_params','name',taken_param)
-            #writeToLog(bool(dtTakenParam))
-            if dtTakenParam:                
-                print(u'taken param найден')
-                guid_taken_param=dtTakenParam[0][1]
-                dtLink=GetSimpleTable('link_abonents_taken_params','guid_taken_params',guid_taken_param)
-                print dtLink
-                if (dtLink):
-                    result+=u"\n Привязка канала "+chanel+u" Пульсара "+pulsarName+u" уже существует. Перезапись НЕ произведена для счётчика "+abonent_name
-                    continue
+                print(u'Такой Пульсар уже есть')        
+        # надо проверить каналы и подсоединить их 
+        #Пульсар 16M 029571 Пульсар 16M Канал 16 Суточный -- adress: 16  channel: 0
+        chanel=unicode(dtAll[i][4])
+        pulsarName=unicode(dtAll[i][6])
+        abonent_name=unicode(dtAll[i][2])
+        taken_param = pulsarName + u' ' + unicode(dtAll[i][5]) + u' '+ pulsarName + u' ' + u'Канал ' + chanel+ u' Суточный -- adress: ' +chanel+u'  channel: 0'
+        #print "chanel ", chanel
+        print(taken_param)
+        #Sravnenie(taken_param)
+        dtTakenParam=GetSimpleTable('taken_params','name',taken_param)
+        #writeToLog(bool(dtTakenParam))
+        if dtTakenParam:                
+            print(u'taken param найден')
+            guid_taken_param=dtTakenParam[0][1]
+            dtLink=GetSimpleTable('link_abonents_taken_params','guid_taken_params',guid_taken_param)
+            #print dtLink
+            if (dtLink):
+                print 'link is exist '+ chanel + '  '+pulsarName
+                result+=u"\n Привязка канала "+chanel+u" Пульсара "+pulsarName+u" уже существует. Перезапись НЕ произведена для счётчика "+abonent_name
+                continue
+            else:
                 dtAbon=GetSimpleTable('abonents','name', abonent_name)
                 guidAbon=dtAbon[0][0]
                 #print guidAbon
@@ -2094,7 +2120,7 @@ def LoadWaterPulsar(sPath, sSheet):
                 con+=1
     result+=u'Прогружено новых пульсаров '+unicode(met)
     if con>0:
-        result+=u'Созданы новые связи'
+        result+=u'Созданы новые связи '
     return result
 
 #def Sravnenie(takenParam):

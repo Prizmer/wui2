@@ -38,7 +38,8 @@ TEMPLATES = [
 STATIC_ROOT = os.path.join(BASE_DIR, "prizmer/static")
 STATIC_URL = '/static/'
 STATICFILES_DIRS = (os.path.join(BASE_DIR, "../prizmer/static"),    
-                     os.path.join(BASE_DIR, "../prizmer/static/excel"),                            
+                     os.path.join(BASE_DIR, "../prizmer/static/excel"), 
+                      os.path.join(BASE_DIR, "../prizmer/static/account_prizmer_imgs"),					 
 					) 
 
 					
@@ -77,6 +78,7 @@ INSTALLED_APPS = (
     'AskueReports',
     'AskueViz',
 	'service',
+	'account_prizmer',
 
 )
 
