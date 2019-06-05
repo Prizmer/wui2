@@ -5859,17 +5859,14 @@ where z1.number_manual=z2.number_manual
 
 def makeSqlQuery_heat_pulsar_teplo_all_period(obj_title, electric_data_end,electric_data_start, params):
     sQuery="""
-   Select  heat_abons.ab_name, heat_abons.factory_number_manual, 
-round((z5.energy_start)::numeric,7) as energy_st,  
-round(z5.energy_end::numeric,7)as energy_e, 
-round((z5.energy_end-z5.energy_start)::numeric,7) as energy_delta, 
-round((z5.volume_start)::numeric,7), 
-round((z5.volume_end)::numeric,7), 
+   Select  ab_name,factory_number_manual,
+round((z5.energy_start)::numeric,7) as energy_st,
+round(z5.energy_end::numeric,7)as energy_e,
+round((z5.energy_end-z5.energy_start)::numeric,7) as energy_delta,
+round((z5.volume_start)::numeric,7),
+round((z5.volume_end)::numeric,7),
 round((z5.volume_end-z5.volume_start)::numeric,7) as volume_delta
- 
-from heat_abons
-left join
-
+FROM
 (Select z3.obj_name, z3.ab_name,z3.factory_number_manual, z3.energy_start,z3.volume_start , z4.energy_end,z4.volume_end
 from
 (Select z2.daily_date, heat_abons.obj_name, heat_abons.ab_name, heat_abons.factory_number_manual, z2.energy as energy_start,z2.volume as volume_start,z2.t_in as t_in_start,z2.t_out as t_out_start
@@ -5964,11 +5961,9 @@ on z2.number_manual=heat_abons.factory_number_manual
 where heat_abons.obj_name='%s') as z4
 where z3.factory_number_manual=z4.factory_number_manual
 ) as z5
-on z5.factory_number_manual=heat_abons.factory_number_manual
-where heat_abons.obj_name='%s' 
-order by heat_abons.ab_name
+order by ab_name
     """%(params[0],params[1],params[2],params[3], obj_title,params[4], electric_data_start,obj_title,
-         params[0],params[1],params[2],params[3], obj_title,params[4], electric_data_end, obj_title,  obj_title)
+         params[0],params[1],params[2],params[3], obj_title,params[4], electric_data_end, obj_title)
     #print sQuery    
     return sQuery
 
