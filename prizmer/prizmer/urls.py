@@ -7,6 +7,7 @@ from django.views.generic import RedirectView
 
 import general.views
 
+
 urlpatterns = patterns('',
     # Examples:
     # url(r'^$', 'prizmer.views.home', name='home'),

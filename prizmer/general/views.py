@@ -14558,8 +14558,7 @@ def electric_restored_activ_reactiv_daily(request):
     return render_to_response("data_table/electric/98.html", args)
 
 def heat_danfoss_period(request):
-    # НЕ ДОДЕЛАНО
-    
+       
     args = {}
     is_abonent_level = re.compile(r'abonent')
     is_object_level_2 = re.compile(r'level2')
@@ -14579,13 +14578,14 @@ def heat_danfoss_period(request):
             request.session["obj_key"]             = obj_key             = request.GET['obj_key']
             request.session["obj_parent_title"]    = obj_parent_title    = request.GET['obj_parent_title']            
             request.session["electric_data_end"]   = electric_data_end   = request.GET['electric_data_end']
+            request.session["electric_data_start"]   = electric_data_start   = request.GET['electric_data_start']
         
         dc=u'current'
 
         if (bool(is_abonent_level.search(obj_key))): 
-            data_table = common_sql.get_data_table_water_current(meters_name, parent_name, electric_data_end, True,dc)
+            data_table = common_sql.get_data_table_water_current(obj_parent_title, obj_title, electric_data_start, electric_data_end, True,dc)
         elif (bool(is_object_level_2.search(obj_key))):
-            data_table = common_sql.get_data_table_water_current(meters_name, parent_name, electric_data_end, False,dc)
+            data_table = common_sql.get_data_table_water_current(obj_parent_title, obj_title, electric_data_start, electric_data_end, False,dc)
             
     
 
@@ -14614,26 +14614,19 @@ def heat_danfoss_daily(request):
         if request.method == 'GET':
             request.session["obj_title"]           = obj_title           = request.GET['obj_title']
             request.session["obj_key"]             = obj_key             = request.GET['obj_key']
-            request.session["obj_parent_title"]    = obj_parent_title    = request.GET['obj_parent_title']            
+            request.session["obj_parent_title"]    = obj_parent_title   = request.GET['obj_parent_title']            
             request.session["electric_data_end"]   = electric_data_end   = request.GET['electric_data_end']
             request.session["is_electric_monthly"]   = is_electric_monthly   = request.GET['is_electric_monthly']
             request.session["is_electric_daily"]   = is_electric_daily   = request.GET['is_electric_daily']
             request.session["is_electric_current"]   = is_electric_current   = request.GET['is_electric_current']
                 
+        print 'Danfoss'
+        dc = u'daily'
         
-        if is_electric_monthly == True:
-            dc = u'monthly'
-        elif is_electric_daily == True:
-            dc = u'daily'
-        else:
-           dc = u'current'
-
         if (bool(is_abonent_level.search(obj_key))): 
-            data_table = common_sql.get_data_table_water_current(meters_name, parent_name, electric_data_end, True,dc)
+            data_table = common_sql.get_data_table_heat_danfos_daily(obj_parent_title, obj_title, electric_data_end, True,dc)
         elif (bool(is_object_level_2.search(obj_key))):
-            data_table = common_sql.get_data_table_water_current(meters_name, parent_name, electric_data_end, False,dc)
-            
-    
+            data_table = common_sql.get_data_table_heat_danfos_daily(obj_parent_title, obj_title, electric_data_end, False,dc)
 
     args['data_table'] = data_table
     args['electric_data_end'] = electric_data_end
