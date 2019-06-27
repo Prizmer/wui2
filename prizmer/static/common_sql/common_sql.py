@@ -4965,9 +4965,10 @@ def get_data_table_water_current(meters_name, parent_name, electric_data_end, is
 
 def MakeSqlQuery_water_period_for_korp(meters_name, parent_name,electric_data_start, electric_data_end, my_param):
     sQuery="""  
-
-Select z_st.ab_name, z_st.account_2,z_st.date, z_st.meter_name,z_st.type_energo, z_st.value,z_end.value,round(z_end.value::numeric-z_st.value::numeric,3) as delta, z_st.date_install, z_end.date
-from 
+SELECT  z.ab_name, z.account_2,z.date_st, z.meter_name,z.type_energo, z.value_st,z.value_end,delta, z.date_install, z.date_end
+From
+(Select z_st.ab_name, z_st.account_2,z_st.date as date_st, z_st.meter_name, z_st.type_energo, z_st.value as value_st,z_end.value as value_end,round(z_end.value::numeric-z_st.value::numeric,3) as delta, z_st.date_install, z_end.date as date_end
+from
 (Select  obj_name as ab_name, account_2,z2.date, water_abons_report.ab_name as meter_name,type_energo, z2.value,date_install
 from water_abons_report
 LEFT JOIN (
@@ -5001,7 +5002,7 @@ and
 )z2
 on z2.ab_name=water_abons_report.ab_name
 where water_abons_report.name='%s'
-order by account_2, obj_name) z_st,
+order by obj_name, water_abons_report.ab_name, type_energo) z_st,
 (
 Select  obj_name as ab_name, account_2,z2.date, water_abons_report.ab_name as meter_name,type_energo, z2.value,date_install
 from water_abons_report
@@ -5036,11 +5037,11 @@ and
 )z2
 on z2.ab_name=water_abons_report.ab_name
 where water_abons_report.name='%s'
-order by account_2, obj_name) z_end
-where z_st.meter_name=z_end.meter_name
+order by obj_name, water_abons_report.ab_name, type_energo) z_end
+where z_st.meter_name=z_end.meter_name) z
+order by ab_name, meter_name
     """%( my_param[0], electric_data_start,meters_name,my_param[0], electric_data_end,meters_name)
-    
-  
+      
     return sQuery
 def MakeSqlQuery_water_period_for_abon(meters_name, parent_name,electric_data_start, electric_data_end, my_param):
     sQuery="""
@@ -11124,6 +11125,7 @@ def get_data_table_heat_danfos_daily(obj_parent_title, obj_title, electric_data_
     #print sQuery
     cursor.execute(sQuery)  
     data_table = cursor.fetchall()
+    data_table = ChangeNull(data_table, None)
     return data_table 
 
 def MakeHeatDanfosQueryPeriod_for_abon(obj_parent_title, obj_title,electric_data_start, electric_data_end, params):
@@ -11317,7 +11319,7 @@ WHERE
     return sQuery
 
 
-def get_data_table_water_current(obj_parent_title, obj_title, electric_data_start, electric_data_end, isAbon,dc):
+def get_data_table_danfoss_period(obj_parent_title, obj_title, electric_data_start, electric_data_end, isAbon,dc):
     params=[u'Энергия', u'Объем', u'Ti', u'To', u'Тепло']
     cursor = connection.cursor()
     data_table=[] 
@@ -11328,4 +11330,5 @@ def get_data_table_water_current(obj_parent_title, obj_title, electric_data_star
     #print sQuery
     cursor.execute(sQuery)  
     data_table = cursor.fetchall()
+    data_table = ChangeNull(data_table, None)
     return data_table 

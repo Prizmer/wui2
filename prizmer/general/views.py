@@ -11643,15 +11643,15 @@ def water_potreblenie_pulsar(request):
     if len(data_table)>0: 
         data_table=common_sql.ChangeNull(data_table, None)
         
-    for i in range(len(data_table)):
-        data_table[i]=list(data_table[i])
-        num=data_table[i][3]
-        if ('ХВС, №' in num) or ('ГВС, №' in num):
-            num=num.replace(u'ХВС, №', ' ')
-            num=num.replace(u'ГВС, №', ' ')
-            data_table[i][3]=num
-            #print num
-        data_table[i]=tuple(data_table[i])
+    # for i in range(len(data_table)):
+    #     data_table[i]=list(data_table[i])
+    #     num=data_table[i][3]
+    #     if ('ХВС, №' in num) or ('ГВС, №' in num):
+    #         num=num.replace(u'ХВС, №', ' ')
+    #         num=num.replace(u'ГВС, №', ' ')
+    #         data_table[i][3]=num
+    #         #print num
+    #     data_table[i]=tuple(data_table[i])
     
     args['data_table'] = data_table
     args['electric_data_end'] = electric_data_end
@@ -14583,9 +14583,9 @@ def heat_danfoss_period(request):
         dc=u'current'
 
         if (bool(is_abonent_level.search(obj_key))): 
-            data_table = common_sql.get_data_table_water_current(obj_parent_title, obj_title, electric_data_start, electric_data_end, True,dc)
+            data_table = common_sql.get_data_table_danfoss_period(obj_parent_title, obj_title, electric_data_start, electric_data_end, True,dc)
         elif (bool(is_object_level_2.search(obj_key))):
-            data_table = common_sql.get_data_table_water_current(obj_parent_title, obj_title, electric_data_start, electric_data_end, False,dc)
+            data_table = common_sql.get_data_table_danfoss_period(obj_parent_title, obj_title, electric_data_start, electric_data_end, False,dc)
             
     
 

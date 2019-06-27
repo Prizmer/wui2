@@ -5669,14 +5669,14 @@ def report_water_potreblenie_pulsar(request):
     if len(data_table)>0: 
         data_table=common_sql.ChangeNull(data_table, None)
         
-    for i in range(len(data_table)):
-        data_table[i]=list(data_table[i])
-        num=data_table[i][3]
-        if ('ХВС, №' in num) or ('ГВС, №' in num):
-            num=num.replace(u'ХВС, №', ' ')
-            num=num.replace(u'ГВС, №', ' ')
-            data_table[i][3]=num
-        data_table[i]=tuple(data_table[i])
+    # for i in range(len(data_table)):
+    #     data_table[i]=list(data_table[i])
+    #     num=data_table[i][3]
+    #     if ('ХВС, №' in num) or ('ГВС, №' in num):
+    #         num=num.replace(u'ХВС, №', ' ')
+    #         num=num.replace(u'ГВС, №', ' ')
+    #         data_table[i][3]=num
+    #     data_table[i]=tuple(data_table[i])
 
         
 # Заполняем отчет значениями

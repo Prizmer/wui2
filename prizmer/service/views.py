@@ -314,9 +314,11 @@ def GetSimpleCrossTable(table1,fieldName1,value1,table2,fieldName2, value2):
 def GetTableFromExcel(sPath,sSheet):
     wb = load_workbook(filename = sPath)
     ws = wb[sSheet]
+    #print sPath, sSheet
     row = 1
     dt=[]
     while (bool(ws[u'A%s'%(row)].value)):
+        #print row
         A=ws[u'A%s'%(row)].value
         B=ws[u'b%s'%(row)].value
         C=ws[u'c%s'%(row)].value
@@ -1924,6 +1926,7 @@ def LoadObjectsAndAbons_water(sPath, sheet):
     result=""
     dtAll=GetTableFromExcel(sPath,sheet) #получили из excel все строки до первой пустой строки (проверка по колонке А)
     kv=0
+    print 'len(dtAll)', str(len(dtAll))
     for i in range(2,len(dtAll)):
         obj_l0=u'Вода' # всегда будет Вода как объект-родитель
         obj_l1=dtAll[i][0] #корпус
@@ -2047,6 +2050,7 @@ def LoadWaterPulsar(sPath, sSheet):
     dtAll=GetTableFromExcel(sPath,sSheet) #получили из excel все строки до первой пустой строки (проверка по колонке А)
     met=0
     con=0
+    print 'str(len(dtAll))', str(len(dtAll))
     for i in range(2,len(dtAll)):
         obj_l0=u'Вода' # всегда будет Вода как объект-родитель
         obj_l1=dtAll[i][0] #корпус
@@ -2085,7 +2089,7 @@ def LoadWaterPulsar(sPath, sSheet):
                    print (u'OK Device 2M added in DB')
                    met+=1
             else:
-                print(u'Такой Пульсар уже есть')        
+                print(u'Такой Пульсар уже есть или Вы не верно указали тип прибора в прогрузочной ведомости')        
         # надо проверить каналы и подсоединить их 
         #Пульсар 16M 029571 Пульсар 16M Канал 16 Суточный -- adress: 16  channel: 0
         chanel=unicode(dtAll[i][4])
