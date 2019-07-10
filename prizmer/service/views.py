@@ -352,18 +352,18 @@ def LoadObjectsAndAbons(sPath, sSheet):
     
     for i in range(1,len(dtAll)):
         #print  dtAll[i][2],dtAll[i][3]
-        print u'Обрабатываем строку ' + dtAll[i][2]+' - '+dtAll[i][3]
-        obj_l0=dtAll[i][0]
+        print u'Обрабатываем строку ' + unicode(dtAll[i][2])+' - ' + unicode(dtAll[i][3])
+        obj_l0=unicode(dtAll[i][0])
         writeToLog( obj_l0)
-        obj_l1=dtAll[i][1]
+        obj_l1=unicode(dtAll[i][1])
         writeToLog(obj_l1)
-        obj_l2=dtAll[i][2]
+        obj_l2=unicode(dtAll[i][2])
         writeToLog(obj_l2)
-        abon=dtAll[i][3]
+        abon=unicode(dtAll[i][3])
         writeToLog(abon)
-        account_1=dtAll[i][4]
+        account_1=unicode(dtAll[i][4])
         writeToLog(account_1)
-        account_2=dtAll[i][5]
+        account_2=unicode(dtAll[i][5])
         writeToLog(account_2)
         isNewObj_l0=SimpleCheckIfExist('objects','name',obj_l0,"","","")
         isNewObj_l1=SimpleCheckIfExist('objects','name',obj_l1,"","","")
@@ -627,14 +627,14 @@ def service_water(request):
     return render_to_response("service/service_water.html", args)
     
 def add_link_meter(sender, instance, created, **kwargs):
-    print u'Vi v f-ii add_link_meter'
+    print u'Start add link port - meter'
     dtAll=GetTableFromExcel(cfg_excel_name,cfg_sheet_name) #получили из excel все строки до первой пустой строки (проверка по колонке А)
     writeToLog( unicode(dtAll[1][1]))
     if (dtAll[1][1] == u'Объект'): #вода
-        print(u'Добавляем связь портов по воде')
+        print(u'Add impulse connect')
         add_link_meter_port_from_excel_cfg_water_v2(sender, instance, created, **kwargs)
     else:# электрика
-        print(u'Добавляем связь портов по электрике')
+        print(u'Add digital connect')
         add_link_meter_port_from_excel_cfg_electric(sender, instance, created, **kwargs)
 
 def add_link_meter_port_from_excel_cfg_water_v2(sender, instance, created, **kwargs):
@@ -720,7 +720,7 @@ def add_link_meter_port_from_excel_cfg_electric(sender, instance, created, **kwa
         if meter is not None:
             if unicode(meter) == instance.factory_number_manual :
                 if PortType == u'Com-port':
-                    print 'dtAll[i][12]', dtAll[i][12]
+                    #print 'dtAll[i][12]', dtAll[i][12]
                     guid_com_port_from_excel = connection.cursor()
                     guid_com_port_from_excel.execute("""SELECT 
                                                       comport_settings.guid
@@ -730,9 +730,11 @@ def add_link_meter_port_from_excel_cfg_electric(sender, instance, created, **kwa
                                                       comport_settings.name = '%s';"""%(unicode(dtAll[i][12])))
                     guid_com_port_from_excel = guid_com_port_from_excel.fetchall()
                     #print guid_com_port_from_excel
-                    guid_com_port = ComportSettings.objects.get(guid=guid_com_port_from_excel[0][0])
-                    add_com_port_link = LinkMetersComportSettings(guid_meters = instance, guid_comport_settings = guid_com_port)
-                    add_com_port_link.save()
+                    if (len(guid_com_port_from_excel)>0):
+                        guid_com_port = ComportSettings.objects.get(guid=guid_com_port_from_excel[0][0])
+                        add_com_port_link = LinkMetersComportSettings(guid_meters = instance, guid_comport_settings = guid_com_port)
+                        add_com_port_link.save()
+                    else: print ' Com-port does not exist. Create it before! '
                 
                 else:
                     guid_ip_port_from_excel = connection.cursor()

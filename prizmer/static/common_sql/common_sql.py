@@ -9700,7 +9700,7 @@ def get_A_R_energy_by_factory_number_period(factory_number_manual,electric_data_
 
     sQuery="""
     Select dd::date,
-(case when count_48>1 then count_48 else 0 end)
+(case when count_48>0 then count_48 else 0 end)
 FROM generate_series
         ( '%s'::timestamp
         , '%s'::timestamp
@@ -9742,6 +9742,7 @@ WHERE
   count_48
   order by  dd
     """%(electric_data_start,electric_data_end,factory_number_manual,electric_data_start,electric_data_end, name_param)
+   
     #print sQuery
     cursor = connection.cursor()
     data_table=[]      
