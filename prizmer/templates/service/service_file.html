@@ -9,7 +9,7 @@
 <br>
 <span><strong> Загрузка файла на сервер </strong> </span>
 <br><br>
-
+<div class="meters_change_block">
 <form enctype="multipart/form-data" method="post"  action="/service/service_file_loading/" id="form_load"> 
 
  {% csrf_token %}
@@ -22,6 +22,7 @@
 <strong>{{status}}</strong>
 
 </form>
+</div>
 <br>
 <br>
 <br>

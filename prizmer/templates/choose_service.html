@@ -109,13 +109,22 @@ $.ajax({
     contentType: false,
     success: function(data) {
         alert('success');
-    }	
+		document.location.href='/service/confoig/';
+    }
+	
+
 });		
 return false;
 }
 
 $(function() {
     $('form').submit(upload);
+	var url      = window.location.href; 
+	if (~url.indexOf("/service_file_loading"))
+	    { setTimeout(function() {
+                 history.back();
+                 }, 2000);		
+		}
 });	
 
 
