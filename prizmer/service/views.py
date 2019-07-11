@@ -24,6 +24,9 @@ from django.db.models import Max
 import uuid
 
 import common_sql
+from HTMLParser import HTMLParser
+import io
+import psycopg2
 
 cfg_excel_name=""
 cfg_sheet_name=""
@@ -46,9 +49,9 @@ def MakeSheet(request):
     args={}
     fileName=""
     sheets=""
-    print request.GET['choice_file']
-    print '___________'
-    print request.GET.get('choice_file')
+    #print request.GET['choice_file']
+    #print '___________'
+    #print request.GET.get('choice_file')
     if request.is_ajax():
         if request.method == 'GET':
             request.session["choice_file"]    = fileName    = request.GET['choice_file']
@@ -74,9 +77,9 @@ def choose_service(request):
     
     if  not(os.path.exists(directory)):
         os.mkdir(directory)
-    print directory
+    #print directory
     files = os.listdir(directory) 
-    print files
+    #print files
     args['filesFF']= files
     return render_to_response("choose_service.html", args)
 
@@ -120,7 +123,8 @@ def service_file_loading(request):
     #print status
     return render_to_response("choose_service.html", args)
 
-    
+
+
 def service_electric_load(request):
     args={}
     data_table=[]
@@ -2921,3 +2925,242 @@ def get_water_impulse_template(request):
 
 def get_balance_template(request):
     return get_file('balance_template_for_load.xlsx')
+
+
+def service_load30_page(request):    
+    args={}
+    
+    return render_to_response("service/service_30.html", args)
+
+
+#_____________________________________________________________________________________
+#Прогрузка получасовок
+#________________________________________________________
+con=psycopg2.connect(host='127.0.0.1', port=5432,dbname='prizmer', user='postgres', password='1')
+setev = 0
+zavod = 0
+col=0
+row=0
+dt=[]
+
+class NumberParser(HTMLParser):
+    def __init__(self):
+        HTMLParser.__init__(self)
+        self.in_h2 = False
+
+    def handle_starttag(self, tag, attrs):
+        if tag == 'h2':
+            self.in_h2 = True
+
+    def handle_data(self, data):
+        if self.in_h2:
+            global setev 
+            global zavod
+            setev_start_pos = data.find('-') + 2
+            setev_end_pos = data.find(',') 
+            setev = unicode(data[setev_start_pos:setev_end_pos])
+            zavod_start_pos = data.rfind('-') + 2
+            zavod_end_pos = data.rfind(')') 
+            zavod = unicode(data[zavod_start_pos:zavod_end_pos])
+            #print u'setevoy: '+setev
+            #print u'zavodskoy: '+zavod
+            #print data
+
+    def handle_endtag(self, tag):
+        self.in_h2 = False
+
+class TableParser(HTMLParser):
+    def __init__(self):
+        HTMLParser.__init__(self)
+        self.in_td = False
+     
+    def handle_starttag(self, tag, attrs):
+        if tag == 'td':
+            self.in_td = True
+     
+    def handle_data(self, data):
+        if self.in_td:
+            global col
+            global row
+            global dt
+            #print unicode(row),unicode(col)
+            dt[row][col]=data
+            if col==9:
+                col = 0
+                row+=1
+            else:  col+=1
+            
+            #print data
+     
+    def handle_endtag(self, tag):
+        self.in_td = False
+ 
+def Insert(id_var, date,time, param,param_id):
+    curs=con.cursor()
+    sQueryInsert="""
+    INSERT INTO various_values(
+            id, date, "time", value, status, id_taken_params)
+    VALUES (%s, '%s', '%s', %s, %s, %s);
+        """%(id_var, date, time, param, True ,param_id)
+    #print sQueryInsert
+    curs.execute(sQueryInsert)
+    con.commit()
+
+def checkIsExist(date,time, taken_param,taken_param_id):
+    isExist = False
+    curs=con.cursor()
+    sQuery = """
+  SELECT id, date, "time", value, status, id_taken_params
+  FROM various_values
+  WHERE  date = '%s'
+  AND  time = '%s'
+  AND id_taken_params = '%s'
+"""%(date, time, taken_param_id)
+    #print sQuery
+    curs.execute(sQuery)
+    temp =  curs.fetchall()
+    if len(temp)>0:
+        isExist = True
+    curs.close()
+    return isExist
+
+def checkIsSameNumbers(address, zav):
+    isSame=True
+    curs=con.cursor()
+    sQuery ="""SELECT 
+    meters.name, 
+    meters.address, 
+    meters.factory_number_manual
+    FROM 
+    public.meters
+    WHERE 
+    meters.address = '%s' AND 
+    meters.factory_number_manual = '%s' """%(address, zav)
+    
+    curs.execute(sQuery)
+    temp =  curs.fetchall()
+    if len(temp) == 0:
+        isSame=False
+    curs.close()
+    return isSame
+
+def get_id_taken_param_for_meter_by_guid_params(zav, guid):
+    result = 0
+    curs=con.cursor()
+    sQuery = """
+    SELECT id
+    FROM taken_params
+    where name like '%%%s%%'
+    and guid_params = '%s'
+    """%(zav, guid)
+    curs.execute(sQuery)
+    temp =  curs.fetchall()
+    result = temp[0][0]
+    curs.close()
+    return result
+
+def load_30_in_db(f_path,file_list):
+    result = ""
+    for f_name in file_list:
+        path = f_path+'\\'+f_name
+        #print path
+        with io.open(path, "r",  encoding="cp1251") as profil_file:
+            data = profil_file.read().replace('\n', '')
+        
+        global setev
+        global zavod
+        global col
+        global row
+        global dt
+
+        setev = 0
+        zavod = 0
+        col=0
+        row=0
+        dt=[]
+        n = NumberParser()
+        n.feed(data)
+              
+        # проверяем соответствие заводского и сетевого в базе и в прогружаемом файле
+        if not checkIsSameNumbers(setev, zavod):
+            result += ' Сетевой и заводской номер не соотвествуют номерам в БАЗЕ. Файл не загружен: ' + unicode(f_name)
+            continue
+        
+        #инициируем пустой список из 1488 строк и 9 столбцов
+        for i in range(1488):
+            dt.append([0] * 10)
+
+        p = TableParser()
+        p.feed(data)
+        
+        #получаем taken_param activ&reactiv
+        activ_id = get_id_taken_param_for_meter_by_guid_params(zavod, '6af9ddce-437a-4e07-bd70-6cf9dcc10b31')
+        reactiv_id = get_id_taken_param_for_meter_by_guid_params(zavod, '66e997c0-8128-40a7-ae65-7e8993fbea61')
+       
+       #получаем последний id_varius_values, чтобы начать присваивать новые id после него
+        curs=con.cursor()
+        sQuery ="""SELECT id
+        FROM various_values
+        order by id DESC
+        Limit 1"""
+        curs.execute(sQuery)
+        dt_var = curs.fetchall()
+        curs.close()
+        #print sQuery
+        if dt_var == []:
+            id_var=0
+        else:
+            id_var = int(dt_var[0][0])
+        
+        counter = 0
+        for dt_row in dt:    
+            activ = float(dt_row[1])*0.5
+            reactiv = float(dt_row[3])*0.5
+            time = dt_row[5]
+            date = dt_row[6]
+            problem = dt_row[8]
+            if problem == '-':
+                if not(checkIsExist(date,time, activ,activ_id)):
+                    id_var +=1
+                    Insert(id_var, date,time, activ,activ_id)
+                    counter+=1
+
+                if not(checkIsExist(date,time, reactiv,reactiv_id)):
+                    id_var +=1
+                    Insert(id_var, date,time, reactiv, reactiv_id)
+                    counter+=1
+                
+            else: continue
+
+        result += ' В таблицу various_values  загружено: '+unicode(counter) + ' новых строк для файла ' + unicode(f_name) + '.'
+        curs.close()
+    
+    return result
+
+def service_load30(request):
+    args={}
+    data_table=[]
+    status='Не удаётся найти указанный путь'
+        
+    result=""
+    file30 =u""
+    if request.is_ajax():
+        if request.method == 'GET':            
+            request.session["file30"]    = file30    = request.GET['file30']
+            #print file30
+            file_list=[]            
+            isExistDir = os.path.exists(file30)
+            if isExistDir:
+                #'извлекаем файлы и загружаем в БД'
+                status = u'Директория существует'
+                #получаем список html-файлов в указанной директории
+                for f in os.listdir(file30):
+                    if f.endswith(".html"):
+                        file_list.append(f)
+                f_count = len(file_list)
+                status += u', в ней находится '+ str(f_count) + ' html-файлов. '
+                if f_count>0:
+                    status += load_30_in_db(file30,file_list)
+    args['data_table'] = data_table
+    args['status']=status
+    return render_to_response("service/service_30.html", args)

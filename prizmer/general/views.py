@@ -12198,7 +12198,9 @@ def forma_80020_v2(request):
             #Заголовок
             #В заголовок добавляем дату чуть позже, чтобы спокойно пройти по номерам и параметрам
             list_of_taken_params.insert(0,[u'Дата'])
-            data_table_check_data_header = list(list_of_taken_params)
+            if len(list_of_taken_params)>1:
+                data_table_check_data_header = list(list_of_taken_params)
+            
 
     args['data_table'] = data_table
     args['data_table_check_data_header'] = data_table_check_data_header

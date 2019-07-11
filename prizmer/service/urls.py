@@ -41,4 +41,7 @@ urlpatterns = patterns('',
     url(r'^get_water_digital_template/$', views.get_water_digital_template), #возвращает excel форму образец для прогрузочной ведомости
     url(r'^get_water_impulse_template/$', views.get_water_impulse_template), #возвращает excel форму образец для прогрузочной ведомости
     url(r'^get_balance_template/$', views.get_balance_template), #возвращает excel форму образец для прогрузочной ведомости
+    
+    url(r'^service_load30_page/$', views.service_load30_page), # загрузка страницы
+    url(r'^service_load30/$', views.service_load30), # загрузка самих получасовок в базу
 )

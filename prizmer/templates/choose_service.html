@@ -38,13 +38,16 @@ var load_service = function(page){
 		old_meter=$("#old_meter").val();
 		new_meter=$("#new_meter").val();
 		meter1=$("#meter1").val();
-		meter2=$("#meter2").val();		
+		meter2=$("#meter2").val();	
+        file30=$("#direct30").val();	
 		
+		$("span").css("pointer-events", "none");
+				
         $.ajax({
         type: "GET",
         url: "/service/"+page,
         beforeSend: function(){show_loader();},
-        data:{isFirst:isFirst, choice_file:choice_file, choice_sheet:choice_sheet, tcp_ip_status:tcp_ip_status, object_status:object_status, counter_status:counter_status, old_meter:old_meter, new_meter:new_meter, meter1:meter1,meter2:meter2, balance_status:balance_status},        
+        data:{isFirst:isFirst, choice_file:choice_file, choice_sheet:choice_sheet, tcp_ip_status:tcp_ip_status, object_status:object_status, counter_status:counter_status, old_meter:old_meter, new_meter:new_meter, meter1:meter1,meter2:meter2, balance_status:balance_status, file30:file30},        
        })
 	   
 	   .done(function( msg ) {
@@ -53,12 +56,14 @@ var load_service = function(page){
 		counter_status="{{counter_status}}";
         $('#data-table').html(msg); // Пишем в div ответ от страницы 
             hide_loader();
+			$("span").css("pointer-events", "auto");
         });
     };
 
 function change_wb(){
      console.log($("#choice_file").val());
      choice_file=$("#choice_file").val();
+	 
 	 $.ajax({
         type: "GET",
         url: "/service/make_sheet",
@@ -99,7 +104,7 @@ var hide_loader = function(){
 function upload(event) {
 event.preventDefault();
 var data = new FormData($('form').get(0));
-
+alert('form find');
 $.ajax({
     url: $(this).attr('action'),
     type: $(this).attr('method'),
@@ -108,8 +113,7 @@ $.ajax({
     processData: false,
     contentType: false,
     success: function(data) {
-        alert('success');
-		document.location.href='/service/confoig/';
+        alert('success');		
     }
 	
 
@@ -118,6 +122,7 @@ return false;
 }
 
 $(function() {
+    hide_loader();
     $('form').submit(upload);
 	var url      = window.location.href; 
 	if (~url.indexOf("/service_file_loading"))
@@ -139,6 +144,16 @@ $(function() {
 		 {% block control-block %}
 		 <br>
 		<span><strong> &nbsp;&nbsp; Выберите сервис </strong></span>
+		<div id="fadingBarsG">
+            <div id="fadingBarsG_1" class="fadingBarsG"></div>
+            <div id="fadingBarsG_2" class="fadingBarsG"></div>
+            <div id="fadingBarsG_3" class="fadingBarsG"></div>
+            <div id="fadingBarsG_4" class="fadingBarsG"></div>
+            <div id="fadingBarsG_5" class="fadingBarsG"></div>
+            <div id="fadingBarsG_6" class="fadingBarsG"></div>
+            <div id="fadingBarsG_7" class="fadingBarsG"></div>
+            <div id="fadingBarsG_8" class="fadingBarsG"></div>
+        </div> 
 		<br>
 		<br>
 		<div>
@@ -148,6 +163,7 @@ $(function() {
 		{% load staticfiles %} <img  onclick="load_service('service_change_electric')" id="change-ico" src="{%static "images/change-ico64.png" %}" alt="Замена счётчиков-электричество и тепло!">
 		{% load staticfiles %} <img  onclick="load_service('service_get_info')" id="change-ico" src="{%static "images/tech-ico64.png" %}" alt="Информация по объекту">
 		{% load staticfiles %} <img  onclick="load_service('service_balance_load')" id="balance-ico" src="{%static "images/balance-ico64.png" %}" alt="Загрузка балансных групп">
+		{% load staticfiles %} <img  onclick="load_service('service_load30_page')" id="load30-ico" src="{%static "images/to_db-ico64.png" %}" alt="Загрузка получасовок">
 		<p>
 		<span><strong>Выберите файл &nbsp;</strong></span>
 			<select onchange="change_wb();" name="choice_file" id="choice_file">

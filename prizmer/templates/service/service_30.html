@@ -6,22 +6,19 @@
 
 <script src="/static/liHighLight.js" type=text/javascript></script>
 <br>
-<div class="meters_change_block">
-<span><strong> Загрузка файла на сервер </strong> </span>
-<br><br>
-<form enctype="multipart/form-data" method="post"  action="/service/service_file_loading/" id="form_load"> 
-<br>
- {% csrf_token %}
-<span> Прогрузочный файл: </span>  <input type="file" accept=".xls,.xlsx" id="id_path" name="path">
-<br>
-<br>
-<!-- <input id="id_title" name="title" type="text"> -->
-<input type="submit" id="file-load" name="file-load" value=Загрузить>
-<strong>{{status}}</strong>
-</form>
-</div>
 
 <br>
+<div class="meters_change_block">
+<form enctype="multipart/form-data" id="form_load30" > 
+<span><strong> Загрузка 30-ок в БД </strong> </span>
+<br><br>
+
+Директория c html-файлами для загрузки: <input type="text" id="direct30" name="direct30" minlength="3" maxlength="300" size="100">
+<br><br>
+<span onclick="load_service('service_load30')" class="button" id="load30">Загрузить получасовые показания</span> 
+<br>&nbsp;{{status}}
+</form>
+ </div>
 
 <br>
 <br>
