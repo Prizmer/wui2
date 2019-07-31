@@ -2942,8 +2942,7 @@ def ReplaceMeters_v2(meter1, meter2):
     result = result + u' Привязки счётчиков успешно изменены '
     return result
 
-@login_required(login_url='/auth/login/') 
-@user_passes_test(isAdmin, login_url='/auth/login/')
+
 def get_file(name_file):
     from django.contrib.staticfiles import finders
     result_url = finders.find('%s'%(name_file))
@@ -2961,6 +2960,7 @@ def get_file(name_file):
             response['Content-Disposition'] = 'attachment;filename="%s"' % (output_name.replace('"', '\"'))
             return response
         f.close() 
+
 
 def get_electric_template(request):
     return get_file('electric_template_for_load.xlsx')
