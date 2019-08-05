@@ -164,8 +164,7 @@ def handle_uploaded_file(f):
     #print 'file load'
     destination.close()
 
-@login_required(login_url='/auth/login/') 
-@user_passes_test(isAdmin, login_url='/auth/login/')
+
 def load_port(request):
     args={}
     #print '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
@@ -201,8 +200,7 @@ def load_port(request):
     args["counter_status"]=counter_status
     return render_to_response("service/service_electric.html", args)
 
-@login_required(login_url='/auth/login/') 
-@user_passes_test(isAdmin, login_url='/auth/login/')
+
 def checkPortIsExist(ip_adr,ip_port):
     dt_ports=[]
     cursor = connection.cursor()
@@ -220,8 +218,7 @@ def checkPortIsExist(ip_adr,ip_port):
     else: 
         return True
 
-@login_required(login_url='/auth/login/') 
-@user_passes_test(isAdmin, login_url='/auth/login/')
+
 def load_tcp_ip_or_com_ports_from_excel(sPath, sSheet):
     #Добавление tcp_ip портов
     global cfg_excel_name
@@ -360,8 +357,7 @@ def GetTableFromExcel(sPath,sSheet):
         row+=1
     return dt
 
-@login_required(login_url='/auth/login/') 
-@user_passes_test(isAdmin, login_url='/auth/login/')
+
 def LoadObjectsAndAbons(sPath, sSheet):
     #Добавление объектов
     global cfg_excel_name
@@ -443,8 +439,7 @@ def LoadObjectsAndAbons(sPath, sSheet):
     result+=u" Прогружено "+str(kv)+u" абонентов"
     return result
 
-@login_required(login_url='/auth/login/') 
-@user_passes_test(isAdmin, login_url='/auth/login/')
+
 def load_electric_objects(request):
     args={}
     fileName=""
@@ -479,8 +474,7 @@ def load_electric_objects(request):
     args["counter_status"]=counter_status
     return render_to_response("service/service_electric.html", args)
 
-@login_required(login_url='/auth/login/') 
-@user_passes_test(isAdmin, login_url='/auth/login/')
+
 def LoadElectricMeters(sPath, sSheet):
     global cfg_excel_name
     cfg_excel_name=sPath
@@ -594,8 +588,7 @@ def LoadElectricMeters(sPath, sSheet):
     
     return result
 
-@login_required(login_url='/auth/login/') 
-@user_passes_test(isAdmin, login_url='/auth/login/')
+
 def load_electric_counters(request):
     global isService
     isService=True
@@ -635,8 +628,7 @@ def service_water(request):
     args={}
     return render_to_response("service/service_water.html", args)
 
-@login_required(login_url='/auth/login/') 
-@user_passes_test(isAdmin, login_url='/auth/login/')
+
 def add_link_meter(sender, instance, created, **kwargs):
     print u'Start add link port - meter'
     dtAll=GetTableFromExcel(cfg_excel_name,cfg_sheet_name) #получили из excel все строки до первой пустой строки (проверка по колонке А)
@@ -648,8 +640,7 @@ def add_link_meter(sender, instance, created, **kwargs):
         print(u'Add digital connect')
         add_link_meter_port_from_excel_cfg_electric(sender, instance, created, **kwargs)
 
-@login_required(login_url='/auth/login/') 
-@user_passes_test(isAdmin, login_url='/auth/login/')
+
 def add_link_meter_port_from_excel_cfg_water_v2(sender, instance, created, **kwargs):
     """Делаем привязку счётчика к порту по excel файлу ведомости"""
     dtAll=GetTableFromExcel(cfg_excel_name,cfg_sheet_name) #получили из excel все строки до первой пустой строки (проверка по колонке А)
@@ -717,8 +708,7 @@ def add_link_meter_port_from_excel_cfg_water_v2(sender, instance, created, **kwa
 #        add_ip_port_link.save()
 #    else: writeToLog(u'Нет tcp-ip порта, создайте его!')
 
-@login_required(login_url='/auth/login/') 
-@user_passes_test(isAdmin, login_url='/auth/login/')
+
 def add_link_meter_port_from_excel_cfg_electric(sender, instance, created, **kwargs):
     """Делаем привязку счётчика к порту по excel файлу ведомости"""    
     dtAll=GetTableFromExcel(cfg_excel_name,cfg_sheet_name) #получили из excel все строки до первой пустой строки (проверка по колонке А)
@@ -772,8 +762,7 @@ def add_link_meter_port_from_excel_cfg_electric(sender, instance, created, **kwa
             else:
                 pass
 
-@login_required(login_url='/auth/login/') 
-@user_passes_test(isAdmin, login_url='/auth/login/')
+
 def add_link_taken_params(sender, instance, created, **kwargs):
     #print 'link taken params'
     dtAll=GetTableFromExcel(cfg_excel_name,cfg_sheet_name) #получили из excel все строки до первой пустой строки (проверка по колонке А)
@@ -782,8 +771,7 @@ def add_link_taken_params(sender, instance, created, **kwargs):
     else:# электрика
         add_link_abonent_taken_params_from_excel_cfg_electric(sender, instance, created, **kwargs)
 
-@login_required(login_url='/auth/login/') 
-@user_passes_test(isAdmin, login_url='/auth/login/')
+
 def add_taken_param(sender, instance, created, **kwargs): # Добавляем считываемые параметры при создании счётчика
     if instance.guid_types_meters.name == u'Меркурий 230':
         #Добавляем параметры для Меркурия 230
@@ -1699,8 +1687,7 @@ else:
 #Не удалять!
 #_____________________________________________________________________________________________________________
 #from general.models import  Meters, TypesMeters, LinkAbonentsTakenParams, TakenParams, Params
-@login_required(login_url='/auth/login/') 
-@user_passes_test(isAdmin, login_url='/auth/login/')
+
 def rename_taken_params(sender, instance, **kwargs):
     #print 'rename taken params'
     try:   
@@ -1721,8 +1708,7 @@ def rename_taken_params(sender, instance, **kwargs):
     except TakenParams.DoesNotExist:
         return False
 
-@login_required(login_url='/auth/login/') 
-@user_passes_test(isAdmin, login_url='/auth/login/')
+
 def rename_link_abonents_taken_params(sender, instance, **kwargs): 
     
     try:
@@ -1756,8 +1742,7 @@ def OnOffSignals():
         signals.pre_save.connect(rename_link_abonents_taken_params, sender=Abonents)
         signals.pre_save.connect(rename_taken_params, sender=Meters)  
 
-@login_required(login_url='/auth/login/') 
-@user_passes_test(isAdmin, login_url='/auth/login/')
+
 def add_link_abonents_taken_params(sender, instance, created, **kwargs):
     def get_taken_param_by_abonent_from_excel_cfg(input_taken_param):
         """Функция, которая читает excel файл. Составляет имя считываемого параметра типа "Пульсар 16M 33555 Пульсар 16M Канал 11". В случае совпадения должна привязать этот параметр к абоненту. Абоненты должны быть предварительно созданы."""    
@@ -1798,8 +1783,7 @@ def add_link_abonents_taken_params(sender, instance, created, **kwargs):
     else:
         pass
     
-@login_required(login_url='/auth/login/') 
-@user_passes_test(isAdmin, login_url='/auth/login/')
+
 def add_link_abonents_taken_params2(sender, instance, created, **kwargs):
     writeToLog(instance.name)
     isExistTakenParam=SimpleCheckIfExist('taken_params','name',instance.name,"","","")
@@ -1858,8 +1842,7 @@ def add_link_abonents_taken_params2(sender, instance, created, **kwargs):
 #    else:
 #        pass
 
-@login_required(login_url='/auth/login/') 
-@user_passes_test(isAdmin, login_url='/auth/login/')
+
 def add_link_abonent_taken_params_from_excel_cfg_electric(sender, instance, created, **kwargs):
     dtAll=GetTableFromExcel(cfg_excel_name,cfg_sheet_name) #получили из excel все строки до первой пустой строки (проверка по колонке А)
     #print dtAll[0][0]
@@ -1890,8 +1873,7 @@ def add_link_abonent_taken_params_from_excel_cfg_electric(sender, instance, crea
             else:
                 pass
     
-@login_required(login_url='/auth/login/') 
-@user_passes_test(isAdmin, login_url='/auth/login/')
+
 def load_water_objects(request):
     args={}
     fileName=""
@@ -1922,8 +1904,7 @@ def load_water_objects(request):
     args["counter_status"]=counter_status
     return render_to_response("service/service_water.html", args)
 
-@login_required(login_url='/auth/login/') 
-@user_passes_test(isAdmin, login_url='/auth/login/')
+
 def CheckIfExistInObjects(name_parent, name_child):
     dt=[]
     cursor = connection.cursor()
@@ -1947,8 +1928,7 @@ order by name_parent    """%(name_parent, name_child)
     else: 
         return dt[0][4]# возвращаем guid квариры
     
-@login_required(login_url='/auth/login/') 
-@user_passes_test(isAdmin, login_url='/auth/login/')
+
 def LoadObjectsAndAbons_water(sPath, sheet):
     result=""
     dtAll=GetTableFromExcel(sPath,sheet) #получили из excel все строки до первой пустой строки (проверка по колонке А)
@@ -2040,8 +2020,7 @@ def LoadObjectsAndAbons_water(sPath, sheet):
     result+=u" Прогружено "+str(kv)+u" водо-счётчиков"
     return result
 
-@login_required(login_url='/auth/login/') 
-@user_passes_test(isAdmin, login_url='/auth/login/')
+
 def load_water_pulsar(request):
     global isService
     isService=True
@@ -2070,8 +2049,7 @@ def load_water_pulsar(request):
     OnOffSignals()
     return render_to_response("service/service_water.html", args)
 
-@login_required(login_url='/auth/login/') 
-@user_passes_test(isAdmin, login_url='/auth/login/')
+
 def LoadWaterPulsar(sPath, sSheet):
     global cfg_excel_name
     cfg_excel_name=sPath
@@ -2167,8 +2145,7 @@ def LoadWaterPulsar(sPath, sSheet):
 #            print i, takenParam[i]
 #        i+=1
 
-@login_required(login_url='/auth/login/') 
-@user_passes_test(isAdmin, login_url='/auth/login/')
+
 def load_water_port(request):
     args={}
 
@@ -2199,8 +2176,7 @@ def load_water_port(request):
 
     return render_to_response("service/service_water.html", args)
 
-@login_required(login_url='/auth/login/') 
-@user_passes_test(isAdmin, login_url='/auth/login/')
+
 def UpdateTable(table,whereFieled, whereValue,field1,value1,field2,value2,field3,value3):
     isOk=False
     dt=[]
@@ -2233,8 +2209,7 @@ def UpdateTable(table,whereFieled, whereValue,field1,value1,field2,value2,field3
         isOk=True   
     return isOk
 
-@login_required(login_url='/auth/login/') 
-@user_passes_test(isAdmin, login_url='/auth/login/')
+
 def load_tcp_ip_water_ports_from_excel(sPath, sheet):
     #Добавление tcp_ip портов
 
@@ -2273,16 +2248,14 @@ def load_tcp_ip_water_ports_from_excel(sPath, sheet):
         row+=1
     return IsAdded
 
-@login_required(login_url='/auth/login/') 
-@user_passes_test(isAdmin, login_url='/auth/login/')
+
 def makeLinkabonentTakenParamName(abName,typeMeter,new_meter):
     #"Квартира 0103 - М-230 21949676"   
 #LinkAbonentsTakenParams (name = Abonents.objects.get(name= get_taken_param_by_abonent_from_excel_cfg(instance.name)).name + u" " + instance.guid_params.guid_names_params.name + u" " + instance.guid_params.guid_types_params.name 
     newLinkAbonentTakenParamName=abName+ u' - '+ typeMeter +u' ' + unicode(new_meter)
     return newLinkAbonentTakenParamName
 
-@login_required(login_url='/auth/login/') 
-@user_passes_test(isAdmin, login_url='/auth/login/')
+
 def makeNewTakenParamName(nameParam1, old_meter, new_meter, typeMeter):
     newName=u''
 
@@ -2307,8 +2280,7 @@ def get_info(request):
     args['pulsar16m_status'] = ''
     return render_to_response("service/service_get_info.html", args)
 
-@login_required(login_url='/auth/login/') 
-@user_passes_test(isAdmin, login_url='/auth/login/')
+
 def load_balance_group(request):
     args={}
     fileName=""
@@ -2333,8 +2305,7 @@ def load_balance_group(request):
 
     return render_to_response("service/service_balance_load.html", args)
 
-@login_required(login_url='/auth/login/') 
-@user_passes_test(isAdmin, login_url='/auth/login/')
+
 def InsertIntoBalanceGroup(guid,name):
     result=u''
     cursor = connection.cursor()
@@ -2350,8 +2321,7 @@ def InsertIntoBalanceGroup(guid,name):
     result =u'Создана балансная группа '+unicode(name)
     return result
 
-@login_required(login_url='/auth/login/') 
-@user_passes_test(isAdmin, login_url='/auth/login/')
+
 def InsertIntoTypesAbonents(guid,name):
     result=u''
     cursor = connection.cursor()
@@ -2367,8 +2337,7 @@ def InsertIntoTypesAbonents(guid,name):
     result =u'Создан тип '+unicode(name)
     return result
 
-@login_required(login_url='/auth/login/') 
-@user_passes_test(isAdmin, login_url='/auth/login/')
+
 def GetGuidFromFirstTableCrossWithSecondTable(table1,table2,field1,val1,field2,val2):
     dt=[]
     cursor = connection.cursor()
@@ -2388,8 +2357,7 @@ WHERE
     #print sQuery
     return dt
    
-@login_required(login_url='/auth/login/') 
-@user_passes_test(isAdmin, login_url='/auth/login/')
+
 def UpdateSimpleTable(table,guid,field,val):
     result=False
     cursor = connection.cursor()
@@ -2405,8 +2373,7 @@ def UpdateSimpleTable(table,guid,field,val):
     result =True
     return result
     
-@login_required(login_url='/auth/login/') 
-@user_passes_test(isAdmin, login_url='/auth/login/')
+
 def LoadImpulseWaterBalance(dtAll):
     result = "Баланс по водным импульсным счётчикам"
     count_new_link=0
@@ -2465,8 +2432,7 @@ def LoadImpulseWaterBalance(dtAll):
     result+= u'  В балансную группу добавлено счётчиков: '+ unicode(count_new_link) 
     return result       
 
-@login_required(login_url='/auth/login/') 
-@user_passes_test(isAdmin, login_url='/auth/login/')
+
 def LoadBalance(sPath, sheet):
     result=u"Баланс по цифровым счётчикам"
     count_new_link=0
@@ -2541,14 +2507,12 @@ def LoadBalance(sPath, sheet):
          
     return result
 
-@login_required(login_url='/auth/login/') 
-@user_passes_test(isAdmin, login_url='/auth/login/')
+
 def service_balance_load(request):    
     args={}    
     return render_to_response("service/service_balance_load.html", args)
 
-@login_required(login_url='/auth/login/') 
-@user_passes_test(isAdmin, login_url='/auth/login/')
+
 def add_current_taken_params_pulsar16m(request):   
     
     result = "Прогрузка прошла не успешно"
@@ -2769,8 +2733,7 @@ def add_current_taken_params_pulsar16m(request):
     args['pulsar16m_status'] = result
     return render_to_response("service/service_get_info.html", args)
 
-@login_required(login_url='/auth/login/') 
-@user_passes_test(isAdmin, login_url='/auth/login/')
+
 def change_meters_v2(request):
     args={}
 
@@ -2796,8 +2759,7 @@ def change_meters_v2(request):
 
     return render_to_response("service/service_change_electric.html", args)
 
-@login_required(login_url='/auth/login/') 
-@user_passes_test(isAdmin, login_url='/auth/login/')
+
 def isInt(s):
     try:
         int(s)
@@ -2819,8 +2781,7 @@ def rename_taken_params_by_guid(guid_meter, old_met, new_met):
     except TakenParams.DoesNotExist:
         return False
 
-@login_required(login_url='/auth/login/') 
-@user_passes_test(isAdmin, login_url='/auth/login/')
+
 def ChangeMeters_v2(old_meter, new_meter):
     result=u""
     # Проверяем существуют ли такие счётчики, в норме первый должен быть, а второй нет
@@ -2853,8 +2814,7 @@ def ChangeMeters_v2(old_meter, new_meter):
     
     return result
 
-@login_required(login_url='/auth/login/') 
-@user_passes_test(isAdmin, login_url='/auth/login/')
+
 def replace_electric_meters_v2(request):
     args={}
 
@@ -2882,8 +2842,7 @@ def replace_electric_meters_v2(request):
     args["meter2"]=meter2
     return render_to_response("service/service_change_electric.html", args)
 
-@login_required(login_url='/auth/login/') 
-@user_passes_test(isAdmin, login_url='/auth/login/')
+
 def ReplaceMeters_v2(meter1, meter2):
     result=u''
     
@@ -3011,8 +2970,8 @@ class NumberParser(HTMLParser):
             zavod_start_pos = data.rfind('-') + 2
             zavod_end_pos = data.rfind(')') 
             zavod = unicode(data[zavod_start_pos:zavod_end_pos])
-            #print u'setevoy: '+setev
-            #print u'zavodskoy: '+zavod
+            print u'setevoy: '+setev
+            print u'zavodskoy: '+zavod
             #print data
 
     def handle_endtag(self, tag):
@@ -3032,7 +2991,8 @@ class TableParser(HTMLParser):
             global col
             global row
             global dt
-            #print unicode(row),unicode(col)
+            print unicode(row),unicode(col)
+            if row > 1487 : return
             dt[row][col]=data
             if col==9:
                 col = 0
@@ -3108,8 +3068,8 @@ def get_id_taken_param_for_meter_by_guid_params(zav, guid):
     curs.close()
     return result
 
-@login_required(login_url='/auth/login/') 
-@user_passes_test(isAdmin, login_url='/auth/login/')
+# @login_required(login_url='/auth/login/') 
+# @user_passes_test(isAdmin, login_url='/auth/login/')
 def load_30_in_db(f_path,file_list):
     result = ""
     for f_name in file_list:
@@ -3188,8 +3148,7 @@ def load_30_in_db(f_path,file_list):
     
     return result
 
-@login_required(login_url='/auth/login/') 
-@user_passes_test(isAdmin, login_url='/auth/login/')
+
 def service_load30(request):
     args={}
     data_table=[]

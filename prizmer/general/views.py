@@ -13524,7 +13524,7 @@ def pulsar_heat_period_with_graphic(request):
 
     return render_to_response("data_table/heat/81.html", args)
 
-@login_required(login_url='/auth/login/') 
+ 
 def instruction_user(request):
     from django.contrib.staticfiles import finders
     result_url = finders.find('User_manual_Prizmer.pdf')
@@ -13536,7 +13536,7 @@ def instruction_user(request):
     pdf.closed    
 #    
 
-@login_required(login_url='/auth/login/') 
+
 def instruction_admin(request):
     from django.contrib.staticfiles import finders
     result_url = finders.find('Admin_manual_Prizmer.pdf')
