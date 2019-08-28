@@ -11069,7 +11069,7 @@ WHERE
 
 def MakeHeatDanfosQueryDaily_for_obj(obj_parent_title, obj_title, electric_data_end, params):
     sQuery = """
-    Select obj_name, ab_name, heat_abons.factory_number_manual, energy, volume, round(t_in::numeric,1), round(t_out::numeric,1)
+    Select obj_name, ab_name, heat_abons.factory_number_manual, round(energy::numeric,2), round(volume::numeric,2), round(t_in::numeric,1), round(t_out::numeric,1)
 from heat_abons
 Left Join
 (
@@ -11227,7 +11227,7 @@ WHERE
 
 def MakeHeatDanfosQueryPeriod_for_obj(obj_parent_title, obj_title,electric_data_start, electric_data_end, params):
     sQuery="""
-    Select z_end.obj_name, z_end.ab_name, z_end.factory_number_manual, z_start.energy,  z_end.energy, round((z_end.energy- z_start.energy)::numeric,2) as delta_energy, z_start.volume, z_end.volume, round((z_end.volume-z_start.volume)::numeric,2) as delta_volume
+    Select z_end.obj_name, z_end.ab_name, z_end.factory_number_manual, round(z_start.energy::numeric,2),  round(z_end.energy::numeric,2), round((z_end.energy- z_start.energy)::numeric,2) as delta_energy, round(z_start.volume::numeric,2), round(z_end.volume::numeric,2), round((z_end.volume-z_start.volume)::numeric,2) as delta_volume
 FROM
 (Select obj_name, ab_name, heat_abons.factory_number_manual, energy, volume, t_in, t_out
 from heat_abons

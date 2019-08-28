@@ -161,7 +161,7 @@ urlpatterns = patterns('',
     
     url(r'^99/$', views.electric_period_30), #вывод всех получасовок за период
 
-    url(r'^100/$', views.heat_danfoss_daily), #показания по теплу данфосс - доделать
+    url(r'^100/$', views.heat_danfoss_daily), #показания по теплу данфосс -
    #---- Test urls
     url(r'^addnum/$', views.add_numbers),
     

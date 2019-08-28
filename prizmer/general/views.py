@@ -14598,7 +14598,7 @@ def heat_danfoss_period(request):
     return render_to_response("data_table/heat/97.html", args)
 
 def heat_danfoss_daily(request):
-    # НЕ ДОДЕЛАНО
+    # 
     args = {}
     is_abonent_level = re.compile(r'abonent')
     is_object_level_2 = re.compile(r'level2')
@@ -14622,7 +14622,7 @@ def heat_danfoss_daily(request):
             request.session["is_electric_daily"]   = is_electric_daily   = request.GET['is_electric_daily']
             request.session["is_electric_current"]   = is_electric_current   = request.GET['is_electric_current']
                 
-        print 'Danfoss'
+        #print 'Danfoss'
         dc = u'daily'
         
         if (bool(is_abonent_level.search(obj_key))): 

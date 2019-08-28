@@ -127,6 +127,9 @@ urlpatterns = patterns('',
     url(r'^98/$', views.electric_restored_activ_reactiv_daily_report), #отчёт профиль r+ a+ на дату восстанволеный через получасовки
     
     url(r'^99/$', views.electric_period_30_report), #отчёт по получасовкам за период
+
+    url(r'^97/$', views.heat_danfoss_period_report), #показания по теплу данфосс - доделать
+    url(r'^100/$', views.heat_danfoss_daily_report), #показания по теплу данфосс - доделать
     #---- Test urls
 
 #    url(r'^test/$', views.test_page),
