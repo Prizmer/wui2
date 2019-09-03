@@ -2811,7 +2811,8 @@ def electric_between_report(request):
     if True:
         if True:            
             if (is_electric_daily == '1') & (bool(is_abonent_level.search(obj_key))):   # daily for abonents
-                data_table = common_sql.get_data_table_electric_between(obj_title, obj_parent_title,electric_data_start, electric_data_end)
+                params=[u'T0 A+',u'T1 A+',u'T2 A+',u'T3 A+', u'Электричество']
+                data_table = common_sql.get_data_table_electric_between(obj_title, obj_parent_title,electric_data_start, electric_data_end, params)
             else:
                 pass
             
@@ -2944,7 +2945,9 @@ def electric_between_2_zones_report(request):
     if True:
         if True:            
             if (is_electric_daily == '1') & (bool(is_abonent_level.search(obj_key))):   # daily for abonents
-                data_table = common_sql.get_data_table_electric_between(obj_title, obj_parent_title,electric_data_start, electric_data_end)
+                params=[u'T0 A+',u'T1 A+',u'T2 A+',u'T3 A+', u'Электричество']
+                data_table = common_sql.get_data_table_electric_between(obj_title, obj_parent_title,electric_data_start, electric_data_end, params)
+                #data_table = common_sql.get_data_table_electric_between(obj_title, obj_parent_title,electric_data_start, electric_data_end)
             else:
                 pass
             
@@ -3115,7 +3118,8 @@ def electric_between_3_zones_report(request):
     if True:
         if True:            
             if (is_electric_daily == '1') & (bool(is_abonent_level.search(obj_key))):   # daily for abonents
-                data_table = common_sql.get_data_table_electric_between(obj_title, obj_parent_title,electric_data_start, electric_data_end)
+                params=[u'T0 A+',u'T1 A+',u'T2 A+',u'T3 A+', u'Электричество']
+                data_table = common_sql.get_data_table_electric_between(obj_title, obj_parent_title,electric_data_start, electric_data_end, params)
             else:
                 pass
             
