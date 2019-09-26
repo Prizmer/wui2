@@ -668,7 +668,7 @@ def add_link_meter_port_from_excel_cfg_water_v2(sender, instance, created, **kwa
     #print sQuery
                  guid_ip_port_from_excel.execute(sQuery)
                  guid_ip_port_from_excel = guid_ip_port_from_excel.fetchall()
-                 #print guid_ip_port_from_excel
+                 print guid_ip_port_from_excel
                  
                  IsExistLink=SimpleCheckIfExist("Link_Meters_Tcpip_Settings","guid_meters",instance.guid,"","guid_tcpip_settings", guid_ip_port_from_excel)
                  #print IsExistLink
@@ -678,7 +678,7 @@ def add_link_meter_port_from_excel_cfg_water_v2(sender, instance, created, **kwa
                      add_ip_port_link = LinkMetersTcpipSettings(guid_meters = instance, guid_tcpip_settings = guid_ip_port)            
                      add_ip_port_link.save()
                      print u'Связь добавлена ', meter, ip_adr, ip_port
-                 else: writeToLog(u'Не прогружен порт')
+                 else: print(u'Не прогружен порт')
                  
            
            
@@ -2801,8 +2801,13 @@ def ChangeMeters_v2(old_meter, new_meter):
     new_num = unicode(old_met_obj[0].factory_number_manual).replace(unicode(old_meter), unicode(new_meter))
     #делаем проверку,если сетевой равен заводскому, то меняем, иначе не трогаем
     new_address = old_met_obj[0].address
-    if old_met_obj[0].address == old_met_obj[0].factory_number_manual:        
-        new_address = unicode(old_met_obj[0].address).replace(unicode(old_meter), unicode(new_meter))    
+    #print new_address, 'new_address'
+    #print old_met_obj[0].address, 'old_met_obj[0].address'
+    #print old_met_obj[0].factory_number_manual, 'old_met_obj[0].factory_number_manual'
+    if unicode(old_met_obj[0].address) == unicode(old_met_obj[0].factory_number_manual):
+                
+        new_address = unicode(old_met_obj[0].address).replace(unicode(old_meter), unicode(new_meter))
+        #print new_address, 'new_address'     
     
     #print old_met_obj.values()
     #print 'old_met_obj.guid', old_met_obj[0].guid
