@@ -157,18 +157,18 @@ $(function() {
 		<br>
 		<br>
 		<div>
-		{% load staticfiles %} <img onclick="load_service('service_file')" id="download-ico" src="{%static "images/download-ico64.png" %}" alt="Загрузить файл">
-		{% load staticfiles %} <img onclick="load_service('service_electric')" id="electric-ico" src="{%static "images/digital2-ico64.png" %}" alt="Электрика">
-		{% load staticfiles %} <img  onclick="load_service('service_water')" id="water-ico" src="{%static "images/impulse2-ico64.png" %}" alt="Вода">
-		{% load staticfiles %} <img  onclick="load_service('service_change_electric')" id="change-ico" src="{%static "images/change-ico64.png" %}" alt="Замена счётчиков-электричество и тепло!">
-		{% load staticfiles %} <img  onclick="load_service('service_get_info')" id="change-ico" src="{%static "images/tech-ico64.png" %}" alt="Информация по объекту">
-		{% load staticfiles %} <img  onclick="load_service('service_balance_load')" id="balance-ico" src="{%static "images/balance-ico64.png" %}" alt="Загрузка балансных групп">
-		{% load staticfiles %} <img  onclick="load_service('service_load30_page')" id="load30-ico" src="{%static "images/to_db-ico64.png" %}" alt="Загрузка получасовок">
+		{% load staticfiles %} <img onclick="load_service('service_file')" id="download-ico" src="{%static "images/download2-ico64.png" %}" alt="Загрузить файл">
+		{% load staticfiles %} <img onclick="load_service('service_electric')" id="electric-ico" src="{%static "images/digital5-ico64.png" %}" alt="Электрика">
+		{% load staticfiles %} <img  onclick="load_service('service_water')" id="water-ico" src="{%static "images/impulse5-ico64.png" %}" alt="Вода">
+		{% load staticfiles %} <img  onclick="load_service('service_change_electric')" id="change-ico" src="{%static "images/change2-ico64.png" %}" alt="Замена счётчиков-электричество и тепло!">
+		{% load staticfiles %} <img  onclick="load_service('service_get_info')" id="change-ico" src="{%static "images/tech3-ico64.png" %}" alt="Информация по объекту">
+		{% load staticfiles %} <img  onclick="load_service('service_balance_load')" id="balance-ico" src="{%static "images/balance2-ico64.png" %}" alt="Загрузка балансных групп">
+		{% load staticfiles %} <img  onclick="load_service('service_load30_page')" id="load30-ico" src="{%static "images/to_db2-ico64.png" %}" alt="Загрузка получасовок">
 		<p>
 		<span><strong>Выберите файл &nbsp;</strong></span>
 			<select onchange="change_wb();" name="choice_file" id="choice_file">
 			<option value="0"><strong>Выберите файл...</strong></option>
-			{% for f in filesFF %}
+			{% for f in filesFF %}			
 			<option value='{{f}}'>{{f}}</option>
 			{% endfor %}           
 			</select>
@@ -178,9 +178,7 @@ $(function() {
 
 			</div>
 			{% endblock %}
-		<div>
 		
-		</div>
 	</div>
 	<strong>{{status}}</strong>
 	<div id="data-block-service">

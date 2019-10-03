@@ -45,7 +45,7 @@ from django.contrib.auth.decorators import user_passes_test
 def isAdmin(user):
     return user.is_staff
 
-@user_passes_test(isAdmin)
+#@user_passes_test(isAdmin)
 class UploadFileForm(forms.Form):
     #title = forms.CharField(max_length=150)
     path  = forms.FileField()
@@ -94,16 +94,21 @@ def service_electric(request):
     args={}
     return render_to_response("service/service_electric.html", args)
 
-@login_required(login_url='/auth/login/') 
-@user_passes_test(isAdmin, login_url='/auth/login/')
+#@login_required(login_url='/auth/login/') 
+#@user_passes_test(isAdmin, login_url='/auth/login/')
 def service_file(request):
     args={}
     args.update(csrf(request))    
     data_table=[]
-    status='file not loaded'
+    status='Файл не загружен'
     args['data_table'] = data_table
     args['status']=status
-
+    
+    directory=os.path.join(BASE_DIR,'static\\cfg\\')    
+    if  not(os.path.exists(directory)):
+        os.mkdir(directory)    
+    files = os.listdir(directory)    
+    args['filesFF']= files
     return render_to_response("service/service_file.html", args)
 
 @login_required(login_url='/auth/login/') 
@@ -111,7 +116,7 @@ def service_file(request):
 def service_file_loading(request):
     args={}
     data_table=[]
-    status='file not loaded'
+    status='Файл не загружен'
     sPath=""
     if request.method == 'POST':        
         form = UploadFileForm(request.POST, request.FILES)
@@ -129,6 +134,12 @@ def service_file_loading(request):
     args['data_table'] = data_table
     args['status']=status
     args['sPath']=sPath
+
+    directory=os.path.join(BASE_DIR,'static\\cfg\\')    
+    if  not(os.path.exists(directory)):
+        os.mkdir(directory)    
+    files = os.listdir(directory)    
+    args['filesFF']= files
     #print status
     return render_to_response("choose_service.html", args)
 
@@ -138,7 +149,7 @@ def service_file_loading(request):
 def service_electric_load(request):
     args={}
     data_table=[]
-    status='file not loaded'
+    status='Файл не загружен'
 
     if request.method == 'POST':
 
@@ -146,17 +157,22 @@ def service_electric_load(request):
 
         if form.is_valid():
             handle_uploaded_file(request.FILES['path'])
-            status='file loaded'
+            status='Файл загружен'
     else:
         form = UploadFileForm()
         
     args['data_table'] = data_table
     args['status']=status
+    directory=os.path.join(BASE_DIR,'static\\cfg\\')    
+    if  not(os.path.exists(directory)):
+        os.mkdir(directory)    
+    files = os.listdir(directory)    
+    args['filesFF']= files
     return render_to_response("service/service_electric.html", args)
     #return render_to_response("service/service_electric_load.html", args)
 
-@login_required(login_url='/auth/login/') 
-@user_passes_test(isAdmin, login_url='/auth/login/')
+#@login_required(login_url='/auth/login/') 
+#@user_passes_test(isAdmin, login_url='/auth/login/')
 def handle_uploaded_file(f):
     destination = open(os.path.join(BASE_DIR,'static/cfg/'+f.name), 'wb+')
     for chunk in f.chunks():
