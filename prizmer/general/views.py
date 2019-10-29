@@ -14593,6 +14593,7 @@ def heat_danfoss_period(request):
 
     args['data_table'] = data_table
     args['electric_data_end'] = electric_data_end
+    args['electric_data_start'] = electric_data_start
     args['obj_title'] = obj_title 
       
     return render_to_response("data_table/heat/97.html", args)

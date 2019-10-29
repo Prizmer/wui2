@@ -49,19 +49,10 @@
 <th>T3 A+</th>
 <!--<th>T4 A+</th>-->
 <th>расход T0 A+, кВт*ч</th>
-<!--
-<th><strong>расход энергии Т0 А+, кВт*ч</strong></th>
--->
 <th>расход T1 A+</th>
 <th>расход T2 A+</th>
 <th>расход T3 A+</th>
-<!--<th>расход T4 A+</th>-->
-<!--
-<th>T0 R+ нач., кВар*ч</th>
-<th>T0 R+ кон., кВар*ч</th>
-<th>расход T0 R+, кВар*ч</th>
-<th><strong>расход энергии Т0 R+, кВар*ч</strong></th>
--->
+
 </tr>
 {% for value in data_table %}
 <tr>
@@ -69,15 +60,15 @@
 <td>{{value.1}}</td>
 <td>{{value.20|floatformat}}</td>
 <td>{{value.23|floatformat}}</td>
-<td>{{value.2}}</td>
-<td>{{value.3}}</td>
-<td>{{value.4}}</td>
-<td>{{value.5}}</td>
+<td>{{value.2|floatformat:3}}</td>
+<td>{{value.3|floatformat:3}}</td>
+<td>{{value.4|floatformat:3}}</td>
+<td>{{value.5|floatformat:3}}</td>
 <!--<td>{{value.6}}</td>-->
-<td>{{value.7}}</td>
-<td>{{value.8}}</td>
-<td>{{value.9}}</td>
-<td>{{value.10}}</td>
+<td>{{value.7|floatformat:3}}</td>
+<td>{{value.8|floatformat:3}}</td>
+<td>{{value.9|floatformat:3}}</td>
+<td>{{value.10|floatformat:3}}</td>
 <!--<td>{{value.11}}</td>-->
 <td>{{value.12|floatformat:3}}</td>
 <!--

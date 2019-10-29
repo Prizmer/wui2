@@ -2306,7 +2306,7 @@ def report_electric_simple_3_zones_v2(request):
     ws['A2'] = obj_title+' .Срез показаний с коэффициентами на дату' + ' ' + electric_data_end
     
     ws.merge_cells('A4:A5')
-    ws['A4'] = 'Наименование канала'
+    ws['A4'] = 'Наименование абонента'
     ws['A4'].style = ali_grey
     ws['A5'].style = ali_grey
     
@@ -2466,7 +2466,7 @@ def report_electric_simple_3_zones_v2(request):
         try:
             #ws.cell('F%s'%(row)).number_format = 'Comma'
             #ws.cell('F%s'%(row)).value = '%s' % str(data_table[row-6][3]).replace('.',',')  # Сумма А+
-            ws.cell('F%s'%(row)).value = '%s' % str(data_table[row-6][3]).replace('.', separator)  # Сумма А+
+            ws.cell('F%s'%(row)).value = '%s' % str(round((data_table[row-6][3]), 3)).replace('.', separator)  # Сумма А+
             ws.cell('F%s'%(row)).style = ali_white
             
         except:
@@ -2481,7 +2481,7 @@ def report_electric_simple_3_zones_v2(request):
             next
             
         try:
-            ws.cell('H%s'%(row)).value = '%s' % str(data_table[row-6][4]).replace('.', separator)  # Тариф 1 А+
+            ws.cell('H%s'%(row)).value = '%s' % str(round((data_table[row-6][4]),3)).replace('.', separator)  # Тариф 1 А+
             ws.cell('H%s'%(row)).style = ali_white
         except:
             ws.cell('H%s'%(row)).style = ali_white
@@ -2496,7 +2496,7 @@ def report_electric_simple_3_zones_v2(request):
             next
             
         try:
-            ws.cell('J%s'%(row)).value = '%s' % str(data_table[row-6][5]).replace('.', separator)  # Тариф 2 А+
+            ws.cell('J%s'%(row)).value = '%s' % str(round((data_table[row-6][5]),3)).replace('.', separator)  # Тариф 2 А+
             ws.cell('J%s'%(row)).style = ali_white
         except:
             ws.cell('J%s'%(row)).style = ali_white
@@ -2511,7 +2511,7 @@ def report_electric_simple_3_zones_v2(request):
             next
             
         try:
-            ws.cell('L%s'%(row)).value = '%s' % str(data_table[row-6][6]).replace('.', separator)  # Тариф 3 А+
+            ws.cell('L%s'%(row)).value = '%s' % str(round((data_table[row-6][6]),3)).replace('.', separator)  # Тариф 3 А+
             ws.cell('L%s'%(row)).style = ali_white
 
         except:
@@ -4070,7 +4070,7 @@ def report_electric_potreblenie_3_zones_v2(request):
     ws['A2'] = obj_title+'. Потребление электроэнергии в период с ' + electric_data_start + ' по ' + electric_data_end
     
     ws.merge_cells('A4:A5')
-    ws['A4'] = 'Наименование канала'
+    ws['A4'] = 'Наименование абонента'
     ws['A4'].style = ali_grey
     ws['A5'].style = ali_grey
     

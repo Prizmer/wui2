@@ -869,7 +869,10 @@ def get_data_table_electric_parametr_daily_by_meters_number(meters_number, elect
 def makeSqlQuery_electric_by_daily_or_monthly_for_group_v3(obj_title, electric_data, params, dm):
     sQuery="""select z2.monthly_date,
  z3.name_abonents, z2.number_manual,
-      z3.znak*z2.t0, z3.znak*z2.t1, z3.znak*z2.t2, z3.znak*z2.t3
+      round((z3.znak*z2.t0)::numeric,3), 
+      round((z3.znak*z2.t1::numeric,3), 
+      round((z3.znak*z2.t2::numeric,3), 
+      round((z3.znak*z2.t3::numeric,3)
 from 
 (SELECT  
  abonents.name as name_abonents,
@@ -1505,7 +1508,11 @@ def get_data_table_diferent_numbers():
 def makeSqlQuery_electric_by_daily_or_monthly_for_object_v3(obj_title, electric_data, params, dm, res):
     sQuery="""Select  z2.monthly_date,
     electric_abons_2.ab_name, 
-    electric_abons_2.factory_number_manual, z2.t0, z2.t1, z2.t2, z2.t3,electric_abons_2.obj_name, z2.ktt,z2.ktn,z2.a, 
+    electric_abons_2.factory_number_manual, 
+    round(z2.t0::numeric,3), 
+    round(z2.t1::numeric,3), 
+    round(z2.t2::numeric,3), 
+    round(z2.t3::numeric,3),electric_abons_2.obj_name, z2.ktt,z2.ktn,z2.a, 
     electric_abons_2.comment, electric_abons_2.date, electric_abons_2.ab_guid
 from electric_abons_2
 LEFT JOIN 
@@ -2115,11 +2122,26 @@ def get_data_table_electric_parametr_by_period_v2(isAbon,obj_title, obj_parent_t
 def makeSqlQuery_electric_by_period_for_group(obj_title, date_start, date_end,params, res):
     sQuery="""
     Select  z3.name_abonents, z3.number_manual,
-z3.t0_start, z3.t1_start, z3.t2_start, z3.t3_start, z3.t4_start, 
-z4.t0_end, z4.t1_end, z4.t2_end, z4.t3_end, z4.t4_end,  
-z4.t0_end-z3.t0_start as delta_t0, z4.t1_end-z3.t1_start as delta_t1, z4.t2_end-z3.t2_start as delta_t2, z4.t3_end-z3.t3_start as delta_t3, z4.t4_end-z3.t4_start as delta_t4,
-z3.t0R_start, z4.t0R_end,  z4.t0R_end-z3.t0R_start as delta_t0R, z4.ktt, z4.ktn, 
-z4.ktt*z4.ktn*(z4.t0_end-z3.t0_start), z4.ktt*z4.ktn*(z4.t0R_end-z3.t0R_start)
+round(z3.t0_start::numeric,3), 
+round(z3.t1_start::numeric,3), 
+round(z3.t2_start::numeric,3), 
+round(z3.t3_start::numeric,3), 
+round(z3.t4_start::numeric,3), 
+round(z4.t0_end::numeric,3), 
+round(z4.t1_end::numeric,3), 
+round(z4.t2_end::numeric,3), 
+round(z4.t3_end::numeric,3), 
+round(z4.t4_end::numeric,3),  
+round((z4.t0_end-z3.t0_start)::numeric,3) as delta_t0, 
+round((z4.t1_end-z3.t1_start)::numeric,3) as delta_t1, 
+round((z4.t2_end-z3.t2_start)::numeric,3) as delta_t2, 
+round((z4.t3_end-z3.t3_start)::numeric,3) as delta_t3, 
+round((z4.t4_end-z3.t4_start)::numeric,3) as delta_t4,
+round(z3.t0R_start::numeric,3), 
+round(z4.t0R_end::numeric,3),  
+round((z4.t0R_end-z3.t0R_start)::numeric,3) as delta_t0R, z4.ktt, z4.ktn, 
+round((z4.ktt*z4.ktn*(z4.t0_end-z3.t0_start))::numeric,3), 
+round((z4.ktt*z4.ktn*(z4.t0R_end-z3.t0R_start))::numeric,3)
 from
 (Select z2.group_name, z2.ktt, z2.ktn, z2.date as date_end, electric_groups.name_group, electric_groups.name_abonents, electric_groups.number_manual, z2.name_res, z2.t0 as t0_end, z2.t1 as t1_end, z2.t2 as t2_end, z2.t3 as t3_end, z2.t4 as t4_end, z2.t0r as t0r_end
 from electric_groups
@@ -2678,7 +2700,12 @@ def makeSqlQuery_electric_by_daily_or_monthly(obj_title, obj_parent_title, elect
     sQuery="""
    Select  z2.daily_date,
    electric_abons.ab_name, 
-   electric_abons.factory_number_manual, z2.t0, z2.t1, z2.t2, z2.t3, electric_abons.obj_name,  z2.ktt, z2.ktn, z2.a 
+   electric_abons.factory_number_manual, 
+   round(z2.t0::numeric,3), 
+   round(z2.t1::numeric,3), 
+   round(z2.t2::numeric,3), 
+   round(z2.t3::numeric,3), 
+   electric_abons.obj_name,  z2.ktt, z2.ktn, z2.a 
 from electric_abons
 LEFT JOIN 
 (SELECT z1.daily_date, z1.name_objects, z1.name_abonents, z1.number_manual, 
@@ -4965,7 +4992,11 @@ def get_data_table_water_current(meters_name, parent_name, electric_data_end, is
 
 def MakeSqlQuery_water_period_for_korp(meters_name, parent_name,electric_data_start, electric_data_end, my_param):
     sQuery="""  
-SELECT  z.ab_name, z.account_2,z.date_st, z.meter_name,z.type_energo, z.value_st,z.value_end,delta, z.date_install, z.date_end
+SELECT  z.ab_name, z.account_2,z.date_st, z.meter_name,
+z.type_energo, 
+round(z.value_st::numeric,3),
+round(z.value_end::numeric,3),
+round(delta::numeric,3), z.date_install, z.date_end
 From
 (Select z_st.ab_name, z_st.account_2,z_st.date as date_st, z_st.meter_name, z_st.type_energo, z_st.value as value_st,z_end.value as value_end,round(z_end.value::numeric-z_st.value::numeric,3) as delta, z_st.date_install, z_end.date as date_end
 from
@@ -5045,9 +5076,12 @@ order by ab_name, meter_name
     return sQuery
 def MakeSqlQuery_water_period_for_abon(meters_name, parent_name,electric_data_start, electric_data_end, my_param):
     sQuery="""
-    
 
-Select z_st.ab_name, z_st.account_2,z_st.date, z_st.meter_name,z_st.type_energo, z_st.value,z_end.value,round(z_end.value::numeric-z_st.value::numeric,3) as delta, z_st.date_install, z_end.date
+Select z_st.ab_name, z_st.account_2,z_st.date, z_st.meter_name,
+z_st.type_energo, 
+round(z_st.value::numeric,3),
+round(z_end.value::numeric,3),
+round((z_end.value-z_st.value)::numeric,3) as delta, z_st.date_install, z_end.date
 from 
 (Select  obj_name as ab_name, account_2,z2.date, water_abons_report.ab_name as meter_name,type_energo, z2.value,date_install
 from water_abons_report
@@ -11053,7 +11087,10 @@ def get_water_elf_daily_by_user(id_user, date_end):
 
 def MakeHeatDanfosQueryDaily_for_abon(obj_parent_title, obj_title, electric_data_end, params):
     sQuery = """
-    Select obj_name, ab_name, heat_abons.factory_number_manual, energy, volume, round(t_in::numeric,1), round(t_out::numeric,1)
+    Select obj_name, ab_name, heat_abons.factory_number_manual, 
+    round(energy::numeric,3), 
+    round(volume::numeric,3), 
+    round(t_in::numeric,1), round(t_out::numeric,1)
 from heat_abons
 Left Join
 (
@@ -11102,7 +11139,11 @@ WHERE
 
 def MakeHeatDanfosQueryDaily_for_obj(obj_parent_title, obj_title, electric_data_end, params):
     sQuery = """
-    Select obj_name, ab_name, heat_abons.factory_number_manual, round(energy::numeric,2), round(volume::numeric,2), round(t_in::numeric,1), round(t_out::numeric,1)
+    Select obj_name, ab_name, heat_abons.factory_number_manual, 
+    round(energy::numeric,2), 
+    round(volume::numeric,2), 
+    round(t_in::numeric,1), 
+    round(t_out::numeric,1)
 from heat_abons
 Left Join
 (
@@ -11164,7 +11205,12 @@ def get_data_table_heat_danfos_daily(obj_parent_title, obj_title, electric_data_
 
 def MakeHeatDanfosQueryPeriod_for_abon(obj_parent_title, obj_title,electric_data_start, electric_data_end, params):
     sQuery="""
-     Select z_end.obj_name, z_end.ab_name, z_end.factory_number_manual, z_start.energy,  z_end.energy, round((z_end.energy- z_start.energy)::numeric,2) as delta_energy, z_start.volume, z_end.volume, round((z_end.volume-z_start.volume)::numeric,2) as delta_volume
+     Select z_end.obj_name, z_end.ab_name, z_end.factory_number_manual, 
+     round(z_start.energy::numeric,3),  
+     round(z_end.energy::numeric,3), 
+     round((z_end.energy- z_start.energy)::numeric,2) as delta_energy, 
+     round(z_start.volume::numeric,3), 
+     round(z_end.volume::numeric,3), round((z_end.volume-z_start.volume)::numeric,2) as delta_volume
 FROM
 (Select obj_name, ab_name, heat_abons.factory_number_manual, energy, volume, t_in, t_out
 from heat_abons
@@ -11260,7 +11306,12 @@ WHERE
 
 def MakeHeatDanfosQueryPeriod_for_obj(obj_parent_title, obj_title,electric_data_start, electric_data_end, params):
     sQuery="""
-    Select z_end.obj_name, z_end.ab_name, z_end.factory_number_manual, round(z_start.energy::numeric,2),  round(z_end.energy::numeric,2), round((z_end.energy- z_start.energy)::numeric,2) as delta_energy, round(z_start.volume::numeric,2), round(z_end.volume::numeric,2), round((z_end.volume-z_start.volume)::numeric,2) as delta_volume
+    Select z_end.obj_name, z_end.ab_name, z_end.factory_number_manual, 
+    round(z_start.energy::numeric,2),  
+    round(z_end.energy::numeric,2), 
+    round((z_end.energy- z_start.energy)::numeric,2) as delta_energy, 
+    round(z_start.volume::numeric,2), round(z_end.volume::numeric,2), 
+    round((z_end.volume-z_start.volume)::numeric,2) as delta_volume
 FROM
 (Select obj_name, ab_name, heat_abons.factory_number_manual, energy, volume, t_in, t_out
 from heat_abons
