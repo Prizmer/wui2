@@ -386,7 +386,7 @@ def LoadObjectsAndAbons(sPath, sSheet):
     
     for i in range(1,len(dtAll)):
         #print  dtAll[i][2],dtAll[i][3]
-        print u'Обрабатываем строку ' + unicode(dtAll[i][2])+' - ' + unicode(dtAll[i][3])
+        # print u'Обрабатываем строку ' + unicode(dtAll[i][2])+' - ' + unicode(dtAll[i][3])
         obj_l0=unicode(dtAll[i][0])
         writeToLog( obj_l0)
         obj_l1=unicode(dtAll[i][1])
@@ -497,13 +497,13 @@ def LoadElectricMeters(sPath, sSheet):
     global cfg_sheet_name
     cfg_sheet_name=sSheet
     result=u"Счётчики не загружены"
-    print type(sPath), sPath, type(sSheet), sSheet
+    #print type(sPath), sPath, type(sSheet), sSheet
     dtAll=GetTableFromExcel(sPath,sSheet) #получили из excel все строки до первой пустой строки (проверка по колонке А)
     met=0
-    print 'load dt - ok'
+    #print 'load dt - ok'
     for i in range(1,len(dtAll)):
         #writeToLog(u'Обрабатываем строку ' + unicode(dtAll[i][3])+' - '+unicode(dtAll[i][6]))
-        print unicode(dtAll[i][3]), unicode(dtAll[i][6])
+        #print unicode(dtAll[i][3]), unicode(dtAll[i][6])
         obj_l2=unicode(dtAll[i][2]) #корпус
         abon=unicode(dtAll[i][3]) #квартира
         meter=unicode(dtAll[i][6]) #номер счётчика
@@ -646,14 +646,14 @@ def service_water(request):
 
 
 def add_link_meter(sender, instance, created, **kwargs):
-    print u'Start add link port - meter'
+    #print u'Start add link port - meter'
     dtAll=GetTableFromExcel(cfg_excel_name,cfg_sheet_name) #получили из excel все строки до первой пустой строки (проверка по колонке А)
     writeToLog( unicode(dtAll[1][1]))
     if (dtAll[1][1] == u'Объект'): #вода
-        print(u'Add impulse connect')
+        #print(u'Add impulse connect')
         add_link_meter_port_from_excel_cfg_water_v2(sender, instance, created, **kwargs)
     else:# электрика
-        print(u'Add digital connect')
+        #print(u'Add digital connect')
         add_link_meter_port_from_excel_cfg_electric(sender, instance, created, **kwargs)
 
 
@@ -693,37 +693,9 @@ def add_link_meter_port_from_excel_cfg_water_v2(sender, instance, created, **kwa
                      guid_ip_port = TcpipSettings.objects.get(guid=guid_ip_port_from_excel[0][0])
                      add_ip_port_link = LinkMetersTcpipSettings(guid_meters = instance, guid_tcpip_settings = guid_ip_port)            
                      add_ip_port_link.save()
-                     print u'Связь добавлена ', meter, ip_adr, ip_port
-                 else: print(u'Не прогружен порт')
+                     #print u'Связь добавлена ', meter, ip_adr, ip_port
+                 else: pass #print(u'Не прогружен порт')
                  
-           
-           
-#def add_link_meter_port_from_excel_cfg_water(sender, instance, created, **kwargs):
-#    """Делаем привязку счётчика к порту по excel файлу ведомости"""
-#    dtAll=GetTableFromExcel(cfg_excel_name,cfg_sheet_name) #получили из excel все строки до первой пустой строки (проверка по колонке А)
-#    i=3
-#    #здесь ошибка-привязки по одному и тому же порту
-#    ip_adr=unicode(dtAll[i][7]).strip()
-#    ip_port=unicode(dtAll[i][8]).strip()
-## Привязка к tpc порту
-#    guid_ip_port_from_excel = connection.cursor()
-#    sQuery="""SELECT 
-#                                      tcpip_settings.guid
-#                                    FROM 
-#                                      public.tcpip_settings
-#                                    WHERE 
-#                                      tcpip_settings.ip_address = '%s' AND 
-#                                      tcpip_settings.ip_port = '%s';"""%(unicode(ip_adr), unicode(ip_port))
-#    #print sQuery
-#    guid_ip_port_from_excel.execute(sQuery)
-#    guid_ip_port_from_excel = guid_ip_port_from_excel.fetchall()
-#
-#    if guid_ip_port_from_excel:
-#        guid_ip_port = TcpipSettings.objects.get(guid=guid_ip_port_from_excel[0][0])
-#        add_ip_port_link = LinkMetersTcpipSettings(guid_meters = instance, guid_tcpip_settings = guid_ip_port)            
-#        add_ip_port_link.save()
-#    else: writeToLog(u'Нет tcp-ip порта, создайте его!')
-
 
 def add_link_meter_port_from_excel_cfg_electric(sender, instance, created, **kwargs):
     """Делаем привязку счётчика к порту по excel файлу ведомости"""    
@@ -769,12 +741,12 @@ def add_link_meter_port_from_excel_cfg_electric(sender, instance, created, **kwa
                     guid_ip_port_from_excel.execute(sQuery)
                     guid_ip_port_from_excel = guid_ip_port_from_excel.fetchall()
             
-                    print guid_ip_port_from_excel
+                    #print guid_ip_port_from_excel
                     if (len(guid_ip_port_from_excel)>0):
                         guid_ip_port = TcpipSettings.objects.get(guid=guid_ip_port_from_excel[0][0])
                         add_ip_port_link = LinkMetersTcpipSettings(guid_meters = instance, guid_tcpip_settings = guid_ip_port)            
                         add_ip_port_link.save()
-                    else: print u'Привязки по портам не добавлены'
+                    else: pass #print u'Привязки по портам не добавлены'
             else:
                 pass
 
@@ -1612,7 +1584,7 @@ def add_taken_param(sender, instance, created, **kwargs): # Добавляем �
         add_param.save()
         
     elif instance.guid_types_meters.name == u'Карат 307':
-        print u'Добавляем параметры для счётчика Карат 307'
+        #print u'Добавляем параметры для счётчика Карат 307'
         #Суточные 
         #Объём     
         add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"3024fd72-d1e8-4476-a876-4bc09553dde9"))
@@ -1636,7 +1608,7 @@ def add_taken_param(sender, instance, created, **kwargs): # Добавляем �
         add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"eb617f04-14a3-403c-90e8-286412872232"))
         add_param.save()
     elif instance.guid_types_meters.name == u'Danfoss SonoSelect':
-        print u'Добавляем параметры для счётчика Danfoss SonoSelect'
+        #print u'Добавляем параметры для счётчика Danfoss SonoSelect'
         #Суточные 
         #Объём     
         add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"83ba885f-1881-45db-9d63-52195e67cf64"))
@@ -1688,7 +1660,7 @@ signals.post_save.disconnect(add_link_meter, sender=Meters)
 signals.post_save.disconnect(add_link_taken_params, sender=TakenParams)  
         
 if (isService):
-    print 'signals ON'
+    #print 'signals ON'
     signals.post_save.connect(add_link_taken_params, sender=TakenParams)
     signals.post_save.connect(add_link_meter, sender=Meters)
     signals.post_save.connect(add_taken_param, sender=Meters)
@@ -1742,7 +1714,7 @@ signals.pre_save.connect(rename_taken_params, sender=Meters)
 #____________________________________________________________________________________________
 def OnOffSignals():
     if (isService):
-        print 'signals ON'
+        #print 'signals ON'
         signals.post_save.connect(add_link_taken_params, sender=TakenParams)
         signals.post_save.connect(add_link_meter, sender=Meters)
         signals.post_save.connect(add_taken_param, sender=Meters)
@@ -1750,7 +1722,7 @@ def OnOffSignals():
         signals.pre_save.disconnect(rename_link_abonents_taken_params, sender=Abonents)
         signals.pre_save.disconnect(rename_taken_params, sender=Meters)
     else:
-        print 'signals Off'
+        #print 'signals Off'
         signals.post_save.disconnect(add_link_meter, sender=Meters)
         signals.post_save.disconnect(add_taken_param, sender=Meters)
         signals.post_save.disconnect(add_link_taken_params, sender=TakenParams)
@@ -1804,7 +1776,7 @@ def add_link_abonents_taken_params2(sender, instance, created, **kwargs):
     writeToLog(instance.name)
     isExistTakenParam=SimpleCheckIfExist('taken_params','name',instance.name,"","","")
     if not isExistTakenParam:
-        print(u'Параметра не существует!!! Связать невозможно')
+        print(u'ERR: Param not exist!')
         return None
     dtAll=GetTableFromExcel(cfg_excel_name,cfg_sheet_name) #получили из excel все строки до первой пустой строки (проверка по колонке А)
     for i in range(2,len(dtAll)):
@@ -1949,7 +1921,7 @@ def LoadObjectsAndAbons_water(sPath, sheet):
     result=""
     dtAll=GetTableFromExcel(sPath,sheet) #получили из excel все строки до первой пустой строки (проверка по колонке А)
     kv=0
-    print 'len(dtAll)', str(len(dtAll))
+    #print 'len(dtAll)', str(len(dtAll))
     for i in range(2,len(dtAll)):
         obj_l0=u'Вода' # всегда будет Вода как объект-родитель
         obj_l1=dtAll[i][0] #корпус
@@ -2075,7 +2047,7 @@ def LoadWaterPulsar(sPath, sSheet):
     dtAll=GetTableFromExcel(sPath,sSheet) #получили из excel все строки до первой пустой строки (проверка по колонке А)
     met=0
     con=0
-    print 'str(len(dtAll))', str(len(dtAll))
+    #print 'str(len(dtAll))', str(len(dtAll))
     for i in range(2,len(dtAll)):
         obj_l0=u'Вода' # всегда будет Вода как объект-родитель
         obj_l1=dtAll[i][0] #корпус
@@ -2095,7 +2067,7 @@ def LoadWaterPulsar(sPath, sSheet):
         if not (isNewAbon):
             return u"Нет структуры объектов и счётчиков для "+ obj_l2 + " " +abon
         if not (isNewPulsar):
-            print (u'Обрабатываем строку '+unicode(obj_l2) +' '+ unicode(numPulsar))
+            #print (u'Обрабатываем строку '+unicode(obj_l2) +' '+ unicode(numPulsar))
             if unicode(typePulsar) == u'Пульсар 10M':
                     add_meter = Meters(name = unicode(typePulsar) + u' ' + unicode(numPulsar), address = unicode(numPulsar), factory_number_manual = unicode(numPulsar), guid_types_meters = TypesMeters.objects.get(guid = u"cae994a2-6ab9-4ffa-aac3-f21491a2de0b") )
                     add_meter.save()
@@ -2114,7 +2086,7 @@ def LoadWaterPulsar(sPath, sSheet):
                    print (u'OK Device 2M added in DB')
                    met+=1
             else:
-                print(u'Такой Пульсар уже есть или Вы не верно указали тип прибора в прогрузочной ведомости')        
+                print(u'Pulsar already exists or you incorrectly indicated the type of device in the loading list')        
         # надо проверить каналы и подсоединить их 
         #Пульсар 16M 029571 Пульсар 16M Канал 16 Суточный -- adress: 16  channel: 0
         chanel=unicode(dtAll[i][4])
@@ -2122,17 +2094,17 @@ def LoadWaterPulsar(sPath, sSheet):
         abonent_name=unicode(dtAll[i][2])
         taken_param = pulsarName + u' ' + unicode(dtAll[i][5]) + u' '+ pulsarName + u' ' + u'Канал ' + chanel+ u' Суточный -- adress: ' +chanel+u'  channel: 0'
         #print "chanel ", chanel
-        print(taken_param)
+        #print(taken_param)
         #Sravnenie(taken_param)
         dtTakenParam=GetSimpleTable('taken_params','name',taken_param)
         #writeToLog(bool(dtTakenParam))
         if dtTakenParam:                
-            print(u'taken param найден')
+            #print(u'taken param найден')
             guid_taken_param=dtTakenParam[0][1]
             dtLink=GetSimpleTable('link_abonents_taken_params','guid_taken_params',guid_taken_param)
             #print dtLink
             if (dtLink):
-                print 'link is exist '+ chanel + '  '+pulsarName
+                #print 'link is exist '+ chanel + '  '+pulsarName
                 result+=u"\n Привязка канала "+chanel+u" Пульсара "+pulsarName+u" уже существует. Перезапись НЕ произведена для счётчика "+abonent_name
                 continue
             else:
@@ -2218,7 +2190,7 @@ def UpdateTable(table,whereFieled, whereValue,field1,value1,field2,value2,field3
      WHERE %s='%s'
      RETURNING * 
    """%(table, field1, value1,field2,value2,field3,value3,whereFieled, whereValue)
-    print sQuery
+    #print sQuery
     cursor.execute(sQuery)
     dt = cursor.fetchall()
     if len(dt):
@@ -2398,21 +2370,21 @@ def LoadImpulseWaterBalance(dtAll):
         znak=unicode(dtAll[i][1])        
         meter=unicode(dtAll[i][4])
         type_abonent=unicode(dtAll[i][5])
-        print balance_group, znak, meter, type_abonent
+        #print balance_group, znak, meter, type_abonent
         isNewBalanceGroup=not SimpleCheckIfExist('balance_groups','name',balance_group,"","","")
         isNewMeter=not SimpleCheckIfExist('meters','factory_number_manual',meter,"","","")
         isNewTypeAbonent=not SimpleCheckIfExist('types_abonents','name',type_abonent,"","","")
-        print u'isNewBalanceGroup: ', isNewBalanceGroup
-        print u'isNewTypeAbonent: ', isNewTypeAbonent
-        print u'isNewMeter: ', isNewMeter
+        #print u'isNewBalanceGroup: ', isNewBalanceGroup
+        #print u'isNewTypeAbonent: ', isNewTypeAbonent
+        #print u'isNewMeter: ', isNewMeter
         if isNewBalanceGroup: #если балансной группы ещё не существует, то создаём её
             balance_group_guid=uuid.uuid4()
             result += InsertIntoBalanceGroup(balance_group_guid, balance_group)
-            print u'Создана балансная группа '+balance_group
+            #print u'Создана балансная группа '+balance_group
         if isNewTypeAbonent: #если такого типа абонента не существует, то создаём
             types_abonents_guid=uuid.uuid4()
             result += InsertIntoTypesAbonents(types_abonents_guid, type_abonent)
-            print u'Создан тип абонента ' + type_abonent       
+            #print u'Создан тип абонента ' + type_abonent       
         if isNewMeter:#ничего не создаём, добавляем сообщение, что абонента надо создать
            result += u'Счётчика '+meter+u' (в таблице строка '+str(i+1)+u') не существует. В балансную группу не добавлен!'
            continue
@@ -2425,13 +2397,13 @@ def LoadImpulseWaterBalance(dtAll):
         dt_link=GetSimpleTable('link_balance_groups_meters',"guid_meters",guid_meters[0][0])
         isNewLink=True
         for j in range(1,len(dt_link)):
-            print dt_link[j][3]
+            #print dt_link[j][3]
             if dt_link[j][3] == balance_group_guid:
                 isNewLink=False
                 result+= u'Счётчик ' + meter + u' уже принадлежит балансной группе ' + balance_group
                 break
         if isNewLink:
-            print balance_group, meter
+            #print balance_group, meter
             cursor = connection.cursor()
             isZnak=True        
             if znak=='0' or znak == 0:
@@ -2467,21 +2439,21 @@ def LoadBalance(sPath, sheet):
             abonent_name=unicode(dtAll[i][3])
             meter=unicode(dtAll[i][4])
             type_abonent=unicode(dtAll[i][5])
-            print balance_group, znak, abonent_name,meter, type_abonent
+            #print balance_group, znak, abonent_name,meter, type_abonent
             isNewBalanceGroup=not SimpleCheckIfExist('balance_groups','name',balance_group,"","","")
             isNewMeter=not SimpleCheckIfExist('meters','factory_number_manual',meter,"","","")
             isNewTypeAbonent=not SimpleCheckIfExist('types_abonents','name',type_abonent,"","","")
-            print u'isNewBalanceGroup: ', isNewBalanceGroup
-            print u'isNewTypeAbonent: ', isNewTypeAbonent
-            print u'isNewMeter: ', isNewMeter
+            #print u'isNewBalanceGroup: ', isNewBalanceGroup
+            #print u'isNewTypeAbonent: ', isNewTypeAbonent
+            #print u'isNewMeter: ', isNewMeter
             if isNewBalanceGroup: #если балансной группы ещё не существует, то создаём её
                 balance_group_guid=uuid.uuid4()
                 result += InsertIntoBalanceGroup(balance_group_guid, balance_group)
-                print u'Создана балансная группа '+balance_group
+                #print u'Создана балансная группа '+balance_group
             if isNewTypeAbonent: #если такого типа абонента не существует, то создаём
                 types_abonents_guid=uuid.uuid4()
                 result += InsertIntoTypesAbonents(types_abonents_guid, type_abonent)
-                print u'Создан тип абонента ' + type_abonent       
+                #print u'Создан тип абонента ' + type_abonent       
             if isNewMeter:#ничего не создаём, добавляем сообщение, что абонента надо создать
                result += u'Счётчика '+meter+u' (в таблице должен принадлежать абоненту '+abonent_name+u') не существует. В балансную группу не добавлен!'
                continue
@@ -2489,7 +2461,7 @@ def LoadBalance(sPath, sheet):
             types_abonents_guid=GetSimpleTable('types_abonents','name',type_abonent)[0][0]
             guid_abonent=GetGuidFromFirstTableCrossWithSecondTable('abonents','objects','name',abonent_name,'name',object_name)[0][0]
             isOk=UpdateSimpleTable('abonents', guid_abonent,'guid_types_abonents',types_abonents_guid)
-            print u'type of abonents changed: ', isOk 
+            #print u'type of abonents changed: ', isOk 
             
             guid_meters=GetSimpleTable('meters','factory_number_manual',meter)[0][0]        
             if not isNewBalanceGroup:
@@ -2499,13 +2471,13 @@ def LoadBalance(sPath, sheet):
             dt_link=GetSimpleTable('link_balance_groups_meters',"guid_meters",guid_meters[0][0])
             isNewLink=True
             for j in range(1,len(dt_link)):
-                print dt_link[j][3]
+                #print dt_link[j][3]
                 if dt_link[j][3] == balance_group_guid:
                     isNewLink=False
                     result+= u'Счётчик ' + meter + u' уже принадлежит балансной группе ' + balance_group
                     break
             if isNewLink:
-                print balance_group, meter
+                #print balance_group, meter
                 cursor = connection.cursor()
                 isZnak=True        
                 if znak=='0' or znak == 0:
@@ -2537,7 +2509,7 @@ def add_current_taken_params_pulsar16m(request):
     dt_pulsar16m=common_sql.get_meters_by_type( u'Пульсар 16M')
     count16m=0
     for puls in dt_pulsar16m:
-        print u'счётчик', puls[1]
+        #print u'счётчик', puls[1]
         guid_meter = puls[0]
         dt_current_count = common_sql.get_count_current_params_by_meters_guid(guid_meter)
         if len(dt_current_count)>0: continue
@@ -2666,7 +2638,7 @@ def add_current_taken_params_pulsar16m(request):
     count10m=0
     for puls in dt_pulsar10m:        
         #Добавляем параметры для Пульсар10 
-        print u'счётчик', puls[1]
+        #print u'счётчик', puls[1]
         guid_meter = puls[0]
         dt_current_count = common_sql.get_count_current_params_by_meters_guid(guid_meter)
         if len(dt_current_count)>0: continue
@@ -2991,8 +2963,8 @@ class NumberParser(HTMLParser):
             zavod_start_pos = data.rfind('-') + 2
             zavod_end_pos = data.rfind(')') 
             zavod = unicode(data[zavod_start_pos:zavod_end_pos])
-            print u'setevoy: '+setev
-            print u'zavodskoy: '+zavod
+            #print u'setevoy: '+setev
+            #print u'zavodskoy: '+zavod
             #print data
 
     def handle_endtag(self, tag):
@@ -3012,7 +2984,8 @@ class TableParser(HTMLParser):
             global col
             global row
             global dt
-            print unicode(row),unicode(col)
+            #
+            # print unicode(row),unicode(col)
             if row > 1487 : return
             dt[row][col]=data
             if col==9:
