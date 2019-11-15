@@ -11008,14 +11008,16 @@ def electric_simple_3_zones_v3(request):
                         data_table = [[electric_data_end, obj_title, u'Н/Д', u'Н/Д', u'Н/Д', u'Н/Д', u'Н/Д']]
 
             elif (is_electric_daily == '1') & (bool(is_group_level.search(obj_key))): # поиск по баланскной группе
-                    data_table= common_sql.get_data_table_by_date_for_group_3_zones_v3(obj_title, electric_data_end, 'daily')
-                    if not data_table:
-                        data_table = [[electric_data_end, obj_title, u'Н/Д', u'Н/Д', u'Н/Д', u'Н/Д', u'Н/Д']]
+                    pass
+                    # data_table= common_sql.get_data_table_by_date_for_group_3_zones_v3(obj_title, electric_data_end, 'daily')
+                    # if not data_table:
+                    #     data_table = [[electric_data_end, obj_title, u'Н/Д', u'Н/Д', u'Н/Д', u'Н/Д', u'Н/Д']]
               
             elif (is_electric_monthly == '1') & (bool(is_group_level.search(obj_key))): # поиск по баланскной группе
-                    data_table= common_sql.get_data_table_by_date_for_group_3_zones_v3(obj_title, electric_data_end, 'monthly')
-                    if not data_table:
-                        data_table = [[electric_data_end, obj_title, u'Н/Д', u'Н/Д', u'Н/Д', u'Н/Д', u'Н/Д']]
+                    pass
+                    # data_table= common_sql.get_data_table_by_date_for_group_3_zones_v3(obj_title, electric_data_end, 'monthly')
+                    # if not data_table:
+                    #     data_table = [[electric_data_end, obj_title, u'Н/Д', u'Н/Д', u'Н/Д', u'Н/Д', u'Н/Д']]
 
             elif (is_electric_current == '1') & (bool(is_object_level.search(obj_key))): # текущие для объекта учёта
                     pass

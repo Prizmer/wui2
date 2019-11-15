@@ -28,6 +28,7 @@ from HTMLParser import HTMLParser
 import io
 import psycopg2
 
+
 cfg_excel_name=""
 cfg_sheet_name=""
 
@@ -62,8 +63,11 @@ def MakeSheet(request):
             request.session["choice_file"]    = fileName    = request.GET['choice_file']
             #print fileName
             directory=os.path.join(BASE_DIR,'static/cfg/')
-            wb=load_workbook(directory+fileName)
-            sheets=wb.sheetnames
+            try:
+                wb=load_workbook(directory+fileName)
+                sheets=wb.sheetnames
+            except Exception as e:
+                pass
 
     args['sheets']=sheets
     return render_to_response("service/service_sheets_excel.html", args)
@@ -152,7 +156,6 @@ def service_electric_load(request):
     status='Файл не загружен'
 
     if request.method == 'POST':
-
         form = UploadFileForm(request.POST, request.FILES)
 
         if form.is_valid():
@@ -190,28 +193,29 @@ def load_port(request):
     object_status    = ""
     counter_status    = ""
     result=""
-    if request.is_ajax():
-        if request.method == 'GET':
-            request.session["choice_file"]    = fileName    = request.GET['choice_file']
-            request.session["choice_sheet"]    = sheet    = request.GET['choice_sheet']
-            request.session["tcp_ip_status"]    = tcp_ip_status    = request.GET['tcp_ip_status']
-            request.session["object_status"]    = object_status    = request.GET['object_status']
-            request.session["counter_status"]    = counter_status    = request.GET['counter_status']
-            
-            #print fileName
-            directory=os.path.join(BASE_DIR,'static/cfg/')
-            sPath=directory+fileName
-            #print sPath, sheet
-            result=load_tcp_ip_or_com_ports_from_excel(sPath, sheet)
-    writeToLog(result)
-    if result:
-        tcp_ip_status=u"Порт/ы был успешно добавлен"
-    else:
-        tcp_ip_status=u"Порт не был загружен, он уже существует в БД"
-    #print fileName
+    try:
+        if request.is_ajax():
+            if request.method == 'GET':
+                request.session["choice_file"]    = fileName    = request.GET['choice_file']
+                request.session["choice_sheet"]    = sheet    = request.GET['choice_sheet']
+                request.session["tcp_ip_status"]    = tcp_ip_status    = request.GET['tcp_ip_status']
+                request.session["object_status"]    = object_status    = request.GET['object_status']
+                request.session["counter_status"]    = counter_status    = request.GET['counter_status']
+                
+                directory=os.path.join(BASE_DIR,'static/cfg/')
+                sPath=directory+fileName
+                
+                result=load_tcp_ip_or_com_ports_from_excel(sPath, sheet)
+                if result:
+                    result=u"Порт/ы был успешно добавлен"
+                else:
+                    result=u"Порт не был загружен, он уже существует в БД"
+    except Exception as e:
+        result = u"Ошибка: " + e.message
+
     args["choice_file"]    = fileName
     args["choice_sheet"]    = sheet
-    args["tcp_ip_status"]=tcp_ip_status
+    args["tcp_ip_status"]=result
     args["object_status"]=object_status
     args["counter_status"]=counter_status
     return render_to_response("service/service_electric.html", args)
@@ -419,7 +423,7 @@ def LoadObjectsAndAbons(sPath, sSheet):
             writeToLog('create abonent '+abon)
             add_abonent = Abonents(name = abon, account_1 =unicode(account_1), account_2 =unicode(account_2), guid_objects =add_object2, guid_types_abonents = TypesAbonents.objects.get(guid= u"e4d813ca-e264-4579-ae15-385cdbf5d28c"))
             add_abonent.save()
-            result=u"Объекты: "+obj_l0+", "+obj_l1+u", "+obj_l2+u","+abon+u" созданы"
+            result=u"Объекты созданы"
             continue
         if not (isNewObj_l1):
             writeToLog('create object '+obj_l1)
@@ -433,7 +437,7 @@ def LoadObjectsAndAbons(sPath, sSheet):
                 writeToLog('create abonent '+abon)
                 add_abonent = Abonents(name = abon, account_1 =unicode(account_1), account_2 =unicode(account_2), guid_objects =add_object2, guid_types_abonents = TypesAbonents.objects.get(guid= u"e4d813ca-e264-4579-ae15-385cdbf5d28c"))
                 add_abonent.save()
-                result+=u"Объекты: "+obj_l1+u", "+obj_l2+u","+abon+u" созданы"
+                result=u"Объекты созданы"
                 continue
         if not (isNewObj_l2):
             writeToLog('create object '+obj_l2)
@@ -442,7 +446,7 @@ def LoadObjectsAndAbons(sPath, sSheet):
                 guid_parent=dtParent[0][0]                
                 add_object = Objects(name=obj_l2, level=2, guid_parent = Objects.objects.get(guid=guid_parent))
                 add_object.save()
-                result+=u"Объект: "+obj_l2+u" создан"
+                result=u"Объекты созданы"
         if not (isNewAbon):
             writeToLog('create abonent '+ abon)
             dtObj=GetSimpleTable('objects','name',obj_l2)
@@ -452,7 +456,7 @@ def LoadObjectsAndAbons(sPath, sSheet):
                 add_abonent.save()
                 kv+=1
 
-    result+=u" Прогружено "+str(kv)+u" абонентов"
+    result+=u" Абоненты созданы"
     return result
 
 
@@ -461,32 +465,30 @@ def load_electric_objects(request):
     fileName=""
     sheet    = ""
     tcp_ip_status    = ""
-    object_status    = ""
     counter_status    = ""
     result="Не загружено"
-    #writeToLog('test1')    
-    if request.is_ajax():
-        if request.method == 'GET':            
-            request.session["choice_file"]    = fileName    = request.GET['choice_file']
-            request.session["choice_sheet"]    = sheet    = request.GET['choice_sheet']
-            request.session["tcp_ip_status"]    = tcp_ip_status    = request.GET['tcp_ip_status']
-            request.session["object_status"]    = object_status    = request.GET['object_status']
-            request.session["counter_status"]    = counter_status    = request.GET['counter_status']
-            
-            directory=os.path.join(BASE_DIR,'static/cfg/')
-            sPath=directory+fileName
-            writeToLog(sPath)
-                        
-            #print 'Path:_____',sPath, sheet
-            result=LoadObjectsAndAbons(sPath, sheet)
+    #writeToLog('test1') 
+    try:    
+        if request.is_ajax():
+            if request.method == 'GET':            
+                request.session["choice_file"]    = fileName    = request.GET['choice_file']
+                request.session["choice_sheet"]    = sheet    = request.GET['choice_sheet']
+                request.session["tcp_ip_status"]    = tcp_ip_status    = request.GET['tcp_ip_status']
+                request.session["object_status"]    = object_status    = request.GET['object_status']
+                request.session["counter_status"]    = counter_status    = request.GET['counter_status']
+                
+                directory=os.path.join(BASE_DIR,'static/cfg/')
+                sPath=directory+fileName
+                writeToLog(sPath)
+                            
+                result=LoadObjectsAndAbons(sPath, sheet)
+    except Exception as e:
+        result = u"Ошибка "+e.message
     
-    object_status=result#"Загрузка объектов условно прошла"
-
-    #print fileName
     args["choice_file"]    = fileName
     args["choice_sheet"]    = sheet
     args["tcp_ip_status"]=tcp_ip_status
-    args["object_status"]=object_status
+    args["object_status"]=result
     args["counter_status"]=counter_status
     return render_to_response("service/service_electric.html", args)
 
@@ -614,26 +616,27 @@ def load_electric_counters(request):
     sheet    = ""
     tcp_ip_status    = ""
     object_status    = ""
-    counter_status    = ""
     result=""
-    if request.is_ajax():
-        if request.method == 'GET':
-            request.session["choice_file"]    = fileName    = request.GET['choice_file']
-            request.session["choice_sheet"]    = sheet    = request.GET['choice_sheet']
-            request.session["tcp_ip_status"]    = tcp_ip_status    = request.GET['tcp_ip_status']
-            request.session["object_status"]    = object_status    = request.GET['object_status']
-            request.session["counter_status"]    = counter_status    = request.GET['counter_status']
-            directory=os.path.join(BASE_DIR,'static/cfg/')
-            sPath=directory+fileName
-            result=LoadElectricMeters(sPath, sheet)
-    counter_status=result#"Загрузка счётчиков условно прошла"
+    try:
+        if request.is_ajax():
+            if request.method == 'GET':
+                request.session["choice_file"]    = fileName    = request.GET['choice_file']
+                request.session["choice_sheet"]    = sheet    = request.GET['choice_sheet']
+                request.session["tcp_ip_status"]    = tcp_ip_status    = request.GET['tcp_ip_status']
+                request.session["object_status"]    = object_status    = request.GET['object_status']
+                request.session["counter_status"]    = counter_status    = request.GET['counter_status']
+                directory=os.path.join(BASE_DIR,'static/cfg/')
+                sPath=directory+fileName
+                result=LoadElectricMeters(sPath, sheet)                
+    except Exception as e:
+        result = u"Ошибка "+e.message
         
     #print fileName
     args["choice_file"]    = fileName
     args["choice_sheet"]    = sheet
     args["tcp_ip_status"]=tcp_ip_status
     args["object_status"]=object_status
-    args["counter_status"]=counter_status
+    args["counter_status"]=result
     isService=False
     OnOffSignals()
     return render_to_response("service/service_electric.html", args)
@@ -1864,31 +1867,32 @@ def add_link_abonent_taken_params_from_excel_cfg_electric(sender, instance, crea
 
 def load_water_objects(request):
     args={}
-    fileName=""
-    sheet    = ""
-    tcp_ip_status    = ""
-    object_status    = ""
-    counter_status    = ""
+    fileName = u""
+    sheet    = u""
+    tcp_ip_status    = u""
+    counter_status    = u""
     result="Не загружено"
-    if request.is_ajax():
-        if request.method == 'GET':
-            request.session["choice_file"]    = fileName    = request.GET['choice_file']
-            request.session["choice_sheet"]    = sheet    = request.GET['choice_sheet']
-            request.session["tcp_ip_status"]    = tcp_ip_status    = request.GET['tcp_ip_status']
-            request.session["object_status"]    = object_status    = request.GET['object_status']
-            request.session["counter_status"]    = counter_status    = request.GET['counter_status']
-            
-            directory=os.path.join(BASE_DIR,'static/cfg/')
-            sPath=directory+fileName
-            result=LoadObjectsAndAbons_water(sPath, sheet)
+    try:
+        if request.is_ajax():
+            if request.method == 'GET':
+                request.session["choice_file"]    = fileName    = request.GET['choice_file']
+                request.session["choice_sheet"]    = sheet    = request.GET['choice_sheet']
+                request.session["tcp_ip_status"]    = tcp_ip_status    = request.GET['tcp_ip_status']
+                request.session["object_status"]    = object_status    = request.GET['object_status']
+                request.session["counter_status"]    = counter_status    = request.GET['counter_status']
+                
+                directory=os.path.join(BASE_DIR,'static/cfg/')
+                sPath=directory+fileName
+                result=LoadObjectsAndAbons_water(sPath, sheet)
+    except Exception as e:
+        result = u"Ошибка "+e.message
     
-    object_status=result
 
     #print fileName
     args["choice_file"]    = fileName
     args["choice_sheet"]    = sheet
     args["port_status"]=tcp_ip_status
-    args["object_status"]=object_status
+    args["object_status"]=result
     args["counter_status"]=counter_status
     return render_to_response("service/service_water.html", args)
 
@@ -1918,7 +1922,7 @@ order by name_parent    """%(name_parent, name_child)
     
 
 def LoadObjectsAndAbons_water(sPath, sheet):
-    result=""
+    result="Объекты не загружены"
     dtAll=GetTableFromExcel(sPath,sheet) #получили из excel все строки до первой пустой строки (проверка по колонке А)
     kv=0
     #print 'len(dtAll)', str(len(dtAll))
@@ -1961,7 +1965,7 @@ def LoadObjectsAndAbons_water(sPath, sheet):
             
             add_abonent.save()
             kv+=1
-            result=u"Объекты: "+obj_l0+", "+obj_l1+u", "+obj_l2+u","+abon+u" созданы"
+            result=u"Объекты созданы"
             continue
         if not (isNewObj_l1):#новый корпус
             writeToLog('Level 1 create object '+obj_l1)
@@ -1977,7 +1981,7 @@ def LoadObjectsAndAbons_water(sPath, sheet):
                 add_abonent = Abonents(name = abon, guid_objects =add_object2, guid_types_abonents = TypesAbonents.objects.get(guid= u"e4d813ca-e264-4579-ae15-385cdbf5d28c"))
                 add_abonent.save()
                 kv+=1
-                result+=u"Объекты: "+obj_l1+u", "+obj_l2+u","+abon+u" созданы"
+                result=u"Объекты созданы"
                 continue
             else: 
                 writeToLog(u'Не удалось создать объект '+obj_l1)
@@ -1991,7 +1995,7 @@ def LoadObjectsAndAbons_water(sPath, sheet):
                 guid_parent=dtParent[0][0]
                 add_object = Objects(name=obj_l2, level=2, guid_parent = Objects.objects.get(guid=guid_parent))
                 add_object.save()
-                result+=u"Объект: "+obj_l2+u" создан"
+                result=u"Объекты созданы"
                 add_abonent = Abonents(name = abon, guid_objects = add_object, guid_types_abonents = TypesAbonents.objects.get(guid= u"e4d813ca-e264-4579-ae15-385cdbf5d28c"))
                 add_abonent.save()
                 kv+=1
@@ -2005,7 +2009,7 @@ def LoadObjectsAndAbons_water(sPath, sheet):
 #                print u'Не удалось создать объект '+abon
                 continue
 
-    result+=u" Прогружено "+str(kv)+u" водо-счётчиков"
+    result+=u" Структура счётчиков создана "
     return result
 
 
@@ -2014,25 +2018,30 @@ def load_water_pulsar(request):
     isService=True
     OnOffSignals()
     args={}
-    result=""
-    if request.is_ajax():
-        if request.method == 'GET':
-            request.session["choice_file"]    = fileName    = request.GET['choice_file']
-            request.session["choice_sheet"]    = sheet    = request.GET['choice_sheet']
-            request.session["tcp_ip_status"]    = tcp_ip_status    = request.GET['tcp_ip_status']
-            request.session["object_status"]    = object_status    = request.GET['object_status']
-            request.session["counter_status"]    = counter_status    = request.GET['counter_status']
-            directory=os.path.join(BASE_DIR,'static/cfg/')
-            sPath=directory+fileName
-            result=LoadWaterPulsar(sPath, sheet)
-    counter_status=result#"Загрузка счётчиков условно прошла"
+    result=u""
+    fileName = u""
+    sheet = u""
+    tcp_ip_status = u""
+    object_status =u""
+    try:
+        if request.is_ajax():
+            if request.method == 'GET':
+                request.session["choice_file"]    = fileName    = request.GET['choice_file']
+                request.session["choice_sheet"]    = sheet    = request.GET['choice_sheet']
+                request.session["tcp_ip_status"]    = tcp_ip_status    = request.GET['tcp_ip_status']
+                request.session["object_status"]    = object_status    = request.GET['object_status']                
+                directory=os.path.join(BASE_DIR,'static/cfg/')
+                sPath=directory+fileName
+                result=LoadWaterPulsar(sPath, sheet)
+    except Exception as e:
+        result = u"Ошибка "+e.message
         
     #print fileName
     args["choice_file"]    = fileName
     args["choice_sheet"]    = sheet
     args["tcp_ip_status"]=tcp_ip_status
     args["object_status"]=object_status
-    args["counter_status"]=counter_status
+    args["counter_status"]=result
     isService=False
     OnOffSignals()
     return render_to_response("service/service_water.html", args)
@@ -2139,28 +2148,28 @@ def load_water_port(request):
 
     fileName=""
     sheet    = ""
-    tcp_ip_status    = ""
     result=""
-    if request.is_ajax():
-        if request.method == 'GET':
-            request.session["choice_file"]    = fileName    = request.GET['choice_file']
-            request.session["choice_sheet"]    = sheet    = request.GET['choice_sheet']
-            request.session["tcp_ip_status"]    = tcp_ip_status    = request.GET['tcp_ip_status']
-            
-            #print fileName
-            directory=os.path.join(BASE_DIR,'static/cfg/')
-            sPath=directory+fileName
-            #print sPath, sheet
-            result=load_tcp_ip_water_ports_from_excel(sPath, sheet)
-    #print result
-    if result:
-        tcp_ip_status=u"Порт/ы был успешно добавлен"
-    else:
-        tcp_ip_status=u"Порт не был загружен, он уже существует в БД"
+    try:
+        if request.is_ajax():
+            if request.method == 'GET':
+                request.session["choice_file"]    = fileName    = request.GET['choice_file']
+                request.session["choice_sheet"]    = sheet    = request.GET['choice_sheet']
+                request.session["tcp_ip_status"]    = tcp_ip_status    = request.GET['tcp_ip_status']
+                
+                directory=os.path.join(BASE_DIR,'static/cfg/')
+                sPath=directory+fileName
+                #print sPath, sheet
+                result=load_tcp_ip_water_ports_from_excel(sPath, sheet)
+                if result:
+                    result=u"Порт/ы был успешно добавлен"
+                else:
+                    result=u"Порт не был загружен, он уже существует в БД"
+    except Exception as e:
+        result = u"Ошибка "+e.message
 
     args["choice_file"]    = fileName
     args["choice_sheet"]    = sheet
-    args["tcp_ip_status"]=tcp_ip_status
+    args["tcp_ip_status"]=result
 
     return render_to_response("service/service_water.html", args)
 
@@ -2200,7 +2209,7 @@ def UpdateTable(table,whereFieled, whereValue,field1,value1,field2,value2,field3
 
 def load_tcp_ip_water_ports_from_excel(sPath, sheet):
     #Добавление tcp_ip портов
-
+    
     wb = load_workbook(filename = sPath)
     sheet_ranges = wb[sheet]
     row = 3

@@ -942,7 +942,7 @@ ORDER BY z3.name_abonents ASC;    """%(obj_title, params[0],params[1],params[2],
     
     if dm=='monthly' or dm=='daily' or dm=='current':
         sQuery=sQuery.replace('monthly',dm)
-        
+        #print sQuery
         return sQuery
     else: return """Select 'Н/Д'"""
 
@@ -1558,12 +1558,10 @@ z1.ktt,z1.ktn,z1.a
                         resources.name='%s' and
                  objects.name = '%s' AND                      
                         monthly_values.date = '%s' 
-                        ) z1                        
-                      
+                        ) z1                  
 group by z1.name_objects, z1.monthly_date, z1.name_objects, z1.name_abonents, z1.number_manual, z1.ktt,z1.ktn,z1.a
-
 ) z2
-on electric_abons_2.ab_name=z2.name_abonents
+on electric_abons_2.factory_number_manual=z2.number_manual
 where electric_abons_2.obj_name='%s'
 ORDER BY electric_abons_2.ab_name ASC;
 """%(params[0],params[1],params[2],params[3], res,obj_title, electric_data, obj_title)
@@ -1640,7 +1638,7 @@ z1.ktn, z1.ktt, z1.a
                         ) z1                      
 group by z1.name_objects, z1.daily_date, z1.name_objects, z1.name_abonents, z1.number_manual, z1.ktn, z1.ktt, z1.a 
 ) z2
-on electric_abons.ab_name=z2.name_abonents
+on electric_abons.factory_number_manual=z2.number_manual
 where electric_abons.ab_name = '%s' AND electric_abons.obj_name='%s'
 ORDER BY electric_abons.ab_name, z2.daily_date  ASC) z3
 on z4.c_date=z3.daily_date 
@@ -1927,7 +1925,7 @@ sum(Case when z1.params_name = '%s' then z1.value else null end) as t0R
                                   ) z1                       
                       group by z1.name, z1.date, z1.name_objects, z1.name, z1.num_manual, z1.name_res, z1.ktt, z1.ktn, z1.a
                       order by z1.name) z2
-on electric_abons.ab_name=z2.name_abonent
+on electric_abons.factory_number_manual=z2.num_manual
 where electric_abons.obj_name='%s') z4, 
 
 (Select z2.date as date_start, electric_abons.obj_name, electric_abons.ab_name, electric_abons.factory_number_manual, z2.name_res, z2.t0 as t0_start, z2.t1 as t1_start, z2.t2 as t2_start, z2.t3 as t3_start, z2.t4 as t4_start, z2.t0r as t0r_start
@@ -1978,11 +1976,11 @@ SELECT
                                   ) z1                       
                       group by z1.name, z1.date, z1.name_objects, z1.name, z1.num_manual, z1.name_res
                       order by z1.name) z2
-on electric_abons.ab_name=z2.name_abonent
+on electric_abons.factory_number_manual=z2.num_manual
 where electric_abons.obj_name='%s') z3
-where z3.ab_name=z4.ab_name and z3.ab_name='%s'""" % (params[0],params[1],params[2],params[3], params[4], params[5],  obj_parent_title, obj_title, date_end, res, obj_parent_title, 
+where z3.ab_name=z4.ab_name and z3.ab_name='%s' and z3.factory_number_manual=z4.factory_number_manual """ % (params[0],params[1],params[2],params[3], params[4], params[5],  obj_parent_title, obj_title, date_end, res, obj_parent_title, 
                             params[0],params[1],params[2],params[3], params[4], params[5],obj_parent_title, obj_title, date_start, res,obj_parent_title, obj_title)
-    
+    #print sQuery
     if dm=='monthly' or dm=='daily' or dm=='current':
         sQuery=sQuery.replace('daily',dm)    
     return sQuery
@@ -2046,7 +2044,7 @@ SELECT
                                   ) z1                       
                       group by z1.name, z1.date, z1.name_objects, z1.name, z1.num_manual, z1.name_res, z1.ktt, z1.ktn,z1.a
                       order by z1.name) z2
-on electric_abons.ab_name=z2.name_abonent
+on electric_abons.factory_number_manual=z2.num_manual
 where electric_abons.obj_name='%s') z4, 
 
 
@@ -2097,9 +2095,9 @@ SELECT
                                   ) z1                       
                       group by z1.name, z1.date, z1.name_objects, z1.name, z1.num_manual, z1.name_res
                       order by z1.name) z2
-on electric_abons.ab_name=z2.name_abonent
+on electric_abons.factory_number_manual=z2.num_manual
 where electric_abons.obj_name='%s') z3
-where z3.ab_name=z4.ab_name
+where z3.ab_name=z4.ab_name and z3.factory_number_manual=z4.factory_number_manual
 order by z3.ab_name ASC""" % (params[0],params[1],params[2],params[3], params[4], params[5], obj_title, date_end, res, obj_title, 
                             params[0],params[1],params[2],params[3], params[4], params[5],obj_title,  date_start, res,obj_title)
     if dm=='monthly' or dm=='daily' or dm=='current':
@@ -2752,7 +2750,7 @@ z1.ktn, z1.ktt, z1.a
                         ) z1                      
 group by z1.name_objects, z1.daily_date, z1.name_objects, z1.name_abonents, z1.number_manual, z1.ktn, z1.ktt, z1.a 
 ) z2
-on electric_abons.ab_name=z2.name_abonents
+on electric_abons.factory_number_manual=z2.number_manual
 where electric_abons.ab_name = '%s' AND electric_abons.obj_name='%s'
 ORDER BY electric_abons.ab_name ASC;""" % (params[0],params[1],params[2],params[3],obj_title, obj_parent_title, electric_data, obj_title,obj_parent_title )
     if dm=='monthly' or dm=='daily' or dm=='current':
@@ -2856,18 +2854,14 @@ def get_data_table_by_date_for_object_3_zones_v2(obj_title, electric_data, dm):
     if len(data_table)>0: data_table=ChangeNull(data_table, electric_data)
     return data_table
     
-def get_data_table_electric_parametr_by_date_monthly_v2(obj_title, obj_parent_title, electric_data, params, dm):
-    cursor = connection.cursor()
-    #dm - строка, содержащая monthly or daily для sql-запроса
-    cursor.execute(makeSqlQuery_electric_by_daily_or_monthly(obj_title, obj_parent_title, electric_data, params, dm))
-    data_table = cursor.fetchall()
-    # 0 - дата, 1 - Имя объекта, 2 - Имя абонента, 3 - заводской номер, 4 - значение
-    return data_table
     
 def get_data_table_by_date_monthly_3_zones_v2(obj_title, obj_parent_title, electric_data, dm):
     data_table = []
     params=[u'T0 A+',u'T1 A+',u'T2 A+',u'T3 A+']
-    data_table=get_data_table_electric_parametr_by_date_monthly_v2(obj_title, obj_parent_title, electric_data, params, dm)
+    cursor = connection.cursor()
+    #dm - строка, содержащая monthly or daily для sql-запроса
+    cursor.execute(makeSqlQuery_electric_by_daily_or_monthly(obj_title, obj_parent_title, electric_data, params, dm))
+    data_table = cursor.fetchall()
     if len(data_table)>0: data_table=ChangeNull(data_table, electric_data)
     return data_table
 
