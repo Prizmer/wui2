@@ -1794,8 +1794,10 @@ def add_link_abonents_taken_params2(sender, instance, created, **kwargs):
             if isExistAbonent:
                 writeToLog(u'Совпадение')
                 #"ХВС, №47622 Канал 4 Суточный"
-                guidAbon=GetSimpleTable('abonents','name',abon)[0][0]
-                
+                #guidAbon=GetSimpleTable('abonents','name',abon)[0][0]
+                t = Abonents.objects.filter(name = abon)
+                guidAbon = t[0].guid
+                print guidAbon
                 linkName=abon+u' Канал '+channel+' Суточный'
                 writeToLog(linkName)
                 try:
@@ -2078,18 +2080,21 @@ def LoadWaterPulsar(sPath, sSheet):
         if not (isNewPulsar):
             #print (u'Обрабатываем строку '+unicode(obj_l2) +' '+ unicode(numPulsar))
             if unicode(typePulsar) == u'Пульсар 10M':
+                    signals.post_save.disconnect(add_link_taken_params, sender=TakenParams)  
                     add_meter = Meters(name = unicode(typePulsar) + u' ' + unicode(numPulsar), address = unicode(numPulsar), factory_number_manual = unicode(numPulsar), guid_types_meters = TypesMeters.objects.get(guid = u"cae994a2-6ab9-4ffa-aac3-f21491a2de0b") )
                     add_meter.save()
                     print (u'OK Device 10M added in DB')
                     met+=1
                     
             elif unicode(typePulsar) == u'Пульсар 16M':
+                   signals.post_save.disconnect(add_link_taken_params, sender=TakenParams)  
                    add_meter = Meters(name = unicode(unicode(typePulsar) + u' ' + unicode(numPulsar)), address = unicode(numPulsar),  factory_number_manual = unicode(numPulsar), guid_types_meters = TypesMeters.objects.get(guid = u"7cd88751-d232-410c-a0ef-6354a79112f1") )
                    add_meter.save()
                    print (u'OK Device 16M added in DB')
                    met+=1
                    
             elif unicode(typePulsar) == u'Пульсар 2M':
+                   signals.post_save.disconnect(add_link_taken_params, sender=TakenParams)  
                    add_meter = Meters(name = unicode(unicode(typePulsar) + u' ' + unicode(numPulsar)), address = unicode(numPulsar),  factory_number_manual = unicode(numPulsar), guid_types_meters = TypesMeters.objects.get(guid = u"6599be9a-1f4d-4a6e-a3d9-fb054b8d44e8") )
                    add_meter.save()
                    print (u'OK Device 2M added in DB')
@@ -2117,20 +2122,20 @@ def LoadWaterPulsar(sPath, sSheet):
                 result+=u"\n Привязка канала "+chanel+u" Пульсара "+pulsarName+u" уже существует. Перезапись НЕ произведена для счётчика "+abonent_name
                 continue
             else:
-                dtAbon=GetSimpleTable('abonents','name', abonent_name)
-                guidAbon=dtAbon[0][0]
+                #dtAbon= GetSimpleTable('abonents','name', abonent_name)
+                t = Abonents.objects.filter(name = abonent_name)
+                guidAbon = t[0].guid     #dtAbon[0][0]
                 #print guidAbon
-                #print guid_taken_param
-                #print TakenParams.objects.get(guid=guid_taken_param) 
                 #"миномес ГВС, №68208 Канал 5 Суточный"
                 #print abonent_name, guidAbon, guid_taken_param
                 common_sql.InsertInLinkAbonentsTakenParams(name = abonent_name+u' Канал '+chanel+u' Суточный',coefficient=1, coefficient_2 = 1,coefficient_3 = 1, guid_abonents = guidAbon, guid_taken_params = guid_taken_param)
                 #add_link_abonents_taken_param.save()
-                print u'Abonent connected with taken param'
+                #print u'Abonent connected with taken param'
                 con+=1
     result+=u'Прогружено новых пульсаров '+unicode(met)
     if con>0:
         result+=u'Созданы новые связи '
+    signals.post_save.connect(add_link_taken_params, sender=TakenParams)  
     return result
 
 #def Sravnenie(takenParam):

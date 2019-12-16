@@ -11202,9 +11202,9 @@ def MakeHeatDanfosQueryPeriod_for_abon(obj_parent_title, obj_title,electric_data
      Select z_end.obj_name, z_end.ab_name, z_end.factory_number_manual, 
      round(z_start.energy::numeric,3),  
      round(z_end.energy::numeric,3), 
-     round((z_end.energy- z_start.energy)::numeric,2) as delta_energy, 
+     round((z_end.energy- z_start.energy)::numeric,3) as delta_energy, 
      round(z_start.volume::numeric,3), 
-     round(z_end.volume::numeric,3), round((z_end.volume-z_start.volume)::numeric,2) as delta_volume
+     round(z_end.volume::numeric,3), round((z_end.volume-z_start.volume)::numeric,3) as delta_volume
 FROM
 (Select obj_name, ab_name, heat_abons.factory_number_manual, energy, volume, t_in, t_out
 from heat_abons
@@ -11295,17 +11295,17 @@ WHERE
   and ab_name = '%s'
   order by ab_name) z_start
   where z_end.factory_number_manual=z_start.factory_number_manual
-    """%(params[0], params[1], params[2], params[3],electric_data_start, obj_parent_title,obj_title, params[0], params[1], params[2], params[3], electric_data_start,obj_parent_title, obj_title)
+    """%(params[0], params[1], params[2], params[3],electric_data_end, obj_parent_title,obj_title, params[0], params[1], params[2], params[3], electric_data_start,obj_parent_title, obj_title)
     return sQuery
 
 def MakeHeatDanfosQueryPeriod_for_obj(obj_parent_title, obj_title,electric_data_start, electric_data_end, params):
     sQuery="""
     Select z_end.obj_name, z_end.ab_name, z_end.factory_number_manual, 
-    round(z_start.energy::numeric,2),  
-    round(z_end.energy::numeric,2), 
-    round((z_end.energy- z_start.energy)::numeric,2) as delta_energy, 
-    round(z_start.volume::numeric,2), round(z_end.volume::numeric,2), 
-    round((z_end.volume-z_start.volume)::numeric,2) as delta_volume
+    round(z_start.energy::numeric,3),  
+    round(z_end.energy::numeric,3), 
+    round((z_end.energy- z_start.energy)::numeric,3) as delta_energy, 
+    round(z_start.volume::numeric,3), round(z_end.volume::numeric,3), 
+    round((z_end.volume-z_start.volume)::numeric,3) as delta_volume
 FROM
 (Select obj_name, ab_name, heat_abons.factory_number_manual, energy, volume, t_in, t_out
 from heat_abons
@@ -11394,8 +11394,10 @@ WHERE
   where obj_name='%s'
   order by ab_name) z_start
   where z_end.factory_number_manual=z_start.factory_number_manual
-    """%(params[0], params[1], params[2], params[3],electric_data_start, obj_title, params[0], params[1], params[2], params[3], electric_data_start,obj_title)
+  order by z_end.ab_name
+    """%(params[0], params[1], params[2], params[3],electric_data_end, obj_title, params[0], params[1], params[2], params[3], electric_data_start,obj_title)
     return sQuery
+
 
 
 def get_data_table_danfoss_period(obj_parent_title, obj_title, electric_data_start, electric_data_end, isAbon,dc):
