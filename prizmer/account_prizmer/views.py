@@ -8,9 +8,24 @@ import common_sql
 @login_required(login_url='/auth/login/') 
 def account(request):
     args = {}
-    args['user_name']=request.user.first_name + ' ' + request.user.last_name
+    dt =[]
+    obj_name = u''
+    ab_name = u''
+    dt = common_sql.get_abonent_and_object_name_by_account(request.user.id)
+    
+    if len(dt)>0 :
+        obj_name = dt[0][0]
+        ab_name = dt[0][1]
+ 
+    args['user_name'] = request.user.first_name + ' ' + request.user.last_name
+    args['ab_name'] = ab_name
+    args['obj_name'] = obj_name
     return render_to_response("account/base.html", args)
 
+def go_out(request):
+    auth.logout(request)
+    return redirect(account)
+    
 def electric_info(request):
     args = {}
     date_end = ""

@@ -13,5 +13,6 @@ urlpatterns = patterns('',
     url(r'^electric_info', views.electric_info),
     url(r'^heat_info', views.heat_info),
     url(r'^water_info', views.water_info),
+    url(r'^exit', views.go_out),
 
 )

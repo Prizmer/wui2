@@ -10551,7 +10551,12 @@ WHERE
   meters.name
 )
 
-Select electic_info.res_name, electic_info.username, electic_info.first_name, electic_info.last_name, electic_info.meters_name, date, t0,t1,t2,t3
+Select electic_info.res_name, electic_info.username, electic_info.first_name, 
+electic_info.last_name, electic_info.meters_name, date, 
+round(t0::numeric,3),
+round(t1::numeric,3),
+round(t2::numeric,3),
+round(t3::numeric,3)
 From electic_info
 LEFT JOIN
 (
@@ -11412,4 +11417,25 @@ def get_data_table_danfoss_period(obj_parent_title, obj_title, electric_data_sta
     cursor.execute(sQuery)  
     data_table = cursor.fetchall()
     data_table = ChangeNull(data_table, None)
+    return data_table 
+
+def get_abonent_and_object_name_by_account(user_id):
+    cursor = connection.cursor()
+    data_table=[] 
+    sQuery ="""
+    SELECT 
+  objects.name, 
+  abonents.name, 
+  link_abonents_auth_user.id_auth_user
+FROM 
+  public.abonents, 
+  public.objects, 
+  public.link_abonents_auth_user
+WHERE 
+  abonents.guid_objects = objects.guid AND
+  link_abonents_auth_user.guid_abonents = abonents.guid AND
+  link_abonents_auth_user.id_auth_user = %s;
+    """ % user_id
+    cursor.execute(sQuery)  
+    data_table = cursor.fetchall()
     return data_table 

@@ -16,7 +16,7 @@ from django.db.models.signals import post_save
 from django.db.models import signals
 from django.db.models import Q
 
-
+from django.contrib.auth.decorators import user_passes_test
 #---------
 import calendar
 import common_sql
@@ -815,7 +815,12 @@ def get_data_table_by_date_daily(obj_title, obj_parent_title, electric_data):
     
     return data_table
 
+#my_decorators
+def isStaff(user):
+    return user.is_staff
+
 # Create your views here.
+@user_passes_test(isStaff, login_url='/account/')
 @login_required(login_url='/auth/login/') 
 def default(request):
     args={}

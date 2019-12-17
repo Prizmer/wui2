@@ -124,6 +124,7 @@ $(document).ready(function(){
 		//console.log('refresh');		
     });
 });
+
  
  </script>
 </head>
@@ -137,9 +138,14 @@ $(document).ready(function(){
 		  <span class="sr-only">Загрузка...</span>
 		</div>  
 	</div>
-	<div class="col-sm-auto align-self-end order-12" >
-	Здравствуйте, {{user_name}}
+	<div class="col-sm-auto align-self-end order-12">
+	{{obj_name}}&nbsp;&nbsp; {{ab_name}}
 	</div>
+	<div class="col-sm-auto align-self-end order-12" >
+	Здравствуйте, {{user_name}} &nbsp;&nbsp;
+	<span> <a href="../exit"><strong>Выйти</strong> </a></span>
+	</div>
+	
   </div>
 
     <div class="row">
