@@ -15,7 +15,7 @@ from openpyxl import load_workbook
 import os
 from django.db import connection
 #from general.models import Objects, Abonents, TypesAbonents, Meters, MonthlyValues, DailyValues, CurrentValues, VariousValues, TypesParams, Params, TakenParams, LinkAbonentsTakenParams, Resources, TypesMeters, Measurement, NamesParams, BalanceGroups, LinkMetersComportSettings, LinkMetersTcpipSettings, ComportSettings, TcpipSettings, LinkBalanceGroupsMeters, Groups80020, LinkGroups80020Meters
-from general.models import  Objects, Abonents, TcpipSettings, TypesAbonents, Meters, TypesMeters,LinkAbonentsTakenParams,LinkMetersComportSettings, LinkMetersTcpipSettings, ComportSettings,  TakenParams,Params
+from general.models import  Objects, Abonents, TcpipSettings, TypesAbonents, Meters, TypesMeters,LinkAbonentsTakenParams,LinkMetersComportSettings, LinkMetersTcpipSettings, ComportSettings,  TakenParams,Params, LinkAbonentsAuthUser
 from django.db.models.signals import pre_save
 from django.db.models.signals import post_save
 from django.db.models import signals
@@ -28,6 +28,8 @@ from HTMLParser import HTMLParser
 import io
 import psycopg2
 
+from django.contrib.auth.models import User
+from django.contrib.auth import authenticate
 
 cfg_excel_name=""
 cfg_sheet_name=""
@@ -321,13 +323,21 @@ def SimpleCheckIfExist(table1,fieldName1, value1, table2, fieldName2, value2):
     else: 
         return True
     
-def GetSimpleTable(table,fieldName,value):
+def GetSimpleTable(table,fieldName1,value1, fieldName2=u'', value2=u''):
     dt=[]
     cursor = connection.cursor()
-    sQuery="""
-        Select *
-        from %s
-        where %s.%s='%s'"""%(table, table, fieldName, value)
+    if len(fieldName2)==0: #одна таблица с 1 полем на запрос
+        sQuery="""
+            Select *
+            from %s
+            where %s.%s='%s'"""%(table, table, fieldName1, value1)
+    else:
+        sQuery="""
+            Select *
+            from %s
+            where %s.%s='%s'
+            and %s.%s='%s' """%(table, table, fieldName1, value1, fieldName2, value2)
+
     #print sQuery
     cursor.execute(sQuery)
     dt = cursor.fetchall()
@@ -2268,6 +2278,7 @@ def makeNewTakenParamName(nameParam1, old_meter, new_meter, typeMeter):
     newName= typeMeter + u' ' + unicode(new_meter) + s
     return newName
     
+
 def get_electric_progruz(request):
     pass
 
@@ -2947,6 +2958,8 @@ def service_load30_page(request):
     args={}    
     return render_to_response("service/service_30.html", args)
 
+def get_users_account_template(request):
+    return get_file('users_account_template.xlsx')
 
 #_____________________________________________________________________________________
 #Прогрузка получасовок
@@ -3184,3 +3197,130 @@ def service_load30(request):
     args['data_table'] = data_table
     args['status']=status
     return render_to_response("service/service_30.html", args)
+
+def service_user_account(request):
+    args={}
+    return render_to_response("service/service_users_account.html", args)
+
+def load_user_account(request):
+    args={}
+    fileName=""
+    sheet    = ""    
+    result = u""
+    try:    
+        if request.is_ajax():
+            if request.method == 'GET':            
+                request.session["choice_file"]    = fileName    = request.GET['choice_file']
+                request.session["choice_sheet"]    = sheet    = request.GET['choice_sheet']
+                
+                directory=os.path.join(BASE_DIR,'static/cfg/')
+                sPath=directory+fileName
+                result = u"Не загружено"
+                result = load_users_account(sPath, sheet)
+    except Exception as e:
+        result = u"Ошибка.load: "+e.message
+    args["result"]    = result
+    return render_to_response("service/service_users_account.html", args)
+
+def create_user(login, u_pass, u_mail, u_last_name, u_name):
+    result = u''
+    guid_user = u''
+    user_new = True
+    try:    
+        #проверяем, существует ли такой пользователь, если нет- вернётся None        
+        user = authenticate(username=login, password=u_pass)      
+        if user is not None:            
+            #пользователь новый или пара логин-пароль не совпадет
+            user_new = False
+        else:
+            #создаём пользователя
+            print login, u_pass, u_mail, u_last_name, u_name
+            user = User.objects.create_user(password = u_pass, username=login, first_name = u_name, last_name = u_last_name, email = u_mail)
+            user.save()
+            #print 'new user created:', user
+    except Exception as e:
+        result = u"Ошибка.user: "+e.message
+    return result, user, user_new
+
+
+def create_link_user_abonent(user, obj, abon):
+    result_link = u''
+    is_new_link = False
+    try:
+        #проверяем существует ли такой абонент
+        #print 'check abonent', obj, abon
+        dt=[]
+        dt = GetSimpleCrossTable(u'objects', u'name', obj, u'abonents', u'name', abon)
+        #print 'dt', dt, type(dt)
+        if len(dt) > 0:
+            #абонент существует
+            #первые 4 поля (0,1,2,3) - это поля objects, далее по порядку идут поля abonents
+            guid_abon = dt[0][4]
+            id_user = user.id
+            name = unicode(user.last_name) + ' - ' +unicode(abon)
+            #print name, guid_abon, id_user
+            #проверяем есть ли уже такая привязка:    
+            dt_check_link = []        
+            dt_check_link = LinkAbonentsAuthUser.objects.filter(guid_abonents = guid_abon).filter(guid_auth_user = id_user)
+            #print dt_check_link, 'dt_check_link'
+            if len(dt_check_link) < 1:
+                link = LinkAbonentsAuthUser(name = name, guid_abonents = Abonents.objects.get(guid= guid_abon), guid_auth_user = user)
+                link.save()
+                is_new_link = True
+            else: result_link += u' Связь ''%s'' уже существует. '%(name)
+        else:
+            #print u' Не существует: %s -> %s '%(obj, abon)
+            result_link += u' Не существует: %s -> %s. '%(obj, abon)
+    except Exception as e:
+        result_link += u"Ошибка.link: "+e.message
+        print result_link
+    return result_link, is_new_link
+
+
+def load_users_account(sPath, sheet):
+    result = u''
+    dtAll = GetTableFromExcel(sPath,sheet) #получили из excel все строки до первой пустой строки (проверка по колонке А)
+    user_count = 0 #счётчик кол-ва добавленных пользователей
+    link_count = 0
+    for i in range(2,len(dtAll)):
+        obj = dtAll[i][0] #корпус
+        abon = dtAll[i][1] #квартира
+        login = dtAll[i][2] # логин
+        u_last_name = dtAll[i][4] #фамилия
+        u_name = dtAll[i][5] #имя 
+        u_pass = dtAll[i][3] #пароль
+        u_mail = dtAll[i][6] #мейл
+        if login is None:
+            result += u'Строка %s не загружена: Отсутствует логин. '%(unicode(i+3))
+            continue
+        if u_pass is None:
+            result += u'Строка %s не загружена: Отсутствует пароль. '%(unicode(i+3))
+            continue
+        if abon is None or obj is None:
+            result += u'Строка %s не загружена: Отсутствует объект и/или абонент . '%(unicode(i+3))
+            continue
+
+        #если пользователь новый/существует, то вернёт oбъект user
+        result_create = u''
+        is_new_user = False
+        result_create, user, is_new_user = create_user(login, u_pass, u_mail, u_last_name, u_name)
+        if len(result_create)>0: 
+            result +=result_create
+            continue
+        if is_new_user:
+            user_count +=1
+        
+        #связываем абонента(картира или имп.счётчик) и пользователя
+        result_link = u''
+        result_link, is_new_link = create_link_user_abonent(user, obj, abon) 
+        if len(result_link) > 0:
+            result += result_link
+            continue
+        if is_new_link:
+            link_count +=1
+    result += u'Добавлено пользователей: %s. Добавлено привязок пользователей к ПУ: %s' %(unicode(user_count), unicode(link_count))
+    return result
+
+def service_del_meters(request):
+    args ={}
+    return render_to_response("service/service_del_meters.html", args)

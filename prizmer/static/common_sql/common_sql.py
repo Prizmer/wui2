@@ -11439,3 +11439,22 @@ WHERE
     cursor.execute(sQuery)  
     data_table = cursor.fetchall()
     return data_table 
+
+# def InsertInLinkAbonentsUser(name, guid_abonents,id_user):
+#     result = u''
+    
+#     #print sQuery
+#     try:
+#         cursor = connection.cursor()
+#         sQuery="""
+#         INSERT INTO link_abonents_auth_user(
+#                 guid, name, guid_abonents, id_auth_user)
+#         VALUES ('%s',%s, '%s')
+#         """ %(name, guid_abonents, id_user)
+#         print sQuery
+#         cursor.execute(sQuery)
+#         connection.commit()
+#     except Exception as e:
+#         result += u"Ошибка: "+e.message
+    
+#     return result  

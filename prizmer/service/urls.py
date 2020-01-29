@@ -44,4 +44,9 @@ urlpatterns = patterns('',
     
     url(r'^service_load30_page/$', views.service_load30_page), # загрузка страницы
     url(r'^service_load30/$', views.service_load30), # загрузка самих получасовок в базу
+
+    url(r'^service_user_account/$', views.service_user_account), # страница для добавления пользователей личного кабинета
+    url(r'^load_user_account/$', views.load_user_account), # добавление аккаунтов пользвоателей личного кабинета
+    url(r'^get_users_account_template/$', views.get_users_account_template), #возвращает excel форму образец для прогрузочной ведомости get_users_account_template
+    url(r'^service_del_meters/$', views.service_del_meters), # удаление приборов через прогурзочную ведомость
 )

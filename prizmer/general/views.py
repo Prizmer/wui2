@@ -833,15 +833,15 @@ def default(request):
         all_level_0 = Objects.objects.filter(level=0)
         tree_data = []
         for l0 in range(len(all_level_0)):
-            filter_level_1 = Objects.objects.filter(level=1).filter(guid_parent = all_level_0[l0].guid)
+            filter_level_1 = Objects.objects.filter(level=1).filter(guid_parent = all_level_0[l0].guid).order_by('name')
             children_data_l1 = []
             for l1 in range(len(filter_level_1)):
                 children_data_l2 = []
-                filter_level_2 = Objects.objects.filter(level=2).filter(guid_parent = filter_level_1[l1].guid)
+                filter_level_2 = Objects.objects.filter(level=2).filter(guid_parent = filter_level_1[l1].guid).order_by('name')
                 for l2 in range(len(filter_level_2)):
                     abonents_data = []
                     list_of_level_2 = {"key":u"level2-"+str(l2), "title": filter_level_2[l2].name, "children":abonents_data}
-                    filter_level_abonents = Abonents.objects.filter(guid_objects = filter_level_2[l2].guid)
+                    filter_level_abonents = Abonents.objects.filter(guid_objects = filter_level_2[l2].guid).order_by('name')
                     for l3 in range(len(filter_level_abonents)):
                         meters_data = []
                         cursor = connection.cursor()

@@ -164,6 +164,8 @@ $(function() {
 		{% load staticfiles %} <img  onclick="load_service('service_get_info')" id="change-ico" src="{%static "images/tech3-ico64.png" %}" alt="Информация по объекту">
 		{% load staticfiles %} <img  onclick="load_service('service_balance_load')" id="balance-ico" src="{%static "images/balance2-ico64.png" %}" alt="Загрузка балансных групп">
 		{% load staticfiles %} <img  onclick="load_service('service_load30_page')" id="load30-ico" src="{%static "images/to_db2-ico64.png" %}" alt="Загрузка получасовок">
+		{% load staticfiles %} <img  onclick="load_service('service_user_account')" id="user-ico" src="{%static "images/users-ico64.png" %}" alt="Добавление пользователей ЛК">
+		{% load staticfiles %} <img  onclick="load_service('service_del_meters')" id="del-ico" src="{%static "images/del-ico64.png" %}" alt="Удалёние приборов">
 		<p>
 		<span><strong>Выберите файл &nbsp;</strong></span>
 			<select onchange="change_wb();" name="choice_file" id="choice_file">
