@@ -14144,3 +14144,147 @@ def heat_danfoss_period_report(request):
     
     response['Content-Disposition'] = 'attachment;filename="%s.%s"' % (output_name.replace('"', '\"'), file_ext)    
     return response
+
+def water_consumption_impuls_report(request):
+    response = StringIO.StringIO()
+    wb = Workbook()
+    ws = wb.active
+    
+    obj_title         = request.GET.get('obj_title')
+    electric_data_end   = request.GET.get('electric_data_end')
+    electric_data_start   = request.GET.get('electric_data_start')
+    
+#Шапка
+    ws.merge_cells('A2:G2')
+    ws['A2'] = obj_title+'. Потребление по импульсным водосчётчикам в период с ' + electric_data_start + ' по ' +electric_data_end
+    
+
+    ws['A5'] = 'Абонент'
+    ws['A5'].style = ali_grey
+    
+    ws['B5'] = 'Марка счётчика'
+    ws['B5'].style = ali_grey
+    
+    ws['C5'] = 'Номер счётчика'
+    ws['C5'].style = ali_grey
+    
+    ws['d5'] = 'Тип ресурса'
+    ws['d5'].style = ali_grey
+
+    ws['e5'] = 'Показания на '  + electric_data_start+u', м3'
+    ws['e5'].style = ali_grey
+    
+    ws['f5'] = 'Показания на '  + electric_data_end+u', м3'
+    ws['f5'].style = ali_grey
+    
+    ws['g5'] = 'Потребление, м3'
+    ws['g5'].style = ali_grey
+    
+    ws['h5'] = 'Лицевой номер '
+    ws['h5'].style = ali_grey    
+  
+    
+#Запрашиваем данные для отчета
+    is_abonent_level = re.compile(r'level2')
+    is_object_level_2 = re.compile(r'level1')    
+    obj_parent_title         = request.GET['obj_parent_title']
+    obj_title         = request.GET['obj_title']
+    electric_data_end   = request.GET['electric_data_end']            
+    electric_data_start   = request.GET['electric_data_start']            
+    obj_key             = request.GET['obj_key']    
+    data_table = []
+
+    if request.is_ajax():
+        if request.method == 'GET':
+            request.session["obj_parent_title"]    = obj_parent_title         = request.GET['obj_parent_title']
+            request.session["obj_title"]           = obj_title         = request.GET['obj_title']
+            request.session["electric_data_end"]   = electric_data_end   = request.GET['electric_data_end']
+            request.session["electric_data_end"]   = electric_data_start   = request.GET['electric_data_start']
+            request.session["obj_key"]             = obj_key             = request.GET['obj_key']
+
+    if (bool(is_abonent_level.search(obj_key))): 
+        data_table = common_sql.get_dt_water_impulse_consumption(obj_title, obj_parent_title,electric_data_start, electric_data_end, True)        
+    elif (bool(is_object_level_2.search(obj_key))):
+        data_table = common_sql.get_dt_water_impulse_consumption(obj_title, obj_parent_title,electric_data_start, electric_data_end, False)
+        
+    #zamenyem None na N/D vezde
+    if len(data_table)>0: 
+        data_table=common_sql.ChangeNull(data_table, None)
+        
+# Заполняем отчет значениями
+    for row in range(6, len(data_table)+6):
+        try:
+            ws.cell('A%s'%(row)).value = '%s' % (data_table[row-6][0])  # Абонент
+            ws.cell('A%s'%(row)).style = ali_white
+        except:
+            ws.cell('A%s'%(row)).style = ali_white
+            next
+        
+        try:
+            ws.cell('B%s'%(row)).value = '%s' % (data_table[row-6][1])  # заводской номер
+            ws.cell('B%s'%(row)).style = ali_white
+        except:
+            ws.cell('B%s'%(row)).style = ali_white
+            next
+            
+        try:
+            ws.cell('C%s'%(row)).value = '%s' % (data_table[row-6][2])  # Тип ресурса
+            ws.cell('C%s'%(row)).style = ali_white
+        except:
+            ws.cell('C%s'%(row)).style = ali_white
+            next
+            
+        try:
+            ws.cell('d%s'%(row)).value = '%s' % (data_table[row-6][5])  # 
+            ws.cell('d%s'%(row)).style = ali_white
+        except:
+            ws.cell('d%s'%(row)).style = ali_white
+            next
+            
+        try:
+            ws.cell('e%s'%(row)).value = '%s' % get_val(data_table[row-6][6])  # 
+            ws.cell('e%s'%(row)).style = ali_white
+        except:
+            ws.cell('e%s'%(row)).style = ali_white
+            next
+            
+        try:
+            ws.cell('f%s'%(row)).value = '%s' % get_val(data_table[row-6][7])  # 
+            ws.cell('f%s'%(row)).style = ali_white
+        except:
+            ws.cell('f%s'%(row)).style = ali_white
+            next
+        
+        try:
+            ws.cell('g%s'%(row)).value = '%s' % get_val(data_table[row-6][8])  
+            ws.cell('g%s'%(row)).style = ali_white
+        except:
+            ws.cell('g%s'%(row)).style = ali_white
+            next
+        
+        try:
+            ws.cell('h%s'%(row)).value = '%s' % (data_table[row-6][11])  
+            ws.cell('h%s'%(row)).style = ali_white
+        except:
+            ws.cell('h%s'%(row)).style = ali_white
+            next
+
+
+    ws.row_dimensions[5].height = 41
+    ws.column_dimensions['A'].width = 17 
+    ws.column_dimensions['B'].width = 17 
+    ws.column_dimensions['C'].width = 25
+    ws.column_dimensions['D'].width = 30
+    ws.column_dimensions['E'].width = 18
+    ws.column_dimensions['G'].width = 18
+    ws.column_dimensions['F'].width = 18
+    
+    wb.save(response)
+    response.seek(0)
+    response = HttpResponse(response.read(), content_type="application/vnd.ms-excel")
+    
+    output_name = u'consumption_water_impulse_'+translate(obj_title)+u'_'+electric_data_start+u'-'+electric_data_end
+    file_ext = u'xlsx'
+    
+    response['Content-Disposition'] = 'attachment;filename="%s.%s"' % (output_name.replace('"', '\"'), file_ext)   
+    return response

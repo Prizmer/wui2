@@ -5066,7 +5066,7 @@ order by obj_name, water_abons_report.ab_name, type_energo) z_end
 where z_st.meter_name=z_end.meter_name) z
 order by ab_name, meter_name
     """%( my_param[0], electric_data_start,meters_name,my_param[0], electric_data_end,meters_name)
-      
+    #print sQuery  
     return sQuery
 def MakeSqlQuery_water_period_for_abon(meters_name, parent_name,electric_data_start, electric_data_end, my_param):
     sQuery="""
@@ -11440,21 +11440,188 @@ WHERE
     data_table = cursor.fetchall()
     return data_table 
 
-# def InsertInLinkAbonentsUser(name, guid_abonents,id_user):
-#     result = u''
-    
-#     #print sQuery
-#     try:
-#         cursor = connection.cursor()
-#         sQuery="""
-#         INSERT INTO link_abonents_auth_user(
-#                 guid, name, guid_abonents, id_auth_user)
-#         VALUES ('%s',%s, '%s')
-#         """ %(name, guid_abonents, id_user)
-#         print sQuery
-#         cursor.execute(sQuery)
-#         connection.commit()
-#     except Exception as e:
-#         result += u"Ошибка: "+e.message
-    
-#     return result  
+def get_query_for_obj_water_impulse_consumption(obj_title, obj_parent_title,electric_data_start, electric_data_end):
+    sQuery ="""    
+SELECT  z.ab_name, 
+substring(z.meter_name, 0, strpos(z.meter_name, ',')),
+substring(z.meter_name, strpos(z.meter_name, '№')+1)
+ ,z.date_st, z.meter_name,
+z.type_energo,
+round(z.value_st::numeric,3),
+round(z.value_end::numeric,3),
+round(delta::numeric,3), z.date_install, z.date_end, z.account_2
+From
+(Select z_st.ab_name, z_st.account_2,z_st.date as date_st, z_st.meter_name, z_st.type_energo, z_st.value as value_st,z_end.value as value_end,round(z_end.value::numeric-z_st.value::numeric,3) as delta, z_st.date_install, z_end.date as date_end
+from
+(Select  obj_name as ab_name, account_2,z2.date, water_abons_report.ab_name as meter_name,type_energo, z2.value,date_install
+from water_abons_report
+LEFT JOIN (
+SELECT
+  meters.name,
+  daily_values.date,
+  daily_values.value,
+  abonents.name as ab_name,
+  abonents.guid
+FROM
+  public.meters,
+  public.taken_params,
+  public.daily_values,
+  public.abonents,
+  public.link_abonents_taken_params,
+  params,
+  names_params,
+  resources
+WHERE
+  taken_params.guid_meters = meters.guid AND
+  daily_values.id_taken_params = taken_params.id AND
+  link_abonents_taken_params.guid_taken_params = taken_params.guid AND
+  link_abonents_taken_params.guid_abonents = abonents.guid
+and
+  params.guid=taken_params.guid_params  and
+  names_params.guid=params.guid_names_params and
+  resources.guid=names_params.guid_resources and
+  resources.name='Импульс'
+  and date='%s'
+
+)z2
+on z2.ab_name=water_abons_report.ab_name
+where water_abons_report.name='%s'
+order by obj_name, water_abons_report.ab_name, type_energo) z_st,
+(
+Select  obj_name as ab_name, account_2,z2.date, water_abons_report.ab_name as meter_name,type_energo, z2.value,date_install
+from water_abons_report
+LEFT JOIN (
+SELECT
+  meters.name,
+  daily_values.date,
+  daily_values.value,
+  abonents.name as ab_name,
+  abonents.guid
+FROM
+  public.meters,
+  public.taken_params,
+  public.daily_values,
+  public.abonents,
+  public.link_abonents_taken_params,
+  params,
+  names_params,
+  resources
+WHERE
+  taken_params.guid_meters = meters.guid AND
+  daily_values.id_taken_params = taken_params.id AND
+  link_abonents_taken_params.guid_taken_params = taken_params.guid AND
+  link_abonents_taken_params.guid_abonents = abonents.guid
+and
+  params.guid=taken_params.guid_params  and
+  names_params.guid=params.guid_names_params and
+  resources.guid=names_params.guid_resources and
+  resources.name='Импульс'
+  and date='%s'
+)z2
+on z2.ab_name=water_abons_report.ab_name
+where water_abons_report.name='%s'
+order by obj_name, water_abons_report.ab_name, type_energo) z_end
+where z_st.meter_name=z_end.meter_name) z
+order by ab_name, meter_name
+    """%(electric_data_start, obj_title, electric_data_end, obj_title)
+    #print sQuery
+    return sQuery
+
+def get_query_for_abon_water_impulse_consumption(obj_title, obj_parent_title,electric_data_start, electric_data_end):
+    sQuery = """    
+SELECT  z.ab_name, 
+substring(z.meter_name, 0, strpos(z.meter_name, ',')),
+substring(z.meter_name, strpos(z.meter_name, '№')+1)
+ ,z.date_st, z.meter_name,
+z.type_energo,
+round(z.value_st::numeric,3),
+round(z.value_end::numeric,3),
+round(delta::numeric,3), z.date_install, z.date_end, z.account_2
+From
+(Select z_st.ab_name, z_st.account_2,z_st.date as date_st, z_st.meter_name, z_st.type_energo, z_st.value as value_st,z_end.value as value_end,round(z_end.value::numeric-z_st.value::numeric,3) as delta, z_st.date_install, z_end.date as date_end
+from
+(Select  obj_name as ab_name, account_2,z2.date, water_abons_report.ab_name as meter_name,type_energo, z2.value,date_install
+from water_abons_report
+LEFT JOIN (
+SELECT
+  meters.name,
+  daily_values.date,
+  daily_values.value,
+  abonents.name as ab_name,
+  abonents.guid
+FROM
+  public.meters,
+  public.taken_params,
+  public.daily_values,
+  public.abonents,
+  public.link_abonents_taken_params,
+  params,
+  names_params,
+  resources
+WHERE
+  taken_params.guid_meters = meters.guid AND
+  daily_values.id_taken_params = taken_params.id AND
+  link_abonents_taken_params.guid_taken_params = taken_params.guid AND
+  link_abonents_taken_params.guid_abonents = abonents.guid
+and
+  params.guid=taken_params.guid_params  and
+  names_params.guid=params.guid_names_params and
+  resources.guid=names_params.guid_resources and
+  resources.name='Импульс'
+  and date='%s'
+)z2
+on z2.ab_name=water_abons_report.ab_name
+where water_abons_report.name='%s'
+and water_abons_report.obj_name = '%s'
+order by obj_name, water_abons_report.ab_name, type_energo) z_st,
+(
+Select  obj_name as ab_name, account_2,z2.date, water_abons_report.ab_name as meter_name,type_energo, z2.value,date_install
+from water_abons_report
+LEFT JOIN (
+SELECT
+  meters.name,
+  daily_values.date,
+  daily_values.value,
+  abonents.name as ab_name,
+  abonents.guid
+FROM
+  public.meters,
+  public.taken_params,
+  public.daily_values,
+  public.abonents,
+  public.link_abonents_taken_params,
+  params,
+  names_params,
+  resources
+WHERE
+  taken_params.guid_meters = meters.guid AND
+  daily_values.id_taken_params = taken_params.id AND
+  link_abonents_taken_params.guid_taken_params = taken_params.guid AND
+  link_abonents_taken_params.guid_abonents = abonents.guid
+and
+  params.guid=taken_params.guid_params  and
+  names_params.guid=params.guid_names_params and
+  resources.guid=names_params.guid_resources and
+  resources.name='Импульс'
+  and date='%s'
+)z2
+on z2.ab_name=water_abons_report.ab_name
+where water_abons_report.name='%s'
+and water_abons_report.obj_name = '%s'
+order by obj_name, water_abons_report.ab_name, type_energo) z_end
+where z_st.meter_name=z_end.meter_name) z
+order by ab_name, meter_name
+    """%(electric_data_start, obj_parent_title, obj_title, electric_data_end, obj_parent_title, obj_title)
+    return sQuery
+
+def get_dt_water_impulse_consumption(obj_title, obj_parent_title,electric_data_start, electric_data_end, isAbon):
+    cursor = connection.cursor()
+    data_table=[] 
+    sQuery =u''
+    if isAbon:
+        sQuery =get_query_for_abon_water_impulse_consumption(obj_title, obj_parent_title,electric_data_start, electric_data_end)
+    else:
+        sQuery =get_query_for_obj_water_impulse_consumption(obj_title, obj_parent_title,electric_data_start, electric_data_end)
+    cursor.execute(sQuery)  
+    data_table = cursor.fetchall()
+    return data_table 

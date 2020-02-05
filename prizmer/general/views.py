@@ -13467,6 +13467,43 @@ def water_potreblenie_pulsar_with_graphic(request):
     args['AllData']=AllData
     return render_to_response("data_table/water/79.html", args)
     
+def water_consumption_impuls(request):
+    args= {}
+    is_abonent_level = re.compile(r'level2')
+    is_object_level_2 = re.compile(r'level1')    
+    obj_parent_title         = request.GET['obj_parent_title']
+    obj_title         = request.GET['obj_title']
+    electric_data_end   = request.GET['electric_data_end']            
+    electric_data_start   = request.GET['electric_data_start']            
+    obj_key             = request.GET['obj_key']    
+    data_table = []
+
+    if request.is_ajax():
+        if request.method == 'GET':
+            request.session["obj_parent_title"]    = obj_parent_title         = request.GET['obj_parent_title']
+            request.session["obj_title"]           = obj_title         = request.GET['obj_title']
+            request.session["electric_data_end"]   = electric_data_end   = request.GET['electric_data_end']
+            request.session["electric_data_end"]   = electric_data_start   = request.GET['electric_data_start']
+            request.session["obj_key"]             = obj_key             = request.GET['obj_key']
+
+    if (bool(is_abonent_level.search(obj_key))): 
+        data_table = common_sql.get_dt_water_impulse_consumption(obj_title, obj_parent_title,electric_data_start, electric_data_end, True)        
+    elif (bool(is_object_level_2.search(obj_key))):
+        data_table = common_sql.get_dt_water_impulse_consumption(obj_title, obj_parent_title,electric_data_start, electric_data_end, False)
+        
+    #zamenyem None na N/D vezde
+    if len(data_table)>0: 
+        data_table=common_sql.ChangeNull(data_table, None)
+             
+    args['data_table'] = data_table
+    args['obj_title'] = obj_title
+    args['obj_key'] = obj_key
+    args['obj_parent_title'] = obj_parent_title
+    args['electric_data_start'] = electric_data_start
+    args['electric_data_end'] = electric_data_end
+    return render_to_response("data_table/water/101.html", args)
+
+
 def pulsar_heat_period_with_graphic(request):
     args = {}
     is_abonent_level = re.compile(r'abonent')

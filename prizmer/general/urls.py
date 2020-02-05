@@ -164,6 +164,8 @@ urlpatterns = patterns('',
     url(r'^100/$', views.heat_danfoss_daily), #показания по теплу данфосс -
    #---- Test urls
     url(r'^addnum/$', views.add_numbers),
+
+    url(r'^101/$', views.water_consumption_impuls), # вода, показания за период Импульсные для мантулинской
     
 
    
