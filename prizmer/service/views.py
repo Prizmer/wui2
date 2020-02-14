@@ -3234,12 +3234,12 @@ def create_user(login, u_pass, u_mail, u_last_name, u_name):
             user_new = False
         else:
             #создаём пользователя
-            print login, u_pass, u_mail, u_last_name, u_name
+            #print login, u_pass, u_mail, u_last_name, u_name
             user = User.objects.create_user(password = u_pass, username=login, first_name = u_name, last_name = u_last_name, email = u_mail)
             user.save()
             #print 'new user created:', user
     except Exception as e:
-        result = u"Ошибка.user: "+e.message
+        result = u"Ошибка создания user: "+u_name+' '+e.message
     return result, user, user_new
 
 
@@ -3273,7 +3273,7 @@ def create_link_user_abonent(user, obj, abon):
             result_link += u' Не существует: %s -> %s. '%(obj, abon)
     except Exception as e:
         result_link += u"Ошибка.link: "+e.message
-        print result_link
+        #print result_link
     return result_link, is_new_link
 
 
