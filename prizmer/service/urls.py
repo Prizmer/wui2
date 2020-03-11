@@ -31,7 +31,8 @@ urlpatterns = patterns('',
     url(r'^service_get_info/$', views.get_info), # поменять местами счётчики
     url(r'^get_electric_progruz/$', views.get_electric_progruz), # прогрузочная ведомость в эксель
     url(r'^get_water_progruz/$', views.get_water_progruz), # прогрузочная ведомость в эксель
-    url(r'^/$', views.get_heat_progruz), # прогрузочная ведомость в эксель
+    url(r'^get_water_impulse_progruz/$', views.get_water_impulse_progruz), # прогрузочная ведомость в эксель
+    url(r'^get_heat_progruz/$', views.get_heat_progruz), # прогрузочная ведомость в эксель
     url(r'^load_balance_group/$', views.load_balance_group), # загрузка портов по элетрике
     url(r'^service_balance_load/$', views.service_balance_load), #загрузка формы для прогурзки балансных групп
 

@@ -14288,3 +14288,4 @@ def water_consumption_impuls_report(request):
     
     response['Content-Disposition'] = 'attachment;filename="%s.%s"' % (output_name.replace('"', '\"'), file_ext)   
     return response
+

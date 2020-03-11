@@ -12,6 +12,7 @@ from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.csrf import csrf_exempt
 from openpyxl import Workbook
 from openpyxl import load_workbook
+from openpyxl.styles import Style, PatternFill, Border, Side, Alignment, Font
 import os
 from django.db import connection
 #from general.models import Objects, Abonents, TypesAbonents, Meters, MonthlyValues, DailyValues, CurrentValues, VariousValues, TypesParams, Params, TakenParams, LinkAbonentsTakenParams, Resources, TypesMeters, Measurement, NamesParams, BalanceGroups, LinkMetersComportSettings, LinkMetersTcpipSettings, ComportSettings, TcpipSettings, LinkBalanceGroupsMeters, Groups80020, LinkGroups80020Meters
@@ -22,8 +23,9 @@ from django.db.models import signals
 import datetime
 from django.db.models import Max 
 import uuid
+import StringIO
 
-import common_sql
+import common_sql, AskueReports
 from HTMLParser import HTMLParser
 import io
 import psycopg2
@@ -44,6 +46,12 @@ import logging
 logger=logging.getLogger('service_log') # path in settings.py
 
 from django.contrib.auth.decorators import user_passes_test
+
+ali_grey   = Style(fill=PatternFill(fill_type='solid', start_color='DCDCDC'), border=Border(left=Side(border_style='thin',color='FF000000'), bottom=Side(border_style='thin',color='FF000000'), right=Side(border_style='thin',color='FF000000'), top=Side(border_style='thin',color='FF000000')), alignment = Alignment(horizontal='center', vertical='center', wrap_text=True, shrink_to_fit=True))
+ali_white  = Style(border=Border(left=Side(border_style='thin',color='FF000000'), bottom=Side(border_style='thin',color='FF000000'), right=Side(border_style='thin',color='FF000000'), top=Side(border_style='thin',color='FF000000')), alignment = Alignment(horizontal='center', vertical='center', wrap_text=True, shrink_to_fit=True))
+ali_blue   = Style(fill=PatternFill(fill_type='solid', start_color='E6E6FA'), border=Border(left=Side(border_style='thin',color='FF000000'), bottom=Side(border_style='thin',color='FF000000'), right=Side(border_style='thin',color='FF000000'), top=Side(border_style='thin',color='FF000000')), alignment = Alignment(horizontal='center', vertical='center', wrap_text=True, shrink_to_fit=True))
+ali_pink   = Style(fill=PatternFill(fill_type='solid', start_color='FFF0F5'), border=Border(left=Side(border_style='thin',color='FF000000'), bottom=Side(border_style='thin',color='FF000000'), right=Side(border_style='thin',color='FF000000'), top=Side(border_style='thin',color='FF000000')), alignment = Alignment(horizontal='center', vertical='center', wrap_text=True, shrink_to_fit=True))
+
 
 def isAdmin(user):
     return user.is_staff
@@ -2280,13 +2288,566 @@ def makeNewTakenParamName(nameParam1, old_meter, new_meter, typeMeter):
     
 
 def get_electric_progruz(request):
-    pass
+    response = StringIO.StringIO()
+    wb = Workbook()
+    ws = wb.active
+    
+    obj_title         = request.GET.get('obj_title')
+    electric_data_end   = request.GET.get('electric_data_end')
+    electric_data_start   = request.GET.get('electric_data_start')
+    
+#Шапка
+    ws['A1'] = 'Населенный пункт'
+    ws['B1'] = 'Наименование улицы'
+    ws['C1'] = 'Наименование дома'
+    ws['D1'] = 'Квартира'
+    ws['E1'] = 'Идентификатор АСКУЭ'
+    ws['F1'] = 'Номер лицевого счета'
+    ws['G1'] = 'Номер счётчика заводской'
+    ws['H1'] = 'Номер в сети'
+    ws['I1'] = 'Тип счётчика'
+    ws['J1'] = 'ТТ'
+    ws['K1'] = 'ip adress'
+    ws['L1'] = 'ip port'
+    
+    ws['A1'].style = ali_grey
+    ws['B1'].style = ali_grey
+    ws['C1'].style = ali_grey
+    ws['D1'].style = ali_grey
+    ws['E1'].style = ali_grey
+    ws['F1'].style = ali_grey
+    ws['G1'].style = ali_grey
+    ws['H1'].style = ali_grey
+    ws['I1'].style = ali_grey
+    ws['J1'].style = ali_grey
+    ws['K1'].style = ali_grey
+    ws['L1'].style = ali_grey
+
+#Запрашиваем данные для отчета
+    data_table = common_sql.get_electric_register()        
+   
+        
+# Заполняем отчет значениями
+    for row in range(2, len(data_table)+2):
+        try:
+            ws.cell('A%s'%(row)).value = '%s' % (data_table[row-2][0])  
+            ws.cell('A%s'%(row)).style = ali_white
+        except:
+            ws.cell('A%s'%(row)).style = ali_white
+            next
+        
+        try:
+            ws.cell('B%s'%(row)).value = '%s' % (data_table[row-2][1]) 
+            ws.cell('B%s'%(row)).style = ali_white
+        except:
+            ws.cell('B%s'%(row)).style = ali_white
+            next
+            
+        try:
+            ws.cell('C%s'%(row)).value = '%s' % (data_table[row-2][2])  
+            ws.cell('C%s'%(row)).style = ali_white
+        except:
+            ws.cell('C%s'%(row)).style = ali_white
+            next
+            
+        try:
+            ws.cell('d%s'%(row)).value = '%s' % (data_table[row-2][3])  # 
+            ws.cell('d%s'%(row)).style = ali_white
+        except:
+            ws.cell('d%s'%(row)).style = ali_white
+            next
+            
+        try:
+            ws.cell('e%s'%(row)).value = '%s' % data_table[row-2][4]  # 
+            ws.cell('e%s'%(row)).style = ali_white
+        except:
+            ws.cell('e%s'%(row)).style = ali_white
+            next
+            
+        try:
+            ws.cell('f%s'%(row)).value = '%s' % data_table[row-2][5]  # 
+            ws.cell('f%s'%(row)).style = ali_white
+        except:
+            ws.cell('f%s'%(row)).style = ali_white
+            next
+        
+        try:
+            ws.cell('g%s'%(row)).value = '%s' % data_table[row-2][6]  
+            ws.cell('g%s'%(row)).style = ali_white
+        except:
+            ws.cell('g%s'%(row)).style = ali_white
+            next
+        
+        try:
+            ws.cell('h%s'%(row)).value = '%s' % (data_table[row-2][7])  
+            ws.cell('h%s'%(row)).style = ali_white
+        except:
+            ws.cell('h%s'%(row)).style = ali_white
+            next
+        
+        try:
+            ws.cell('i%s'%(row)).value = '%s' % (data_table[row-2][8])  
+            ws.cell('i%s'%(row)).style = ali_white
+        except:
+            ws.cell('i%s'%(row)).style = ali_white
+            next
+
+        try:
+            ws.cell('j%s'%(row)).value = '%s' % (data_table[row-2][9])  
+            ws.cell('j%s'%(row)).style = ali_white
+        except:
+            ws.cell('j%s'%(row)).style = ali_white
+            next
+
+        try:
+            ws.cell('k%s'%(row)).value = '%s' % (data_table[row-2][10])  
+            ws.cell('k%s'%(row)).style = ali_white
+        except:
+            ws.cell('k%s'%(row)).style = ali_white
+            next
+
+        try:
+            ws.cell('l%s'%(row)).value = '%s' % (data_table[row-2][11])  
+            ws.cell('l%s'%(row)).style = ali_white
+        except:
+            ws.cell('l%s'%(row)).style = ali_white
+            next
+
+    #ws.row_dimensions[5].height = 41
+    ws.column_dimensions['A'].width = 15 
+    ws.column_dimensions['B'].width = 30 
+    ws.column_dimensions['C'].width = 20
+    ws.column_dimensions['D'].width = 30
+    ws.column_dimensions['E'].width = 10
+    ws.column_dimensions['G'].width = 18
+    ws.column_dimensions['K'].width = 18
+    ws.column_dimensions['L'].width = 10
+    
+    wb.save(response)
+    response.seek(0)
+    now = datetime.datetime.now()
+    electric_data_end = now.strftime("%d-%m-%Y %H:%M")
+    response = HttpResponse(response.read(), content_type="application/vnd.ms-excel")    
+    output_name = u'electric_register-'+electric_data_end
+    file_ext = u'xlsx'    
+    response['Content-Disposition'] = 'attachment;filename="%s.%s"' % (output_name.replace('"', '\"'), file_ext)   
+    return response
 
 def get_water_progruz(request):
-    pass
+    response = StringIO.StringIO()
+    wb = Workbook()
+    ws = wb.active
+    
+    obj_title         = request.GET.get('obj_title')
+    electric_data_end   = request.GET.get('electric_data_end')
+    electric_data_start   = request.GET.get('electric_data_start')
+    
+#Шапка
+    ws['A1'] = 'Населенный пункт'
+    ws['B1'] = 'Наименование улицы'
+    ws['C1'] = 'Наименование дома'
+    ws['D1'] = 'Квартира'
+    ws['E1'] = 'Идентификатор АСКУЭ'
+    ws['F1'] = 'Номер лицевого счета'
+    ws['G1'] = 'Номер счётчика заводской'
+    ws['H1'] = 'Номер в сети'
+    ws['I1'] = 'Тип счётчика'
+    ws['J1'] = 'ТТ'
+    ws['K1'] = 'ip adress'
+    ws['L1'] = 'ip port'
+    
+    ws['A1'].style = ali_grey
+    ws['B1'].style = ali_grey
+    ws['C1'].style = ali_grey
+    ws['D1'].style = ali_grey
+    ws['E1'].style = ali_grey
+    ws['F1'].style = ali_grey
+    ws['G1'].style = ali_grey
+    ws['H1'].style = ali_grey
+    ws['I1'].style = ali_grey
+    ws['J1'].style = ali_grey
+    ws['K1'].style = ali_grey
+    ws['L1'].style = ali_grey
+
+#Запрашиваем данные для отчета
+    data_table = common_sql.get_water_register()        
+   
+        
+# Заполняем отчет значениями
+    for row in range(2, len(data_table)+2):
+        try:
+            ws.cell('A%s'%(row)).value = '%s' % (data_table[row-2][0])  
+            ws.cell('A%s'%(row)).style = ali_white
+        except:
+            ws.cell('A%s'%(row)).style = ali_white
+            next
+        
+        try:
+            ws.cell('B%s'%(row)).value = '%s' % (data_table[row-2][1]) 
+            ws.cell('B%s'%(row)).style = ali_white
+        except:
+            ws.cell('B%s'%(row)).style = ali_white
+            next
+            
+        try:
+            ws.cell('C%s'%(row)).value = '%s' % (data_table[row-2][2])  
+            ws.cell('C%s'%(row)).style = ali_white
+        except:
+            ws.cell('C%s'%(row)).style = ali_white
+            next
+            
+        try:
+            ws.cell('d%s'%(row)).value = '%s' % (data_table[row-2][3])  # 
+            ws.cell('d%s'%(row)).style = ali_white
+        except:
+            ws.cell('d%s'%(row)).style = ali_white
+            next
+            
+        try:
+            ws.cell('e%s'%(row)).value = '%s' % data_table[row-2][4]  # 
+            ws.cell('e%s'%(row)).style = ali_white
+        except:
+            ws.cell('e%s'%(row)).style = ali_white
+            next
+            
+        try:
+            ws.cell('f%s'%(row)).value = '%s' % data_table[row-2][5]  # 
+            ws.cell('f%s'%(row)).style = ali_white
+        except:
+            ws.cell('f%s'%(row)).style = ali_white
+            next
+        
+        try:
+            ws.cell('g%s'%(row)).value = '%s' % data_table[row-2][6]  
+            ws.cell('g%s'%(row)).style = ali_white
+        except:
+            ws.cell('g%s'%(row)).style = ali_white
+            next
+        
+        try:
+            ws.cell('h%s'%(row)).value = '%s' % (data_table[row-2][7])  
+            ws.cell('h%s'%(row)).style = ali_white
+        except:
+            ws.cell('h%s'%(row)).style = ali_white
+            next
+        
+        try:
+            ws.cell('i%s'%(row)).value = '%s' % (data_table[row-2][8])  
+            ws.cell('i%s'%(row)).style = ali_white
+        except:
+            ws.cell('i%s'%(row)).style = ali_white
+            next
+
+        try:
+            ws.cell('j%s'%(row)).value = '%s' % (data_table[row-2][9])  
+            ws.cell('j%s'%(row)).style = ali_white
+        except:
+            ws.cell('j%s'%(row)).style = ali_white
+            next
+
+        try:
+            ws.cell('k%s'%(row)).value = '%s' % (data_table[row-2][10])  
+            ws.cell('k%s'%(row)).style = ali_white
+        except:
+            ws.cell('k%s'%(row)).style = ali_white
+            next
+
+        try:
+            ws.cell('l%s'%(row)).value = '%s' % (data_table[row-2][11])  
+            ws.cell('l%s'%(row)).style = ali_white
+        except:
+            ws.cell('l%s'%(row)).style = ali_white
+            next
+
+    #ws.row_dimensions[5].height = 41
+    ws.column_dimensions['A'].width = 15 
+    ws.column_dimensions['B'].width = 30 
+    ws.column_dimensions['C'].width = 20
+    ws.column_dimensions['D'].width = 30
+    ws.column_dimensions['E'].width = 10
+    ws.column_dimensions['G'].width = 18
+    ws.column_dimensions['K'].width = 18
+    ws.column_dimensions['L'].width = 10
+    ws.column_dimensions['I'].width = 15
+    
+    wb.save(response)
+    response.seek(0)
+    now = datetime.datetime.now()
+    electric_data_end = now.strftime("%d-%m-%Y %H:%M")
+    response = HttpResponse(response.read(), content_type="application/vnd.ms-excel")    
+    output_name = u'water_register-'+electric_data_end
+    file_ext = u'xlsx'    
+    response['Content-Disposition'] = 'attachment;filename="%s.%s"' % (output_name.replace('"', '\"'), file_ext)   
+    return response
+
+def get_water_impulse_progruz(request):
+    response = StringIO.StringIO()
+    wb = Workbook()
+    ws = wb.active
+    
+    obj_title         = request.GET.get('obj_title')
+    electric_data_end   = request.GET.get('electric_data_end')
+    electric_data_start   = request.GET.get('electric_data_start')
+    
+#Шапка
+    ws['A1'] = 'Импульсные приборы'
+    ws['A2'] = 'Наименование дома'
+    ws['B2'] = 'Объект'
+    ws['C2'] = 'Счётчик'
+    ws['D2'] = 'Регистратор'
+    ws['E2'] = 'Канал'
+    ws['F2'] = 'Номер Пульсара'
+    ws['G2'] = 'Тип Пульсара'
+    ws['H2'] = 'IP'
+    ws['I2'] = 'Порт'
+
+    
+    ws['A2'].style = ali_grey
+    ws['B2'].style = ali_grey
+    ws['C2'].style = ali_grey
+    ws['D2'].style = ali_grey
+    ws['E2'].style = ali_grey
+    ws['F2'].style = ali_grey
+    ws['G2'].style = ali_grey
+    ws['H2'].style = ali_grey
+    ws['I2'].style = ali_grey
+
+#Запрашиваем данные для отчета
+    data_table = common_sql.get_water_impulse_register()        
+   
+        
+# Заполняем отчет значениями
+    for row in range(3, len(data_table)+2):
+        try:
+            ws.cell('A%s'%(row)).value = '%s' % (data_table[row-3][0])  
+            ws.cell('A%s'%(row)).style = ali_white
+        except:
+            ws.cell('A%s'%(row)).style = ali_white
+            next
+        
+        try:
+            ws.cell('B%s'%(row)).value = '%s' % (data_table[row-3][1]) 
+            ws.cell('B%s'%(row)).style = ali_white
+        except:
+            ws.cell('B%s'%(row)).style = ali_white
+            next
+            
+        try:
+            ws.cell('C%s'%(row)).value = '%s' % (data_table[row-3][2])  
+            ws.cell('C%s'%(row)).style = ali_white
+        except:
+            ws.cell('C%s'%(row)).style = ali_white
+            next
+            
+        try:
+            ws.cell('d%s'%(row)).value = '%s' % (data_table[row-3][3])  # 
+            ws.cell('d%s'%(row)).style = ali_white
+        except:
+            ws.cell('d%s'%(row)).style = ali_white
+            next
+            
+        try:
+            ws.cell('e%s'%(row)).value = '%s' % data_table[row-3][4]  # 
+            ws.cell('e%s'%(row)).style = ali_white
+        except:
+            ws.cell('e%s'%(row)).style = ali_white
+            next
+            
+        try:
+            ws.cell('f%s'%(row)).value = '%s' % data_table[row-3][5]  # 
+            ws.cell('f%s'%(row)).style = ali_white
+        except:
+            ws.cell('f%s'%(row)).style = ali_white
+            next
+        
+        try:
+            ws.cell('g%s'%(row)).value = '%s' % data_table[row-3][6]  
+            ws.cell('g%s'%(row)).style = ali_white
+        except:
+            ws.cell('g%s'%(row)).style = ali_white
+            next
+        
+        try:
+            ws.cell('h%s'%(row)).value = '%s' % (data_table[row-3][7])  
+            ws.cell('h%s'%(row)).style = ali_white
+        except:
+            ws.cell('h%s'%(row)).style = ali_white
+            next
+        
+        try:
+            ws.cell('i%s'%(row)).value = '%s' % (data_table[row-3][8])  
+            ws.cell('i%s'%(row)).style = ali_white
+        except:
+            ws.cell('i%s'%(row)).style = ali_white
+            next
+
+
+    #ws.row_dimensions[5].height = 41
+    ws.column_dimensions['A'].width = 30 
+    ws.column_dimensions['B'].width = 30 
+    ws.column_dimensions['C'].width = 20
+    ws.column_dimensions['D'].width = 30
+    ws.column_dimensions['E'].width = 10
+    ws.column_dimensions['G'].width = 18
+    ws.column_dimensions['F'].width = 18
+    ws.column_dimensions['H'].width = 20
+    
+    wb.save(response)
+    response.seek(0)
+    now = datetime.datetime.now()
+    electric_data_end = now.strftime("%d-%m-%Y %H:%M")
+    response = HttpResponse(response.read(), content_type="application/vnd.ms-excel")    
+    output_name = u'water_impulse_register-'+electric_data_end
+    file_ext = u'xlsx'    
+    response['Content-Disposition'] = 'attachment;filename="%s.%s"' % (output_name.replace('"', '\"'), file_ext)   
+    return response
 
 def get_heat_progruz(request):
-    pass
+    response = StringIO.StringIO()
+    wb = Workbook()
+    ws = wb.active
+    
+    obj_title         = request.GET.get('obj_title')
+    electric_data_end   = request.GET.get('electric_data_end')
+    electric_data_start   = request.GET.get('electric_data_start')
+    
+#Шапка
+    ws['A1'] = 'Населенный пункт'
+    ws['B1'] = 'Наименование улицы'
+    ws['C1'] = 'Наименование дома'
+    ws['D1'] = 'Квартира'
+    ws['E1'] = 'Идентификатор АСКУЭ'
+    ws['F1'] = 'Номер лицевого счета'
+    ws['G1'] = 'Номер счётчика заводской'
+    ws['H1'] = 'Номер в сети'
+    ws['I1'] = 'Тип счётчика'
+    ws['J1'] = 'ТТ'
+    ws['K1'] = 'ip adress'
+    ws['L1'] = 'ip port'
+    
+    ws['A1'].style = ali_grey
+    ws['B1'].style = ali_grey
+    ws['C1'].style = ali_grey
+    ws['D1'].style = ali_grey
+    ws['E1'].style = ali_grey
+    ws['F1'].style = ali_grey
+    ws['G1'].style = ali_grey
+    ws['H1'].style = ali_grey
+    ws['I1'].style = ali_grey
+    ws['J1'].style = ali_grey
+    ws['K1'].style = ali_grey
+    ws['L1'].style = ali_grey
+
+#Запрашиваем данные для отчета
+    data_table = common_sql.get_heat_register()        
+   
+        
+# Заполняем отчет значениями
+    for row in range(2, len(data_table)+2):
+        try:
+            ws.cell('A%s'%(row)).value = '%s' % (data_table[row-2][0])  
+            ws.cell('A%s'%(row)).style = ali_white
+        except:
+            ws.cell('A%s'%(row)).style = ali_white
+            next
+        
+        try:
+            ws.cell('B%s'%(row)).value = '%s' % (data_table[row-2][1]) 
+            ws.cell('B%s'%(row)).style = ali_white
+        except:
+            ws.cell('B%s'%(row)).style = ali_white
+            next
+            
+        try:
+            ws.cell('C%s'%(row)).value = '%s' % (data_table[row-2][2])  
+            ws.cell('C%s'%(row)).style = ali_white
+        except:
+            ws.cell('C%s'%(row)).style = ali_white
+            next
+            
+        try:
+            ws.cell('d%s'%(row)).value = '%s' % (data_table[row-2][3])  # 
+            ws.cell('d%s'%(row)).style = ali_white
+        except:
+            ws.cell('d%s'%(row)).style = ali_white
+            next
+            
+        try:
+            ws.cell('e%s'%(row)).value = '%s' % data_table[row-2][4]  # 
+            ws.cell('e%s'%(row)).style = ali_white
+        except:
+            ws.cell('e%s'%(row)).style = ali_white
+            next
+            
+        try:
+            ws.cell('f%s'%(row)).value = '%s' % data_table[row-2][5]  # 
+            ws.cell('f%s'%(row)).style = ali_white
+        except:
+            ws.cell('f%s'%(row)).style = ali_white
+            next
+        
+        try:
+            ws.cell('g%s'%(row)).value = '%s' % data_table[row-2][6]  
+            ws.cell('g%s'%(row)).style = ali_white
+        except:
+            ws.cell('g%s'%(row)).style = ali_white
+            next
+        
+        try:
+            ws.cell('h%s'%(row)).value = '%s' % (data_table[row-2][7])  
+            ws.cell('h%s'%(row)).style = ali_white
+        except:
+            ws.cell('h%s'%(row)).style = ali_white
+            next
+        
+        try:
+            ws.cell('i%s'%(row)).value = '%s' % (data_table[row-2][8])  
+            ws.cell('i%s'%(row)).style = ali_white
+        except:
+            ws.cell('i%s'%(row)).style = ali_white
+            next
+
+        try:
+            ws.cell('j%s'%(row)).value = '%s' % (data_table[row-2][9])  
+            ws.cell('j%s'%(row)).style = ali_white
+        except:
+            ws.cell('j%s'%(row)).style = ali_white
+            next
+
+        try:
+            ws.cell('k%s'%(row)).value = '%s' % (data_table[row-2][10])  
+            ws.cell('k%s'%(row)).style = ali_white
+        except:
+            ws.cell('k%s'%(row)).style = ali_white
+            next
+
+        try:
+            ws.cell('l%s'%(row)).value = '%s' % (data_table[row-2][11])  
+            ws.cell('l%s'%(row)).style = ali_white
+        except:
+            ws.cell('l%s'%(row)).style = ali_white
+            next
+
+    #ws.row_dimensions[5].height = 41
+    ws.column_dimensions['A'].width = 15 
+    ws.column_dimensions['B'].width = 30 
+    ws.column_dimensions['C'].width = 20
+    ws.column_dimensions['D'].width = 30
+    ws.column_dimensions['E'].width = 10
+    ws.column_dimensions['G'].width = 18
+    ws.column_dimensions['K'].width = 18
+    ws.column_dimensions['L'].width = 10
+    ws.column_dimensions['I'].width = 20
+
+    wb.save(response)
+    response.seek(0)
+    now = datetime.datetime.now()
+    electric_data_end = now.strftime("%d-%m-%Y %H:%M")
+    response = HttpResponse(response.read(), content_type="application/vnd.ms-excel")    
+    output_name = u'heat_register-'+electric_data_end
+    file_ext = u'xlsx'    
+    response['Content-Disposition'] = 'attachment;filename="%s.%s"' % (output_name.replace('"', '\"'), file_ext)   
+    return response
 
 def get_info(request):    
     args={}   

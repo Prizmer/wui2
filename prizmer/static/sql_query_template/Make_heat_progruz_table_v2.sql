@@ -36,7 +36,7 @@ WHERE
   names_params.guid_resources = resources.guid AND
   link_meters_tcpip_settings.guid_meters = meters.guid AND
   link_meters_tcpip_settings.guid_tcpip_settings = tcpip_settings.guid
-  and (resources.name = 'ХВС'or  resources.name = 'ГВС')
+  and resources.name = 'Тепло'
   group by 
 parent_objects_for_progruz.obj_name2, 
   parent_objects_for_progruz.obj_name1, 
@@ -58,4 +58,5 @@ parent_objects_for_progruz.obj_name2,
   parent_objects_for_progruz.obj_name0, 
   tcpip_settings.ip_address, 
   tcpip_settings.ip_port, 
+    meters.address, 
   parent_objects_for_progruz.ab_name

@@ -4,10 +4,10 @@
   parent_objects_for_progruz.obj_name0,  
   abonents.name, 
   ''::text as askue,
-  ''::text as lic_num, 
+  CASE When meters.name like '%М-200%' then  meters.password else ''::text end as lic_num, 
   meters.factory_number_manual, 
   meters.address, 
-  types_meters.name,
+  replace(types_meters.name, 'Меркурий ','М-'),
   link_abonents_taken_params.coefficient, 
   tcpip_settings.ip_address, 
   tcpip_settings.ip_port
@@ -36,7 +36,7 @@ WHERE
   names_params.guid_resources = resources.guid AND
   link_meters_tcpip_settings.guid_meters = meters.guid AND
   link_meters_tcpip_settings.guid_tcpip_settings = tcpip_settings.guid
-  and (resources.name = 'ХВС'or  resources.name = 'ГВС')
+  and resources.name = 'Электричество'
   group by 
 parent_objects_for_progruz.obj_name2, 
   parent_objects_for_progruz.obj_name1, 
@@ -58,4 +58,5 @@ parent_objects_for_progruz.obj_name2,
   parent_objects_for_progruz.obj_name0, 
   tcpip_settings.ip_address, 
   tcpip_settings.ip_port, 
+    meters.address, 
   parent_objects_for_progruz.ab_name

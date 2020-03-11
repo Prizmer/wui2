@@ -1,14 +1,11 @@
 ﻿SELECT 
-  parent_objects_for_progruz.obj_name2, 
   parent_objects_for_progruz.obj_name1, 
   parent_objects_for_progruz.obj_name0,  
   abonents.name, 
-  ''::text as askue,
-  ''::text as lic_num, 
-  meters.factory_number_manual, 
+  meters.factory_number_manual||'('||types_meters.name||')' as reg, 
   meters.address, 
   types_meters.name,
-  link_abonents_taken_params.coefficient, 
+  params.param_address,
   tcpip_settings.ip_address, 
   tcpip_settings.ip_port
  
@@ -36,7 +33,7 @@ WHERE
   names_params.guid_resources = resources.guid AND
   link_meters_tcpip_settings.guid_meters = meters.guid AND
   link_meters_tcpip_settings.guid_tcpip_settings = tcpip_settings.guid
-  and (resources.name = 'ХВС'or  resources.name = 'ГВС')
+  and (resources.name = 'Импульс')
   group by 
 parent_objects_for_progruz.obj_name2, 
   parent_objects_for_progruz.obj_name1, 
@@ -52,10 +49,13 @@ parent_objects_for_progruz.obj_name2,
   tcpip_settings.ip_port, 
   meters.password,
   meters.name,
-  types_meters.name
-  order by parent_objects_for_progruz.obj_name2, 
-  parent_objects_for_progruz.obj_name1, 
-  parent_objects_for_progruz.obj_name0, 
+  types_meters.name,
+ params.param_address
+  order by 
+  parent_objects_for_progruz.obj_name1,
+  meters.factory_number_manual, 
+  params.param_address,
   tcpip_settings.ip_address, 
-  tcpip_settings.ip_port, 
-  parent_objects_for_progruz.ab_name
+  tcpip_settings.ip_port
+ 
+ 
