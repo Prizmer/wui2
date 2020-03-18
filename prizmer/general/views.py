@@ -12945,7 +12945,7 @@ def electric_potreblenie_3_zones_v3(request):
     is_electric_delta = u'1'
     electric_data_start = u''
     electric_data_end = u''
-    
+    data_table_graphic = []
     dates = None
     is_electric_period = None
     if request.is_ajax():
@@ -12962,7 +12962,7 @@ def electric_potreblenie_3_zones_v3(request):
             request.session["is_electric_period"]  = is_electric_period  = request.GET['is_electric_period']
             
             res='Электричество'
-            data_table_graphic = []
+            
             if (is_electric_monthly=="1"):
                 dm='monthly'
             else:

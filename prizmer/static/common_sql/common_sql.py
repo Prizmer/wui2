@@ -1558,6 +1558,16 @@ z1.ktt,z1.ktn,z1.a
                         resources.name='%s' and
                  objects.name = '%s' AND                      
                         monthly_values.date = '%s' 
+                         group by 
+                        daily_values.date,
+                        objects.name ,
+                        abonents.name ,
+                        meters.factory_number_manual,
+                        daily_values.value ,
+                        names_params.name ,
+                        link_abonents_taken_params.coefficient ,
+                         link_abonents_taken_params.coefficient_2 ,
+                          link_abonents_taken_params.coefficient_3
                         ) z1                  
 group by z1.name_objects, z1.monthly_date, z1.name_objects, z1.name_abonents, z1.number_manual, z1.ktt,z1.ktn,z1.a
 ) z2
@@ -1635,6 +1645,18 @@ z1.ktn, z1.ktt, z1.a
                         abonents.name = '%s' AND 
                         objects.name = '%s' AND                      
                         daily_values.date between '%s' and '%s'
+                         group by
+                    daily_values.date,
+                        daily_values.id_taken_params,
+                        objects.name ,
+                        abonents.name ,
+                        meters.factory_number_manual,
+                        daily_values.value ,
+                        names_params.name ,
+                        link_abonents_taken_params.coefficient ,
+                         link_abonents_taken_params.coefficient_2 ,
+                          link_abonents_taken_params.coefficient_3,
+                          resources.name
                         ) z1                      
 group by z1.name_objects, z1.daily_date, z1.name_objects, z1.name_abonents, z1.number_manual, z1.ktn, z1.ktt, z1.a 
 ) z2
@@ -1786,6 +1808,18 @@ sum(Case when z1.params_name = '%s' then z1.value_daily  end) as t3
                         
                         objects.name = '%s' AND
                         daily_values.date between '%s' and '%s'
+                         group by
+                    daily_values.date,
+                        daily_values.id_taken_params,
+                        objects.name ,
+                        abonents.name ,
+                        meters.factory_number_manual,
+                        daily_values.value ,
+                        names_params.name ,
+                        link_abonents_taken_params.coefficient ,
+                         link_abonents_taken_params.coefficient_2 ,
+                          link_abonents_taken_params.coefficient_3,
+                          resources.name
                         ) z1
 group by z1.name_objects, z1.daily_date, z1.name_objects
 ) z2
@@ -1922,6 +1956,18 @@ sum(Case when z1.params_name = '%s' then z1.value else null end) as t0R
                                   abonents.name='%s' and
                                   daily_values.date = '%s' AND 
                                   resources.name = '%s'
+                                   group by 
+                         daily_values.date,
+                        daily_values.id_taken_params,
+                        objects.name ,
+                        abonents.name ,
+                        meters.factory_number_manual,
+                        daily_values.value ,
+                        names_params.name ,
+                        link_abonents_taken_params.coefficient ,
+                         link_abonents_taken_params.coefficient_2 ,
+                          link_abonents_taken_params.coefficient_3,
+                          resources.name
                                   ) z1                       
                       group by z1.name, z1.date, z1.name_objects, z1.name, z1.num_manual, z1.name_res, z1.ktt, z1.ktn, z1.a
                       order by z1.name) z2
@@ -1973,6 +2019,18 @@ SELECT
                                   abonents.name='%s' and
                                   daily_values.date = '%s' AND 
                                   resources.name = '%s'
+                                   group by 
+                         daily_values.date,
+                        daily_values.id_taken_params,
+                        objects.name ,
+                        abonents.name ,
+                        meters.factory_number_manual,
+                        daily_values.value ,
+                        names_params.name ,
+                        link_abonents_taken_params.coefficient ,
+                         link_abonents_taken_params.coefficient_2 ,
+                          link_abonents_taken_params.coefficient_3,
+                          resources.name
                                   ) z1                       
                       group by z1.name, z1.date, z1.name_objects, z1.name, z1.num_manual, z1.name_res
                       order by z1.name) z2
@@ -1980,7 +2038,8 @@ on electric_abons.factory_number_manual=z2.num_manual
 where electric_abons.obj_name='%s') z3
 where z3.ab_name=z4.ab_name and z3.ab_name='%s' and z3.factory_number_manual=z4.factory_number_manual """ % (params[0],params[1],params[2],params[3], params[4], params[5],  obj_parent_title, obj_title, date_end, res, obj_parent_title, 
                             params[0],params[1],params[2],params[3], params[4], params[5],obj_parent_title, obj_title, date_start, res,obj_parent_title, obj_title)
-    #print sQuery
+    #
+    # print sQuery
     if dm=='monthly' or dm=='daily' or dm=='current':
         sQuery=sQuery.replace('daily',dm)    
     return sQuery
@@ -2041,6 +2100,18 @@ SELECT
                                   objects.name = '%s' AND 
                                   daily_values.date = '%s' AND 
                                   resources.name = '%s'
+                                   group by 
+                         daily_values.date,
+                        daily_values.id_taken_params,
+                        objects.name ,
+                        abonents.name ,
+                        meters.factory_number_manual,
+                        daily_values.value ,
+                        names_params.name ,
+                        link_abonents_taken_params.coefficient ,
+                         link_abonents_taken_params.coefficient_2 ,
+                          link_abonents_taken_params.coefficient_3,
+                          resources.name
                                   ) z1                       
                       group by z1.name, z1.date, z1.name_objects, z1.name, z1.num_manual, z1.name_res, z1.ktt, z1.ktn,z1.a
                       order by z1.name) z2
@@ -2092,6 +2163,18 @@ SELECT
                                   objects.name = '%s' AND 
                                   daily_values.date = '%s' AND 
                                   resources.name = '%s'
+                                   group by 
+                         daily_values.date,
+                        daily_values.id_taken_params,
+                        objects.name ,
+                        abonents.name ,
+                        meters.factory_number_manual,
+                        daily_values.value ,
+                        names_params.name ,
+                        link_abonents_taken_params.coefficient ,
+                         link_abonents_taken_params.coefficient_2 ,
+                          link_abonents_taken_params.coefficient_3,
+                          resources.name
                                   ) z1                       
                       group by z1.name, z1.date, z1.name_objects, z1.name, z1.num_manual, z1.name_res
                       order by z1.name) z2
@@ -2193,6 +2276,19 @@ SELECT
                                   balance_groups.name = '%s' AND 
                                   daily_values.date = '%s' AND 
                                   resources.name = '%s'
+                                  group by 
+                         daily_values.date,
+                        daily_values.id_taken_params,
+                        objects.name ,
+                        abonents.name ,
+                        meters.factory_number_manual,
+                        daily_values.value ,
+                        names_params.name ,
+                        link_abonents_taken_params.coefficient ,
+                         link_abonents_taken_params.coefficient_2 ,
+                          link_abonents_taken_params.coefficient_3,
+                          resources.name,
+                           balance_groups.name
                                   ) z1                       
                       group by z1.name, z1.date, z1.name_objects, z1.name, z1.num_manual, z1.name_res, z1.ktt, z1.ktn, z1.group_name
                       order by z1.name) z2
@@ -2248,6 +2344,19 @@ SELECT
                                   balance_groups.name = '%s' AND 
                                   daily_values.date = '%s' AND 
                                   resources.name = '%s'
+                                  group by 
+                         daily_values.date,
+                        daily_values.id_taken_params,
+                        objects.name ,
+                        abonents.name ,
+                        meters.factory_number_manual,
+                        daily_values.value ,
+                        names_params.name ,
+                        link_abonents_taken_params.coefficient ,
+                         link_abonents_taken_params.coefficient_2 ,
+                          link_abonents_taken_params.coefficient_3,
+                          resources.name,
+                           balance_groups.name
                                   ) z1                       
                       group by z1.name, z1.date, z1.name_objects, z1.name, z1.num_manual, z1.name_res, z1.group_name
                       order by z1.name) z2
@@ -2746,7 +2855,17 @@ z1.ktn, z1.ktt, z1.a
                         names_params.guid_resources=resources.guid and
                         resources.name='Электричество' and
                  abonents.name = '%s' AND objects.name = '%s' AND                      
-                        daily_values.date = '%s' 
+                        daily_values.date = '%s'
+                         group by 
+                        daily_values.date,
+                        objects.name ,
+                        abonents.name ,
+                        meters.factory_number_manual,
+                        daily_values.value ,
+                        names_params.name ,
+                        link_abonents_taken_params.coefficient ,
+                         link_abonents_taken_params.coefficient_2 ,
+                          link_abonents_taken_params.coefficient_3 
                         ) z1                      
 group by z1.name_objects, z1.daily_date, z1.name_objects, z1.name_abonents, z1.number_manual, z1.ktn, z1.ktt, z1.a 
 ) z2
@@ -2805,7 +2924,17 @@ z1.ktt,z1.ktn,z1.a
                         names_params.guid_resources=resources.guid and
                         resources.name='%s' and
                  objects.name = '%s' AND                      
-                        monthly_values.date = '%s' 
+                        monthly_values.date = '%s'
+                         group by 
+                        daily_values.date,
+                        objects.name ,
+                        abonents.name ,
+                        meters.factory_number_manual,
+                        daily_values.value ,
+                        names_params.name ,
+                        link_abonents_taken_params.coefficient ,
+                         link_abonents_taken_params.coefficient_2 ,
+                          link_abonents_taken_params.coefficient_3 
                         ) z1                        
                       
 group by z1.name_objects, z1.monthly_date, z1.name_objects, z1.name_abonents, z1.number_manual, z1.ktt,z1.ktn,z1.a
