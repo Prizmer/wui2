@@ -28,7 +28,7 @@ urlpatterns = patterns('',
     
     url(r'^service_change_electric/$', views.change_meters_v2), # замена одного счётчика на другой
     url(r'^service_replace_electric/$', views.replace_electric_meters_v2), # поменять местами счётчики
-    url(r'^service_get_info/$', views.get_info), # поменять местами счётчики
+    url(r'^service_get_info/$', views.get_info), # 
     url(r'^get_electric_progruz/$', views.get_electric_progruz), # прогрузочная ведомость в эксель
     url(r'^get_water_progruz/$', views.get_water_progruz), # прогрузочная ведомость в эксель
     url(r'^get_water_impulse_progruz/$', views.get_water_impulse_progruz), # прогрузочная ведомость в эксель
@@ -36,7 +36,7 @@ urlpatterns = patterns('',
     url(r'^load_balance_group/$', views.load_balance_group), # загрузка портов по элетрике
     url(r'^service_balance_load/$', views.service_balance_load), #загрузка формы для прогурзки балансных групп
 
-    url(r'^add_current_taken_params_pulsar16m/$', views.add_current_taken_params_pulsar16m), #загрузка формы для прогзузки балансных групп
+    url(r'^add_current_taken_params_pulsar16m/$', views.add_current_taken_params_pulsar16m), #загрузка формы для прогрузки балансных групп
     url(r'^get_electric_template/$', views.get_electric_template), #возвращает excel форму образец для прогрузочной ведомости
     url(r'^get_heat_template/$', views.get_heat_template), #возвращает excel форму образец для прогрузочной ведомости
     url(r'^get_water_digital_template/$', views.get_water_digital_template), #возвращает excel форму образец для прогрузочной ведомости

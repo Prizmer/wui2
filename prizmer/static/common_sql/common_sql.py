@@ -10049,6 +10049,8 @@ def update_table_with_replace(table, update_field, where_field, where_value, old
    SET %s=replace(%s, '%s', '%s')
  WHERE %s='%s'
   """%(table, update_field, update_field, old_value, new_value, where_field, where_value)
+  #print sQuery
+  #print '_________________________________'
   cursor.execute(sQuery)
   #connection.commit()
   cursor.close()

@@ -3453,14 +3453,7 @@ def ReplaceMeters_v2(meter1, meter2):
     
     #сделать запрос на update с replace в link_abonents_taken_params
     # надо менять привязку к абоненту и имя привязки
-#   abonents.guid, 
-#   abonents.name, 
-#   link_abonents_taken_params.guid, 
-#   link_abonents_taken_params.name,  
-#   meters.guid, 
-#   meters.name,
-#   taken_params.guid,
-#   taken_params.name
+
     dt_link1 = common_sql.get_link_abonents_taken_params_by_meter_guid(guid_meter1)
     dt_link2 = common_sql.get_link_abonents_taken_params_by_meter_guid(guid_meter2)
     
@@ -3468,14 +3461,17 @@ def ReplaceMeters_v2(meter1, meter2):
     guid_abonent2 = dt_link2[0][0]
     
     for row in dt_link1:
-        common_sql.update_table_with_replace('link_abonents_taken_params', 'name', 'guid', row[2], meter1, meter2)
-        common_sql.update_table_with_replace('link_abonents_taken_params', 'guid_abonents', 'guid', row[2], guid_abonent1, guid_abonent2)
-        common_sql.update_table_with_replace('taken_params', 'name', 'guid', row[6], meter1, meter2)
-
-    for row in dt_link2:
+        #print 'row[2], meter1, meter2', row[2], meter1, meter2
         common_sql.update_table_with_replace('link_abonents_taken_params', 'name', 'guid', row[2], meter2, meter1)
-        common_sql.update_table_with_replace('link_abonents_taken_params', 'guid_abonents', 'guid', row[2], guid_abonent2, guid_abonent1)
+        #print row[2], guid_abonent1, guid_abonent2
+        common_sql.update_table_with_replace('link_abonents_taken_params', 'guid_abonents', 'guid', row[2], guid_abonent1, guid_abonent2)
+        #print 'taken_params', 'name', 'guid', row[6], meter1, meter2
         common_sql.update_table_with_replace('taken_params', 'name', 'guid', row[6], meter2, meter1)
+       
+    for row in dt_link2:
+        common_sql.update_table_with_replace('link_abonents_taken_params', 'name', 'guid', row[2], meter1, meter2)
+        common_sql.update_table_with_replace('link_abonents_taken_params', 'guid_abonents', 'guid', row[2], guid_abonent2, guid_abonent1)
+        common_sql.update_table_with_replace('taken_params', 'name', 'guid', row[6], meter1, meter2)
     
     result = result + u' Привязки счётчиков успешно изменены '
     return result
