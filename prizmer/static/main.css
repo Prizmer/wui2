@@ -223,21 +223,36 @@ margin-left: 30px;
 border:1px solid black;
 font-size: small;
 padding: 3px;
+
 }
 
 .table_vertical
 {
 	table-layout: fixed;
-	width:100%;
+	width:98%;    
+    
 }
 .th_vertical
 {
 	/* transform-origin: 100% 0;  */
 	transform:rotate(-90deg);
-	height:300px;
-	width:20px;
+	height:200px;
+	width:15px;
 	white-space: nowrap;
-	padding:3px;
+	padding:0px;
+	text-align:left;
+    font-size: small;
+
+
+}
+
+.th_first
+{
+	/* transform-origin: 100% 0;  */
+    transform:rotate(0deg);
+	width:30px;
+	white-space: nowrap;
+	padding:10px;
 	padding-top:0;
 	text-align:left;
 
@@ -246,6 +261,55 @@ padding: 3px;
 .td_vertical
 {
 	width:20px;
+    padding-top:0;
+    padding-bottom:0;
+}
+
+.td_white
+{
+    background: ghostwhite;
+    width:35px;
+    padding-top:0;
+    padding-bottom:0;
+}
+.td_green
+{
+    background: #5cb85c;
+    padding:1px;
+    padding-top:0;
+    padding-bottom:0;
+}
+.td_red
+{
+    background: #cf5d59; /* #d9534f; */
+    padding:1px;
+    padding-top:0;
+    padding-bottom:0;
+}
+.td_yellow
+{
+    background: #ffcc00;
+    padding:1px;
+    padding-top:0;
+    padding-bottom:0;
+}
+.td_else
+{
+    background: #428bca;
+    padding:1px;
+    padding-top:0;
+    padding-bottom:0;
+}
+.td_selected
+{
+    background: ghostwhite;
+    border: 3px solid lightgrey;
+}
+
+.div_scroll
+{
+    width:100%;
+    overflow: auto;
 }
 
 .th_hvs
