@@ -27,12 +27,26 @@
     <p>	
 	<p>
 	<div class="meters_change_block">
+			<span><strong>Загрузка данных для отчёта по форме 80020 &nbsp;</strong></span>
+        <span onclick="load_service('load_80020_group')" class="button" id="counter_load_button">Загрузить</span> 
+        &nbsp; 
+        {% for value in 80020_status %}
+            <br> {{value}} 
+        {% endfor %}
+
+    </div>
+    <p>	
+	<p>
+	<div class="meters_change_block">
 	<p>
 	&nbsp; &nbsp;&nbsp;&nbsp; <a class="button" href ="../../service/get_electric_template/"> Образец прогрузочного файла по электрике </a></span>
 	<p>
 	&nbsp; &nbsp;&nbsp;&nbsp; <a class="button" href ="../../service/get_heat_template/"> Образец прогрузочного файла по теплу </a></span>
 	<p>
 	&nbsp; &nbsp;&nbsp;&nbsp; <a class="button" href ="../../service/get_water_digital_template/"> Образец прогрузочного файла по воде </a></span>
+	<p>
+    <p>
+	&nbsp; &nbsp;&nbsp;&nbsp; <a class="button" href ="../../service/get_80020_template/"> Образец прогрузочного файла для отчёта по форме 80020 </a></span>
 	<p>
 	</div>
 </form>

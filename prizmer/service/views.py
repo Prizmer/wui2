@@ -16,7 +16,7 @@ from openpyxl.styles import Style, PatternFill, Border, Side, Alignment, Font
 import os
 from django.db import connection
 #from general.models import Objects, Abonents, TypesAbonents, Meters, MonthlyValues, DailyValues, CurrentValues, VariousValues, TypesParams, Params, TakenParams, LinkAbonentsTakenParams, Resources, TypesMeters, Measurement, NamesParams, BalanceGroups, LinkMetersComportSettings, LinkMetersTcpipSettings, ComportSettings, TcpipSettings, LinkBalanceGroupsMeters, Groups80020, LinkGroups80020Meters
-from general.models import  Objects, Abonents, TcpipSettings, TypesAbonents, Meters, TypesMeters,LinkAbonentsTakenParams,LinkMetersComportSettings, LinkMetersTcpipSettings, ComportSettings,  TakenParams,Params, LinkAbonentsAuthUser
+from general.models import  Objects, Abonents, TcpipSettings, TypesAbonents, Meters, TypesMeters,LinkAbonentsTakenParams,LinkMetersComportSettings, LinkMetersTcpipSettings, ComportSettings,  TakenParams,Params, LinkAbonentsAuthUser, Groups80020, LinkGroups80020Meters
 from django.db.models.signals import pre_save
 from django.db.models.signals import post_save
 from django.db.models import signals
@@ -344,8 +344,7 @@ def GetSimpleTable(table,fieldName1,value1, fieldName2=u'', value2=u''):
             Select *
             from %s
             where %s.%s='%s'
-            and %s.%s='%s' """%(table, table, fieldName1, value1, fieldName2, value2)
-
+            and %s.%s='%s' """%(table, table, fieldName1, value1, table, fieldName2, value2)
     #print sQuery
     cursor.execute(sQuery)
     dt = cursor.fetchall()
@@ -3881,3 +3880,91 @@ def load_users_account(sPath, sheet):
 def service_del_meters(request):
     args ={}
     return render_to_response("service/service_del_meters.html", args)
+
+def get_80020_template(request):
+    #return get_file('.xlsx')
+    pass
+
+def load_80020_group(request):
+    args={}
+    fileName=""
+    sheet    = ""
+    result = []
+    #writeToLog('test1') 
+    try:    
+        if request.is_ajax():
+            if request.method == 'GET':            
+                request.session["choice_file"]    = fileName    = request.GET['choice_file']
+                request.session["choice_sheet"]    = sheet    = request.GET['choice_sheet']
+
+                directory=os.path.join(BASE_DIR,'static/cfg/')
+                sPath=directory+fileName
+                writeToLog(sPath)
+                            
+                result = make_80020_report(sPath, sheet)
+    except Exception as e:
+        result.append( u"Ошибка "+e.message)
+    print result
+    args["choice_file"]  = fileName
+    args["choice_sheet"] = sheet
+    args["80020_status"] = result
+    return render_to_response("service/service_electric.html", args)
+
+def make_80020_report(sPath, sSheet):
+    global cfg_excel_name
+    cfg_excel_name=sPath
+    global cfg_sheet_name
+    cfg_sheet_name = sSheet
+    result = []
+    dtAll=GetTableFromExcel(sPath,sSheet) #получили из excel все строки до первой пустой строки (проверка по колонке А)
+    i = 0
+    for row in dtAll:
+        i+=1
+        if i<3: continue
+        group_name = unicode(row[0])
+        contract_number = unicode(row[1])
+        measuringpoint_code = unicode(row[2])
+        measuringpoint_name = unicode(row[3])
+        meter_number = unicode(row[4])
+        inn_sender = unicode(row[5])
+        name_sender = unicode(row[6])
+        area_inn = unicode(row[7])
+        abonent_name = unicode(row[8])
+        
+        guid_groups_80020 = u''
+        dt = common_sql.get_80020_group_by_name(group_name)
+        if len(dt) > 0:
+            #проверяем данные по группе, если она уже существует
+            #SELECT guid, name, name_sender, inn_sender, name_postavshik, inn_postavshik, dogovor_number
+            guid_groups_80020 = dt[0][0]           
+            if name_sender != unicode(dt[0][2]): result.append(u'Группа ''%s'' уже существует. Строка %s: Не совпадает название организации.'%(group_name,unicode(i)) )
+            if inn_sender != unicode(dt[0][3]): result.append( u' Группа ''%s'' уже существует. Строка %s: Не совпадает ИНН организации.'%(group_name,unicode(i)) )          
+            if area_inn != unicode(dt[0][5]): result.append(u' Группа ''%s'' уже существует. Строка %s: Не совпадает Идентификатор предоставляемый АТС.'%(group_name,unicode(i))  )          
+            if abonent_name!= unicode(dt[0][4]): result.append(u' Группа ''%s'' уже существует. Строка %s: Не совпадает название организации-поставщика.'%(group_name,unicode(i)) )
+            if contract_number.strip() != unicode(dt[0][6]).strip(): result.append( u' Группа ''%s'' уже существует. Строка %s: Не совпадает номер договора.'%(group_name,unicode(i)) )
+            
+        else:
+            #создаём новую группу
+            #Groups80020, LinkGroups80020Meters
+            group = Groups80020(name = group_name, name_sender = name_sender, inn_sender=inn_sender, name_postavshik=abonent_name, inn_postavshik=area_inn, dogovor_number=contract_number)
+            group.save()
+            guid_groups_80020 = group.guid #Objects.objects.get(guid=guid_parent)
+            result.append( u'Содана группа %s .'%(group_name) )
+        #проверяем существует ли счётчик
+        is_meter_exist = SimpleCheckIfExist('meters','factory_number_manual', meter_number, table2='', fieldName2='', value2='')
+        if is_meter_exist:
+            #проверяем есть ли уже связь счётчика с этой группой
+            #dt = GetSimpleCrossTable('groups_80020',fieldName1,value1,table2,fieldName2, value2):
+            guid_meter = Meters.objects.get(factory_number_manual = meter_number).guid
+            filter_groups = LinkGroups80020Meters.objects.filter(guid_groups_80020 = guid_groups_80020).filter(guid_meters = guid_meter)
+            if filter_groups.count() > 0:
+                continue
+            else:
+                #создаём связь
+                link = LinkGroups80020Meters(measuringpoint_code = measuringpoint_code, measuringpoint_name = measuringpoint_name, guid_groups_80020 = Groups80020.objects.get(guid= guid_groups_80020), guid_meters = Meters.objects.get(guid = guid_meter))
+                link.save()
+                result.append(u' Счётчик %s добавлен к группе ''%s''. '%(meter_number, group_name) )
+        else:
+            result.append( u' Строка %s: Прибора с номером %s не существует в БД, он не был добавлен к группе.'%(unicode(i),meter_number) )
+            
+    return result

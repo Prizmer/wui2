@@ -33,8 +33,8 @@ urlpatterns = patterns('',
     url(r'^get_water_progruz/$', views.get_water_progruz), # прогрузочная ведомость в эксель
     url(r'^get_water_impulse_progruz/$', views.get_water_impulse_progruz), # прогрузочная ведомость в эксель
     url(r'^get_heat_progruz/$', views.get_heat_progruz), # прогрузочная ведомость в эксель
-    url(r'^load_balance_group/$', views.load_balance_group), # загрузка портов по элетрике
-    url(r'^service_balance_load/$', views.service_balance_load), #загрузка формы для прогурзки балансных групп
+    url(r'^load_balance_group/$', views.load_balance_group), # загрузка портов по электрике
+    url(r'^service_balance_load/$', views.service_balance_load), #загрузка формы для прогрузки балансных групп
 
     url(r'^add_current_taken_params_pulsar16m/$', views.add_current_taken_params_pulsar16m), #загрузка формы для прогрузки балансных групп
     url(r'^get_electric_template/$', views.get_electric_template), #возвращает excel форму образец для прогрузочной ведомости
@@ -44,10 +44,14 @@ urlpatterns = patterns('',
     url(r'^get_balance_template/$', views.get_balance_template), #возвращает excel форму образец для прогрузочной ведомости
     
     url(r'^service_load30_page/$', views.service_load30_page), # загрузка страницы
-    url(r'^service_load30/$', views.service_load30), # загрузка самих получасовок в базу
+    url(r'^service_load30/$', views.service_load30), # загрузка получасовок в базу из html
 
     url(r'^service_user_account/$', views.service_user_account), # страница для добавления пользователей личного кабинета
-    url(r'^load_user_account/$', views.load_user_account), # добавление аккаунтов пользвоателей личного кабинета
+    url(r'^load_user_account/$', views.load_user_account), # добавление аккаунтов пользователей личного кабинета
     url(r'^get_users_account_template/$', views.get_users_account_template), #возвращает excel форму образец для прогрузочной ведомости get_users_account_template
-    url(r'^service_del_meters/$', views.service_del_meters), # удаление приборов через прогурзочную ведомость
+    url(r'^service_del_meters/$', views.service_del_meters), # удаление приборов через прогрузочную ведомость
+
+    url(r'^load_80020_group/$', views.load_80020_group), # удаление приборов через прогрузочную ведомость
+    url(r'^get_80020_template/$', views.get_80020_template), #возвращает excel форму образец для прогрузочной ведомости
+    
 )

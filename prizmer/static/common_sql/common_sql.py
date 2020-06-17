@@ -12028,3 +12028,15 @@ parent_objects_for_progruz.obj_name2,
     cursor.execute(sQuery)  
     data_table = cursor.fetchall()
     return data_table 
+
+def get_80020_group_by_name(group_name):
+    cursor = connection.cursor()
+    data_table=[] 
+    sQuery = """
+      SELECT guid, name, name_sender, inn_sender, name_postavshik, inn_postavshik, dogovor_number
+      FROM groups_80020
+      WHERE name = '%s'
+    """%(group_name)
+    cursor.execute(sQuery)  
+    data_table = cursor.fetchall()
+    return data_table
