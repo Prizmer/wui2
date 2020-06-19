@@ -1,5 +1,83 @@
 <script src="/static/liHighLight_30_min.js" type=text/javascript></script>
+<script>
 
+/*Для отчёта 80020*/
+function set_color(){
+var tbl = document.getElementsByName("dt_2");
+if (tbl !== null)
+{
+    var el = tbl[0].getElementsByTagName("td");
+    if (el !== null)
+    {
+        for (var i = 0; i < el.length; i++) {
+          if (el[i].className == "col_date") {
+             el[i].className += " " + "td_white";
+          }
+          else if (parseInt(el[i].innerHTML, 10) == 48) {
+            el[i].className += " " + "td_green";
+          }
+          else if(parseInt(el[i].innerHTML, 10) < 1) {
+                el[i].className += " " + "td_red";
+                 }
+          else if ((parseInt(el[i].innerHTML, 10) > 1) && (parseInt(el[i].innerHTML, 10) < 48) ) {
+                    el[i].className += " " + "td_yellow";
+                  }
+          else { el[i].className += " " + "td_else";}
+        }
+    }
+var el = tbl[0].getElementsByTagName("th");
+/*особый вид для первой колонки*/
+if (el !== null)
+    {
+    for (var i = 0; i < el.length; i++) {
+      if (el[i].innerHTML == "Дата  ") {
+         el[i].className += " " + "th_first";
+      }
+     }
+    }
+}}
+
+function set_title(){
+var tbl = document.getElementsByName("dt_2");
+if (tbl !== null)
+{
+    var el_td = tbl[0].getElementsByTagName("td");
+    var el_th = tbl[0].getElementsByTagName("th");
+    var c = el_th.length;
+    var n_row = 1;
+    var j = 0;
+    if (el_td !== null)
+        {        
+        for (var i = 0; i < el_td.length; i++) {            
+            if (i < c){
+                j = i;               
+                }
+            else
+            {                     
+                j = i - c*n_row;    
+                if ((j+1) == c) {  n_row += 1;}                               
+            }
+            if (el_td[i].innerHTML != "Дата  ") {
+                    el_td[i].setAttribute("title", el_td[i].getAttribute("title") +"  " +el_th[j].innerHTML);
+            }
+           
+        }
+}
+}
+}
+
+/*выделение ячейки*/
+function onm(td)
+{
+td.style.border="2px solid #f9f9f9";
+}
+
+function outm(td)
+{
+td.style.border="1px solid black";
+}
+
+</script>
 
 <span>Отчёт по форме 80020</span>
 <br>
@@ -260,82 +338,4 @@
 <br>
 <br>
 <br>
-<script>
 
-/*Для отчёта 80020*/
-function set_color(){
-var tbl = document.getElementsByName("dt_2");
-if (tbl !== null)
-{
-    var el = tbl[0].getElementsByTagName("td");
-    if (el !== null)
-    {
-        for (var i = 0; i < el.length; i++) {
-          if (el[i].className == "col_date") {
-             el[i].className += " " + "td_white";
-          }
-          else if (parseInt(el[i].innerHTML, 10) == 48) {
-            el[i].className += " " + "td_green";
-          }
-          else if(parseInt(el[i].innerHTML, 10) < 1) {
-                el[i].className += " " + "td_red";
-                 }
-          else if ((parseInt(el[i].innerHTML, 10) > 1) && (parseInt(el[i].innerHTML, 10) < 48) ) {
-                    el[i].className += " " + "td_yellow";
-                  }
-          else { el[i].className += " " + "td_else";}
-        }
-    }
-var el = tbl[0].getElementsByTagName("th");
-/*особый вид для первой колонки*/
-if (el !== null)
-    {
-    for (var i = 0; i < el.length; i++) {
-      if (el[i].innerHTML == "Дата  ") {
-         el[i].className += " " + "th_first";
-      }
-     }
-    }
-}}
-
-function set_title(){
-var tbl = document.getElementsByName("dt_2");
-if (tbl !== null)
-{
-    var el_td = tbl[0].getElementsByTagName("td");
-    var el_th = tbl[0].getElementsByTagName("th");
-    var c = el_th.length;
-    var n_row = 1;
-    var j = 0;
-    if (el_td !== null)
-        {        
-        for (var i = 0; i < el_td.length; i++) {            
-            if (i < c){
-                j = i;               
-                }
-            else
-            {                     
-                j = i - c*n_row;    
-                if ((j+1) == c) {  n_row += 1;}                               
-            }
-            if (el_td[i].innerHTML != "Дата  ") {
-                    el_td[i].setAttribute("title", el_td[i].getAttribute("title") +"  " +el_th[j].innerHTML);
-            }
-           
-        }
-}
-}
-}
-
-/*выделение ячейки*/
-function onm(td)
-{
-td.style.border="2px solid #f9f9f9";
-}
-
-function outm(td)
-{
-td.style.border="1px solid black";
-}
-
-</script>

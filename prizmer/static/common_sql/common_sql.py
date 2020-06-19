@@ -1559,11 +1559,11 @@ z1.ktt,z1.ktn,z1.a
                  objects.name = '%s' AND                      
                         monthly_values.date = '%s' 
                          group by 
-                        daily_values.date,
+                        monthly_values.date,
                         objects.name ,
                         abonents.name ,
                         meters.factory_number_manual,
-                        daily_values.value ,
+                        monthly_values.value ,
                         names_params.name ,
                         link_abonents_taken_params.coefficient ,
                          link_abonents_taken_params.coefficient_2 ,
@@ -1575,11 +1575,11 @@ on electric_abons_2.factory_number_manual=z2.number_manual
 where electric_abons_2.obj_name='%s'
 ORDER BY electric_abons_2.ab_name ASC;
 """%(params[0],params[1],params[2],params[3], res,obj_title, electric_data, obj_title)
-    
+    #print sQuery
     if dm=='monthly' or dm=='daily' or dm=='current':
         sQuery=sQuery.replace('monthly',dm)
-        #print sQuery
-        return sQuery
+        
+        return sQuery    
     else: return """Select 'Н/Д'"""
     
 

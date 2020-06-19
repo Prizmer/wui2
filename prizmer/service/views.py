@@ -488,10 +488,10 @@ def load_electric_objects(request):
     try:    
         if request.is_ajax():
             if request.method == 'GET':            
-                request.session["choice_file"]    = fileName    = request.GET['choice_file']
-                request.session["choice_sheet"]    = sheet    = request.GET['choice_sheet']
-                request.session["tcp_ip_status"]    = tcp_ip_status    = request.GET['tcp_ip_status']
-                request.session["object_status"]    = object_status    = request.GET['object_status']
+                request.session["choice_file"]       = fileName    = request.GET['choice_file']
+                request.session["choice_sheet"]      = sheet    = request.GET['choice_sheet']
+                request.session["tcp_ip_status"]     = tcp_ip_status    = request.GET['tcp_ip_status']
+                request.session["object_status"]     = object_status    = request.GET['object_status']
                 request.session["counter_status"]    = counter_status    = request.GET['counter_status']
                 
                 directory=os.path.join(BASE_DIR,'static/cfg/')
@@ -512,9 +512,9 @@ def load_electric_objects(request):
 
 def LoadElectricMeters(sPath, sSheet):
     global cfg_excel_name
-    cfg_excel_name=sPath
+    cfg_excel_name = sPath
     global cfg_sheet_name
-    cfg_sheet_name=sSheet
+    cfg_sheet_name = sSheet
     result=u"Счётчики не загружены"
     #print type(sPath), sPath, type(sSheet), sSheet
     dtAll=GetTableFromExcel(sPath,sSheet) #получили из excel все строки до первой пустой строки (проверка по колонке А)
@@ -523,21 +523,30 @@ def LoadElectricMeters(sPath, sSheet):
     for i in range(1,len(dtAll)):
         #writeToLog(u'Обрабатываем строку ' + unicode(dtAll[i][3])+' - '+unicode(dtAll[i][6]))
         #print unicode(dtAll[i][3]), unicode(dtAll[i][6])
-        obj_l2=unicode(dtAll[i][2]) #корпус
-        abon=unicode(dtAll[i][3]) #квартира
-        meter=unicode(dtAll[i][6]) #номер счётчика
-        adr=unicode(dtAll[i][7]) #номер в сети
-        type_meter=unicode(dtAll[i][8]) #тип счётчика
-        NumLic=unicode(dtAll[i][5]) #номер лицевого счёта, тут используется как пароль для м-230-ум
-        Group=unicode(dtAll[i][12])
-        attr1=unicode(dtAll[i][13])
-        attr2=unicode(dtAll[i][14])
+        obj_l2=unicode(dtAll[i][2]).strip() #корпус
+        abon=unicode(dtAll[i][3]).strip()  #квартира
+        meter=unicode(dtAll[i][6]).strip()  #номер счётчика
+        adr=unicode(dtAll[i][7]).strip()  #номер в сети
+        type_meter=unicode(dtAll[i][8]).strip()  #тип счётчика
+        NumLic=unicode(dtAll[i][5]).strip()  #номер лицевого счёта, тут используется как пароль для м-230-ум
+        Group=unicode(dtAll[i][12]).strip() 
+        attr1=unicode(dtAll[i][13]).strip() 
+        attr2=unicode(dtAll[i][14]).strip() 
         isNewMeter=SimpleCheckIfExist('meters','factory_number_manual',meter,"","","")
-        isNewAbon=SimpleCheckIfExist('objects','name', obj_l2,'abonents', 'name', abon)        
-        
+        isNewAbon=SimpleCheckIfExist('objects','name', obj_l2,'abonents', 'name', abon)
+        isR = False
+        isHalfs = False
+        print 'attr1, attr2', meter, attr1, attr2
+        #if ((attr1 == u'да') or (attr1 == u'Да') or (attr1 == u'ДА') or (attr2 == u'1')):
+        if (attr1 == u'+'):
+            isR = True        
+        #if ((attr2 == u'да') or (attr2 == u'Да') or (attr2 == u'ДА') or (attr2 == u'1')):
+        if (attr2 == u'+'):
+            isHalfs = True
+        print 'attr1, attr2', meter, isR, isHalfs
         #writeToLog( u'счётчик существует ', isNewMeter)
         if not (isNewAbon):
-            return u"Сначала создайте стурктуру объектов и абонентов"
+            return u"Сначала создайте структуру объектов и абонентов"
         if not (isNewMeter):
             if unicode(type_meter) == u'М-200':
                 add_meter = Meters(name = unicode(type_meter) + u' ' + unicode(meter), address = unicode(adr), factory_number_manual = unicode(meter), guid_types_meters = TypesMeters.objects.get(guid = u"6224d20b-1781-4c39-8799-b1446b60774d") )
@@ -561,8 +570,7 @@ def LoadElectricMeters(sPath, sSheet):
             elif unicode(type_meter) == u'СПГ762-1':
                 add_meter = Meters(name = unicode(type_meter) + u' ' + unicode(meter), address = unicode(adr), factory_number_manual = unicode(meter), guid_types_meters = TypesMeters.objects.get(guid = u"c3ec5c22-d184-41c5-b6bf-66fa30215a41") )
                 add_meter.save()
-                writeToLog(u'Device added' + ' --->   ' + u'СПГ762-1')
-                
+                writeToLog(u'Device added' + ' --->   ' + u'СПГ762-1')                
             elif unicode(type_meter) == u'СПГ762-2':
                 add_meter = Meters(name=unicode(type_meter) + u' ' + unicode(meter), address = unicode(adr), factory_number_manual = unicode(meter), guid_types_meters = TypesMeters.objects.get(guid = u"5eb7dd59-faf9-4ead-8654-4f3de74de2b0") )
                 add_meter.save()
@@ -617,6 +625,13 @@ def LoadElectricMeters(sPath, sSheet):
             else:
                 writeToLog(u'Не найдено совпадение с существующим типом прибора')
                 met-=1
+            
+            #Если экземпляр был создан, то добавляем считываемые параметры
+            try:
+                add_taken_param_no_signals(instance = add_meter, isR = isR, isHalfs = isHalfs)
+            except Exception as e:
+                return None
+            
             met+=1
             
     result=u" Загружено счётчиков "+str(met)
@@ -633,6 +648,7 @@ def load_electric_counters(request):
     sheet    = ""
     tcp_ip_status    = ""
     object_status    = ""
+    counter_status = ""
     result=""
     try:
         if request.is_ajax():
@@ -1675,7 +1691,7 @@ def add_taken_param(sender, instance, created, **kwargs): # Добавляем �
         pass
         #print u'Тип счётчика не определен'
         
-signals.post_save.disconnect(add_taken_param, sender=Meters)
+#signals.post_save.disconnect(add_taken_param, sender=Meters)
 signals.post_save.disconnect(add_link_meter, sender=Meters) 
 signals.post_save.disconnect(add_link_taken_params, sender=TakenParams)  
         
@@ -1683,18 +1699,854 @@ if (isService):
     #print 'signals ON'
     signals.post_save.connect(add_link_taken_params, sender=TakenParams)
     signals.post_save.connect(add_link_meter, sender=Meters)
-    signals.post_save.connect(add_taken_param, sender=Meters)
+    #signals.post_save.connect(add_taken_param, sender=Meters)
 else:
     signals.post_save.disconnect(add_link_meter, sender=Meters)
-    signals.post_save.disconnect(add_taken_param, sender=Meters)
+    #signals.post_save.disconnect(add_taken_param, sender=Meters)
     signals.post_save.disconnect(add_link_taken_params, sender=TakenParams)
 
 
+
+def add_taken_param_no_signals(instance, isR, isHalfs): # Добавляем считываемые параметры при создании счётчика
+    if instance.guid_types_meters.name == u'Меркурий 230':
+        #Добавляем параметры для Меркурия 230
+    # T0 A+
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"bdcd1268-37f3-4579-a9d9-5becb2ba8aa3")) # A+ T0 месячные
+        add_param.save()
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"99cd6002-f81c-4ad6-9cb0-53a92a498519")) # A+ T0 суточные
+        add_param.save()
+        #add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"e8c20ce7-bdb6-4ea6-8401-cee28049a7d7")) # A+ T0 текущие
+        #add_param.save()
+    # T0 R+
+        if isR:
+            add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"2ebc02e6-65c6-40ab-b717-0d98d66b5701")) # R+ T0 месячные
+            add_param.save()
+            add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"345a24a4-95b7-4f67-b004-716706ed2560")) # R+ T0 суточные
+            add_param.save()
+            # add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"4c93dd55-1ec2-48c7-9865-9ceab580b7b3")) # R+ T0 текущие
+            # add_param.save()
+        
+    # T1 A+
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"17789c36-4593-4ff2-94eb-1d0cebdb5366")) # A+ T1 месячные
+        add_param.save()
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"d262c71a-6da4-4ec0-a9c3-b9ea659c246d")) # A+ T1 суточные
+        add_param.save()
+    # T2 A+
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"c31297be-220b-4971-8642-6b614aa7ecee")) # A+ T2 месячные
+        add_param.save()
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"37011b85-c8af-4f6c-857d-4b93a95d31e1")) # A+ T2 суточные
+        add_param.save()
+    # T3 A+
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"79741ba9-e8b8-4352-862e-17a9c4d928ce")) # A+ T3 месячные
+        add_param.save()
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"c3bb9033-ffcb-4a28-91e2-6b45924b8858")) # A+ T3 суточные
+        add_param.save()
+    
+    #Код ошибки
+        # add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"7175f6c7-b816-40f6-86f4-e08a309c08f6")) # код ошибки
+        # add_param.save()
+
+    # Ток
+        #add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"aee312b0-adb1-4be9-9879-b3a3598f9b29")) # Ia текущее
+        #add_param.save()
+        #add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"7ed0d364-e790-4325-a927-9ef86a685f00")) # Ib текущее
+        #add_param.save()
+        #add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"474b0809-482a-4851-9a96-4587f8c59152")) # Ic текущее
+        #add_param.save()
+    # Напряжение
+        #add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"c06f7315-abc6-4889-97ad-201a936c8f2c")) # Ua текущее
+        #add_param.save()
+        #add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"632f76fb-4dd9-4e7d-86a0-a57a27fc648a")) # Ub текущее
+        #add_param.save()
+        #add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"1a3ca6ca-8866-4aad-8712-d9df003fe692")) # Uc текущее
+        #add_param.save()
+    # Мощность
+        #add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"3077b3ac-fde2-4435-9e6f-17464310c090")) # P Активная мощность
+        #add_param.save()
+        #add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"e7617c95-7e42-4cfa-9acd-5bc119261c6d")) # Q Реактивная мощность
+        #add_param.save()
+    #Получасовки
+        if isHalfs:
+            add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"6af9ddce-437a-4e07-bd70-6cf9dcc10b31")) # A+ 30-мин. срез мощности
+            add_param.save()
+            add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"66e997c0-8128-40a7-ae65-7e8993fbea61")) # R+ 30-мин. срез мощности
+            add_param.save()
+    
+    elif instance.guid_types_meters.name == u'Пульсар 16M':
+    # Суточные
+      # Канал 1
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"fc4a9568-4674-4a80-b497-e4f34399acd5"))
+        add_param.save()
+      # Канал 2
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"9e6e308f-abec-4b47-9b99-9cb590c55d0c"))
+        add_param.save()
+      # Канал 3
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"e6815dd5-fbbc-480f-8b95-025d7f9a0403"))
+        add_param.save()
+      # Канал 4
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"612d2f20-d454-4e14-910b-1fd89bbb31dd"))
+        add_param.save()
+      # Канал 5
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"d82c7576-8e5e-4e93-ae10-58459b31e4a0"))
+        add_param.save()
+      # Канал 6
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"6ccc7efb-d9fe-4285-b343-8ed22d2d3625"))
+        add_param.save()
+      # Канал 7
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"72567365-9a40-4f97-ab25-0911585035bf"))
+        add_param.save()
+      # Канал 8
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"9203f5ed-d5da-4462-91d1-5aea42e99124"))
+        add_param.save()
+      # Канал 9
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"e4068568-d8c4-42ab-9957-7292753e2891"))
+        add_param.save()
+      # Канал 10
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"9b5ab67b-40aa-4536-8b7c-340a773ab31b"))
+        add_param.save()
+      # Канал 11
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"4fd440c4-9ec5-4ab9-a073-6c4d3a174777"))
+        add_param.save()
+      # Канал 12
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"00b7f7c5-37f3-494a-8ceb-5a62f9ebf4e3"))
+        add_param.save()
+      # Канал 13
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"169a79e0-da6f-4091-9fc7-ab81adc0d7e0"))
+        add_param.save()
+      # Канал 14
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"17e9c8fe-0d69-4466-b64e-185452c61555"))
+        add_param.save()
+      # Канал 15
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"25de493d-c680-4ca6-ac02-b778022ee151"))
+        add_param.save()
+      # Канал 16
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"908e88f0-f9a0-421d-bbe7-9bafdf5d2565"))
+        add_param.save() 
+  
+    # Текущие
+      # Канал 1
+       # add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"e3f1325e-3018-40ba-b94a-ab6d6ac093e9"))
+       # add_param.save()
+      # Канал 2
+        #add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"5a6b0338-c15d-4224-a04f-a10fc73c5fc7"))
+        #add_param.save()
+      # Канал 3
+        #add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"48a42afe-d9ac-4180-a733-6dd5f9d9ca80"))
+        #add_param.save()
+      # Канал 4
+        #add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"01a5419c-c701-4185-95b6-457b8c9ca2d0"))
+        #add_param.save()
+      # Канал 5
+        #add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"85c4295e-bc6a-46ec-9866-0bf9f77c6904"))
+        #add_param.save()
+      # Канал 6
+        #add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"68270d0a-5043-4ea2-9b61-4adaa298abad"))
+        #add_param.save()
+      # Канал 7
+        #add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"cd489c4b-6e74-4c65-bfee-c0fa78a853bf"))
+        #add_param.save()
+      # Канал 8
+        #add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"f29062a4-ab60-4117-8f85-0cdec634c797"))
+        #add_param.save()
+      # Канал 9
+        #add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"e8521cd7-2f38-4619-935d-8fe86234dbe7"))
+        #add_param.save()
+      # Канал 10
+        #add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"1349b747-41ca-4ba8-a690-69c649129f44"))
+        #add_param.save()
+      # Канал 11
+        #add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"99ab1a30-fde8-4b81-9f9e-2f731516ce1b"))
+        #add_param.save()
+      # Канал 12
+        #add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"c7f6a397-833d-4020-9d2b-38c19bec272c"))
+        #add_param.save()
+      # Канал 13
+        #add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"4413bffb-1832-4900-9351-5ac3666dd8b0"))
+        #add_param.save()
+      # Канал 14
+        #add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"6280490b-123d-4e27-bef9-19fd7dc2cf54"))
+        #add_param.save()
+      # Канал 15
+        #add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"93891c5a-1c8f-4906-b7f0-961dc8ad3c9f"))
+        #add_param.save()
+      # Канал 16
+        #add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"22dd3a17-a828-44e0-80d9-db075ba120ae"))
+        #add_param.save()
+
+    elif instance.guid_types_meters.name == u'Пульсар 10M':
+        #Добавляем параметры для Пульсар10
+    # Суточные
+      # Канал 1
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"325ec164-9428-4a57-867c-33d4eaf8cc2a"))
+        add_param.save()
+      # Канал 2
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"99a99024-65b4-44dd-99fc-6a5cf1d4aaee"))
+        add_param.save()
+      # Канал 3
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"f897f0ca-4e35-4f0d-b345-3379668aa36f"))
+        add_param.save()
+      # Канал 4
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"034374bd-2dfb-4568-aa16-84255df33c88"))
+        add_param.save()
+      # Канал 5
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"b6bdfae8-4f27-4056-af79-d746b44038ee"))
+        add_param.save()
+      # Канал 6
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"2c2f7176-8b77-44f4-9678-4773e95e67ce"))
+        add_param.save()
+      # Канал 7
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"91bb7c43-f802-4ebd-a8fe-75f833acedeb"))
+        add_param.save()
+      # Канал 8
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"cf24b669-1c5b-4db7-936a-5f9d5c8be928"))
+        add_param.save()
+      # Канал 9
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"96035c7c-ee7c-41f6-9723-8a75dd9ed573"))
+        add_param.save()
+      # Канал 10
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"253475ea-614d-4aad-93a8-e81e4c9028e9"))
+        add_param.save()   
+
+    # Текущие
+      # Канал 1
+        #add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"32dad392-ca1e-4110-8f2c-a86b02e26fb3"))
+        #add_param.save()
+      # Канал 2
+        #add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"3e13694b-7cb5-4417-a091-af8a7db34dc7"))
+        #add_param.save()
+      # Канал 3
+        #add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"1023b35b-3cbf-4519-aac3-3bf1ebae07c1"))
+        #add_param.save()
+      # Канал 4
+        #add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"eea27ade-44cd-4e66-8298-00a4a6ad915a"))
+        #add_param.save()
+      # Канал 5
+        #add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"25e09d4d-3a48-4381-ad5d-b783c03c4d35"))
+        #add_param.save()
+      # Канал 6
+        #add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"069898ea-9d74-4571-b719-e8e6f1513c12"))
+        #add_param.save()
+      # Канал 7
+        #add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"084aa5f4-75d5-41f6-b0d6-9f2403eacd2c"))
+        #add_param.save()
+      # Канал 8
+        #add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"786ed8b8-aed1-478c-ae75-99caf1358cf0"))
+        #add_param.save()
+      # Канал 9
+        #add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"6fc4c39c-9a43-4cb7-a066-c40fd2ca47e5"))
+        #add_param.save()
+      # Канал 10
+        #add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"8b2aa40a-cd91-4e22-b9d1-596e49e5f839"))
+        #add_param.save()  
+
+    elif instance.guid_types_meters.name == u'Пульсар 2M':
+        #Добавляем параметры для Пульсар10
+
+    # Суточные
+      # Канал 1
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"0239dffb-de88-45e5-b6f6-18bf39f92525"))
+        add_param.save()
+      # Канал 2
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"a1cb319d-ac09-466d-894b-91d90aba4239"))
+        add_param.save()   
+    
+    # Текущие
+    #   # Канал 1
+    #     add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"fcc28118-66c0-4cdf-aeba-5da1171aae48"))
+    #     add_param.save()
+    #   # Канал 2
+    #     add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"1faeb517-bd1f-4ba0-96a5-67f00764822f"))
+    #     add_param.save()
+
+    elif instance.guid_types_meters.name == u'ПСЧ-3ТА.04':
+        #Добавляем параметры для ПСЧ-3ТА.04
+        pass
+    elif instance.guid_types_meters.name == u'ТЭМ-104':
+        #Добавляем параметры для ТЭМ-104
+        pass
+    elif instance.guid_types_meters.name == u'СЭТ-4ТМ.03М':
+        #Добавляем параметры для СЭТ-4ТМ.03М
+       
+    # T0 A+
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"e7624c25-9852-4ffd-8777-b2bfd16c29a8")) # A+ T0 месячные
+        add_param.save()
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"aa83b499-6a9e-40e1-b68b-dc84fec8490b")) # A+ T0 суточные
+        add_param.save()
+
+    # T0 R+
+        if isR:
+            add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"3d365f91-8bd3-476e-b07e-3f79134f6853")) # R+ T0 месячные
+            add_param.save()
+            add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"087b785e-5d59-4956-9cd3-57706f9557e6")) # R+ T0 суточные
+            add_param.save()
+           
+    #Получасовки
+        if isHalfs:
+            add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"4f505e17-7d71-4cf8-9880-c6ce33612e6e")) # A+ 30-мин. срез мощности
+            add_param.save()
+            add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"55abd40d-fb3c-4100-88f2-46d79be7733a")) # R+ 30-мин. срез мощности
+            add_param.save()
+
+    elif instance.guid_types_meters.name == u'Меркурий 200':
+        #Добавляем параметры для Меркурий 200
+
+    # Значения суточные (текущие)
+    #Не поддерживается прибором, но текущие переделаны на суточные
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"9cbc001d-a262-481f-a1aa-47d02bf18af1")) #T0
+        add_param.save()
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"b65d4227-69a5-487b-9999-5539ca3fc004")) #T1
+        add_param.save()
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"5e312de9-34cd-4ba7-a744-c9b94a77d98b")) #T2
+        add_param.save()
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"4260ea05-78f8-4c5c-9172-fa161fa96068")) #T3
+        add_param.save()
+    # Значения на начало месяца
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"86cd925b-48c2-40b8-b211-f116e0e6dbea")) #T0
+        add_param.save()
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"62a3796a-eaae-445d-9166-2ad517186b78")) #T1
+        add_param.save()
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"5f6e1e3d-4128-4cfe-94cf-57ac84a7694a")) #T2
+        add_param.save()
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"0c28c135-58f2-4dff-a222-9f3d9f3c742b")) #T3
+        add_param.save()
+
+    elif instance.guid_types_meters.name == u'Эльф 1.08':
+        #Добавляем параметры для счётчика тепла Elf 108
+    
+        #-------------Текущие
+        # "Энергия"
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"f2bbf267-456e-477a-95d2-abb94c78ba43"))
+        add_param.save()
+        # "Объем"       
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"dad6e2eb-e978-46f4-b7ec-442834b04e7a"))
+        add_param.save()
+        # "ElfTon"  Время работы прбора     
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"d3c9563d-51ed-4ca7-922f-ac3731065ead"))
+        add_param.save()
+        # "ElfErr"  Время работы прибора с ошибкой
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"dade3324-b9b0-41c8-bc76-70f617573e43"))
+        add_param.save()
+        # "Ti"      Температура входа
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"acca627e-f21a-4f8b-be7e-038f534b5d11"))
+        add_param.save()
+        # "To"      Температура выхода
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"01487323-a28f-419e-9589-2563d785ab2a"))
+        add_param.save()
+        # "Канал 1"      Импульсный вход 1 текущий
+        #add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"6e7f0d37-df5c-4850-991e-b5d7cb793924"))
+        #add_param.save()
+        #"Канал 1"      Импульсный вход 1 суточный
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"9af27a62-d6c8-4b67-bd36-da7103e0b1f1"))
+        add_param.save()
+        #"Канал 2"      Импульсный вход 2 суточный
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"86acc33d-7bea-4977-a5b5-c5858ce9a09d"))
+        add_param.save()
+        # "Канал 2"      Импульсный вход 2 текущий
+        #add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"de7bfdfd-c17f-4a7c-942d-b28e85db33cb"))
+        #add_param.save()
+        #-------------Архивные
+        # "Энергия"
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"ae439e1f-5c4b-494c-8a53-a61b85c804a0"))
+        add_param.save()
+        # "Объем"
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"b02153a4-00c0-4800-a55a-c7f9dfbb14e7"))
+        add_param.save()
+        # "ElfTon" Время работы прибора
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"aa611d48-f1fe-462a-8b0a-0a7596792b69"))
+        add_param.save()
+        # "ElfErr" Время работы прибора с ошибкой
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"af047098-bd45-4579-a60c-b75bed376bbe"))
+        add_param.save()
+        
+        
+    elif instance.guid_types_meters.name == u'СПГ762-1':
+        #Добавляем параметры для счётчика газа СПГ762 Подсистема 1
+    
+        #-------------Часовые
+        # "tи" Время работы узла учета
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"edfc6dc0-1628-4a7e-bd04-71107882039a"))
+        add_param.save()
+        # "tиo" Время работы при ненулевом расходе       
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"1e27e72c-79d6-4c68-bc04-1be84d061622"))
+        add_param.save()
+        # "Рб"  Атмосферное давление   
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"0fa5d9ef-4c6c-4f78-bc64-9d9b34002344"))
+        add_param.save()
+        # "Тнв" Температура наружного воздуха
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"433d7025-15f3-4ab0-9d73-39bd0e425566"))
+        add_param.save()
+        # "toт01"  Значение времени интегрирования
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"446a6bb6-c17f-4478-b1d8-252c7eb454d3"))
+        add_param.save()
+        # "Qoт01"    Среднее значение расхода газа
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"003c2fb2-0092-4d7d-a513-3dcc50a255da"))
+        add_param.save()
+        # "Тт01" Среднее значение температуры газа
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"9c99da7b-1a73-48b0-a3f5-54438a3ea824"))
+        add_param.save()
+        # "Pт01" Среднее значение абсолютного давления
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"832374da-5834-4fe0-abe3-07d48d447af2"))
+        add_param.save()
+        # "Д1т01"  Ср.значение доп.датчика 1
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"4920e70a-452e-4ecf-918e-14ca288c7a1f"))
+        add_param.save()
+        # "Д1т02" Ср.значение доп.датчика 2
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"825dfd73-82fa-4f1a-9635-77bdcb244997"))
+        add_param.save()
+        # "Mт01" Масса газа при ст.условиях
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"daa4a90e-7993-493c-9ac0-c03241b2ab2c"))
+        add_param.save()
+        # "Vт01" Объем газа при ст.условиях
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"72b5f4ba-d179-419c-8795-e2f86f5ee2ff"))
+        add_param.save()
+        # "Vрт01" Объем газа при раб.условиях
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"41774f43-9c9c-4867-bf21-e3d1df4fd2f8"))
+        add_param.save()
+        # "НСот01" Обобщ.сообщения о нештатных ситуац.
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"f610969e-cb2d-436f-9357-e63da72d162e"))
+        add_param.save()
+        
+        #-------------Суточные
+        # "tи" Время работы узла учета
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"ac9fe54a-6f51-4ee9-a849-448f0f10a4b6"))
+        add_param.save()
+        # "tиo" Время работы при ненулевом расходе       
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"2eefa93a-be60-4f23-9b09-8d1c6bad0a15"))
+        add_param.save()
+        # "Рб"  Атмосферное давление   
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"78c30686-a5d0-436f-9c56-57b076769774"))
+        add_param.save()
+        # "Тнв" Температура наружного воздуха
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"d7900bac-b85a-4b83-ad67-b822b470a698"))
+        add_param.save()
+        # "toт01"  Значение времени интегрирования
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"068f4de0-f041-4608-b09a-81dbc8f319ff"))
+        add_param.save()
+        # "Qoт01"    Среднее значение расхода газа
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"dad040cd-1047-4060-a7ac-e9a6e7f30fb4"))
+        add_param.save()        
+        # "Тт01" Среднее значение температуры газа
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"3be53eb7-c931-4728-a442-44d14c9da44f"))
+        add_param.save()
+        # "Pт01" Среднее значение абсолютного давления
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"1dff6784-dd8d-4898-ae8b-f1b60fbdc1af"))
+        add_param.save()
+        # "Д1т01"  Ср.значение доп.датчика 1
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"af26b128-b634-47a4-96ba-42de6f039fdb"))
+        add_param.save()
+        # "Д1т02" Ср.значение доп.датчика 2
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"5bb8af68-588e-470c-9b64-373482f71468"))
+        add_param.save()
+        # "Mт01" Масса газа при ст.условиях
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"c32e7e01-106a-49c6-b8b0-6490448548ad"))
+        add_param.save()
+        # "Vт01" Объем газа при ст.условиях
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"8fc09300-4b19-4478-aa44-d2fb1cf792d5"))
+        add_param.save()
+        # "Vрт01" Объем газа при раб.условиях
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"53693586-e5b5-4204-922a-a0b0153298ea"))
+        add_param.save()
+        # "НСот01" Обобщ.сообщения о нештатных ситуац.              
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"bf06727c-9cab-4efe-a0f2-6242bb320372"))
+        add_param.save()
+        
+        # Масса газа нарастающим итогом
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"5399a54f-0d2c-47e8-8ffb-882f5dddc239"))
+        add_param.save()
+        # Объем газа при ст.условиях нарастающим итогом
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"c14eaa34-3264-4fe4-98ab-8da6618fc431"))
+        add_param.save()
+        # Объем газа при раб.условиях нарастающим итогом              
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"4ed5ba8d-9ead-4a60-96e4-726f38432d9a"))
+        add_param.save()
+        
+    elif instance.guid_types_meters.name == u'СПГ762-2':
+        #Добавляем параметры для счётчика газа СПГ762 Подсистема 1
+    
+        #-------------Часовые
+        # "tи" Время работы узла учета
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"9a17ea4f-a1f8-4fb9-a21e-62f43978535a"))
+        add_param.save()
+        # "tиo" Время работы при ненулевом расходе       
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"49728e75-1d62-4b9e-8633-762cb7117b52"))
+        add_param.save()
+        # "Рб"  Атмосферное давление   
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"c44af390-ed2a-49d8-9c67-25f543db9935"))
+        add_param.save()
+        # "Тнв" Температура наружного воздуха
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"24bd767d-f667-444e-acfa-a935fb8f4699"))
+        add_param.save()
+        # "toт01"  Значение времени интегрирования
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"1e675e58-2cc9-4103-8410-2d37704a2bcf"))
+        add_param.save()
+        # "Qoт01"    Среднее значение расхода газа
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"d14fa3fa-5bd5-4dd9-b740-61049d38e694"))
+        add_param.save()
+        # "Тт01" Среднее значение температуры газа
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"6de742eb-a391-473a-bb4b-ab780a4642b8"))
+        add_param.save()
+        # "Pт01" Среднее значение абсолютного давления
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"04b43217-af06-4f09-8d95-0e2d3dbd0905"))
+        add_param.save()
+        # "Д1т01"  Ср.значение доп.датчика 1
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"b62c6838-7578-41c9-a94c-d06788cc2d41"))
+        add_param.save()
+        # "Д1т02" Ср.значение доп.датчика 2
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"aad9d0b4-1c12-4165-a1b1-4fac9de00c38"))
+        add_param.save()
+        # "Mт01" Масса газа при ст.условиях
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"205a8c8c-de26-44e5-ab72-efb7fe72040c"))
+        add_param.save()
+        # "Vт01" Объем газа при ст.условиях
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"c84c6130-ede7-487e-a414-b384964eb81e"))
+        add_param.save()
+        # "Vрт01" Объем газа при раб.условиях
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"5907cc5f-1386-4fbc-9e5c-7d3f77dba6d6"))
+        add_param.save()
+        # "НСот01" Обобщ.сообщения о нештатных ситуац.
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"c5638410-44b6-41d7-b501-6e5c0a002f48"))
+        add_param.save()
+        
+        #-------------Суточные
+        # "tи" Время работы узла учета
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"c1643ab8-1707-4b73-9610-0226b1fb6860"))
+        add_param.save()
+        # "tиo" Время работы при ненулевом расходе       
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"dbacff0c-2b3d-40c5-aa03-8d51a64919dd"))
+        add_param.save()
+        # "Рб"  Атмосферное давление   
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"279bdfd5-7b22-4d7e-900c-21e4077506dd"))
+        add_param.save()
+        # "Тнв" Температура наружного воздуха
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"b74e6743-3996-4af7-8024-da3912d14b45"))
+        add_param.save()
+        # "toт01"  Значение времени интегрирования
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"c7220fc7-5c01-4bcc-ac2a-7c851276af4d"))
+        add_param.save()
+        # "Qoт01"    Среднее значение расхода газа
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"381ccc3f-a9d9-4dcf-a9aa-2e5bd0e4efc8"))
+        add_param.save()        
+        # "Тт01" Среднее значение температуры газа
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"7f0f0e09-3bd0-4595-84dd-754f4c21bc5e"))
+        add_param.save()
+        # "Pт01" Среднее значение абсолютного давления
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"ee687ef8-36de-4de8-9a05-4ac841c9c144"))
+        add_param.save()
+        # "Д1т01"  Ср.значение доп.датчика 1
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"8ee128d0-5c21-4faa-a2fe-7432ff9be684"))
+        add_param.save()
+        # "Д1т02" Ср.значение доп.датчика 2
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"c61c87eb-5a4f-4095-ac50-4324e7899340"))
+        add_param.save()
+        # "Mт01" Масса газа при ст.условиях
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"bae3e866-f057-4be5-99a0-7474f6c7cbc1"))
+        add_param.save()
+        # "Vт01" Объем газа при ст.условиях
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"8ce68aef-85fa-4ca6-8f9f-dfa1f9e71cdd"))
+        add_param.save()
+        # "Vрт01" Объем газа при раб.условиях
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"ea094191-7ce5-4c42-ad5e-e886d02e73e0"))
+        add_param.save()
+        # "НСот01" Обобщ.сообщения о нештатных ситуац.              
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"e4d751b4-ef6c-45ca-b31a-f107f47a97aa"))
+        add_param.save()
+        
+        # Масса газа нарастающим итогом
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"add68490-64f4-47a2-a801-1fafa48c09a2"))
+        add_param.save()
+        # Объем газа при ст.условиях нарастающим итогом
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"525f9439-ce13-43be-a4f2-67f590f4842b"))
+        add_param.save()
+        # Объем газа при раб.условиях нарастающим итогом              
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"a760c696-fda0-47d4-8fb5-899d742957f1"))
+        add_param.save()
+        
+    elif instance.guid_types_meters.name == u'СПГ762-3':
+        #Добавляем параметры для счётчика газа СПГ762 Подсистема 1
+    
+        #-------------Часовые
+        # "tи" Время работы узла учета
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"187b787c-1693-4c90-b6df-d868effef692"))
+        add_param.save()
+        # "tиo" Время работы при ненулевом расходе       
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"49c86cc3-57c2-4bdf-b4e3-b07f64673d37"))
+        add_param.save()
+        # "Рб"  Атмосферное давление   
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"1e92a9a8-1cd9-4252-b9c7-b33357bafce7"))
+        add_param.save()
+        # "Тнв" Температура наружного воздуха
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"06cd5dad-7ea9-438e-abbf-043e8918eb3e"))
+        add_param.save()
+        # "toт01"  Значение времени интегрирования
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"8064aad9-778a-4902-b0c0-75b23289469a"))
+        add_param.save()
+        # "Qoт01"    Среднее значение расхода газа
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"b747eeb5-8c69-443e-b74b-2bb89af64206"))
+        add_param.save()
+        # "Тт01" Среднее значение температуры газа
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"38c0b41b-0883-4990-bb0c-8b532caed34c"))
+        add_param.save()
+        # "Pт01" Среднее значение абсолютного давления
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"7bf3d68d-4344-49f3-8169-370f6142351a"))
+        add_param.save()
+        # "Д1т01"  Ср.значение доп.датчика 1
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"fa188255-c1cc-4c2d-844c-3b40a3a7559e"))
+        add_param.save()
+        # "Д1т02" Ср.значение доп.датчика 2
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"06c97066-1e35-4bb1-a96f-fe3c0056cf39"))
+        add_param.save()
+        # "Mт01" Масса газа при ст.условиях
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"e530ab26-92e8-4edc-8e6d-5cd6184bfbe7"))
+        add_param.save()
+        # "Vт01" Объем газа при ст.условиях
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"5d315c1e-b237-46d6-9273-be4e597ad1c2"))
+        add_param.save()
+        # "Vрт01" Объем газа при раб.условиях
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"54b86222-3d1c-440a-b02f-bedbef0e9e28"))
+        add_param.save()
+        # "НСот01" Обобщ.сообщения о нештатных ситуац.
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"acb12185-dd88-4449-8f03-76b6fd148958"))
+        add_param.save()
+        
+        #-------------Суточные
+        # "tи" Время работы узла учета
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"d1f0258f-42ba-4e4f-a66c-74aed4d512ce"))
+        add_param.save()
+        # "tиo" Время работы при ненулевом расходе       
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"7ec1a0fb-88f0-497a-8917-01c0b731b88a"))
+        add_param.save()
+        # "Рб"  Атмосферное давление   
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"3465cb7c-57ea-4ad8-afde-74fb2814ddeb"))
+        add_param.save()
+        # "Тнв" Температура наружного воздуха
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"a3014fec-73df-4fd4-a68c-9c3ff737d140"))
+        add_param.save()
+        # "toт01"  Значение времени интегрирования
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"986f24b0-df76-4c36-9b7f-fbbe05a10c94"))
+        add_param.save()
+        # "Qoт01"    Среднее значение расхода газа
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"2a5ec8f1-b6fe-4eff-b91f-42a7712dd663"))
+        add_param.save()        
+        # "Тт01" Среднее значение температуры газа
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"cbfc543d-3a19-46c3-8075-ff59492d2620"))
+        add_param.save()
+        # "Pт01" Среднее значение абсолютного давления
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"8a24d34e-aee6-4865-bf21-56d9c07dcd1e"))
+        add_param.save()
+        # "Д1т01"  Ср.значение доп.датчика 1
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"85de87d5-8e0a-4088-8248-8a64367db47e"))
+        add_param.save()
+        # "Д1т02" Ср.значение доп.датчика 2
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"b2bd2c95-ee85-4156-9ef6-7fc25d29a244"))
+        add_param.save()
+        # "Mт01" Масса газа при ст.условиях
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"8674a61c-af88-46c5-b553-fecc9a7d0837"))
+        add_param.save()
+        # "Vт01" Объем газа при ст.условиях
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"5880bd0f-699d-407c-a3f0-6cea0ebde423"))
+        add_param.save()
+        # "Vрт01" Объем газа при раб.условиях
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"9057618b-445c-4581-86a6-4715469db938"))
+        add_param.save()
+        # "НСот01" Обобщ.сообщения о нештатных ситуац.              
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"4991e5c0-0827-4467-b9d2-7613d1b6dd09"))
+        add_param.save()
+        
+        # Масса газа нарастающим итогом
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"dcd5ed6a-7bd0-41ba-8850-5b88a9831c04"))
+        add_param.save()
+        # Объем газа при ст.условиях нарастающим итогом
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"cbeaa4fa-d1fb-4bf5-9688-7084b57fbfe4"))
+        add_param.save()
+        # Объем газа при раб.условиях нарастающим итогом              
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"d16b31ea-87d1-409a-bbf8-4a743b678dbb"))
+        add_param.save()
+
+    elif instance.guid_types_meters.name == u'Sayany':
+        #Добавляем параметры для счётчика Sayany
+    
+        #-------------Суточные
+        # "Q" Тепловая энергия. Канал1
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"e7f2ffba-9a40-43e1-80f3-ddd22596cdb8"))
+        add_param.save()    
+        # "Q" Тепловая энергия. Канал2
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"6f9cd79e-ca34-447e-8ad1-d54531389fe1"))
+        add_param.save() 
+        # "M" Расход воды. Канал1
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"b05de8e2-6176-4fc0-bc44-79ceb4229c80"))
+        add_param.save() 
+        # "M" ТРасход воды. Канал2
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"5f256e9b-1cb3-4f27-a53a-d08b446dda58"))
+        add_param.save() 
+        # "T" Температура. Канал1
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"75474616-f3db-4903-91d5-1f22f6593394"))
+        add_param.save() 
+        # "T" Температура. Канал2
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"f3210c5b-afde-4c9a-b201-9c7c403c4cf2"))
+        add_param.save() 
+        # "T" Температура. Канал3
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"b12762a0-0a06-49a4-b842-8ad3378f4602"))
+        add_param.save() 
+        # "T" Температура. Канал4
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"472ba2fd-cc06-4147-a1e7-c1bb66096536"))
+        add_param.save() 
+        
+    elif instance.guid_types_meters.name == u'Tekon_hvs':
+        #Добавляем параметры для счётчика Tekon. Читаем один тэк с opcretranslator
+    
+        #-------------Суточные
+        # "Показание". Канал1
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"d76796ea-ea63-4317-982f-ffbcde2074dc"))
+        add_param.save()  
+        
+    elif instance.guid_types_meters.name == u'Tekon_gvs':
+        #Добавляем параметры для счётчика Tekon. Читаем один тэк с opcretranslator
+    
+        #-------------Суточные
+        # "Показание". Канал1
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"e71a7206-7a30-45d9-981d-0b7592b96337"))
+        add_param.save() 
+        
+    elif instance.guid_types_meters.name == u'Tekon_heat':
+        #Добавляем параметры для счётчика Tekon. Читаем один тэк с opcretranslator
+    
+        #-------------Суточные
+        # "Показание". Канал1
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"1dca7dab-371a-4429-afa1-8b4877b38b5b"))
+        add_param.save()
+        
+    elif instance.guid_types_meters.name == u'Меркурий 230-УМ':
+        #Добавляем параметры для счётчика Меркурий на УСПД УМ-RTU.    
+        
+        #-------------Суточные
+        # "Показание". T0 A+
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"b6e89205-3814-463d-86d1-f52cec7d8962"))
+        add_param.save()
+        # "Показание". T1 A+
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"7f3c42e6-4000-4373-a0e6-37e66ce819a9"))
+        add_param.save() 
+        # "Показание". T2 A+
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"c6512649-56ea-4214-aa33-84516bfe8dc1"))
+        add_param.save() 
+        # "Показание". T3 A+
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"4e20bda9-6e75-4b0f-a99a-0e4c1cd07d3b"))
+        add_param.save()
+        
+        #-------------Мощность        
+        #А+ Профиль
+#        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"922ad57c-8f5e-4f00-a78d-e3ba89ef859f")) # A+ 30-мин. срез мощности
+#        add_param.save()        
+#        #R+ Профиль
+#        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"61101fa3-a96a-4934-9482-e32036c12829")) # R+ 30-мин. срез мощности
+#        add_param.save()
+        
+    elif instance.guid_types_meters.name == u'Пульсар Теплосчётчик':
+        #Добавляем параметры для Теплосчётчика Пульсар.
+        #------------Суточные
+        # "Показание Энергии" Q, Гкал
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"24ae9f51-40a4-4758-a826-a5f8286e1a2e"))
+        add_param.save()
+        # "Показание Расход воды" Объем, м3
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"a3da78fb-b07b-4d53-a980-54b51e26819a"))
+        add_param.save()
+        # "Показание Температура подачи" Ti, C0
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"de66ecd2-b243-467c-8d1a-cfcb42377300"))
+        add_param.save()
+        # "Показание Температура выхода" To, C0
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"d3433b80-cb8c-4038-a682-947e6d05955e"))
+        add_param.save()
+
+        
+    elif instance.guid_types_meters.name == u'Пульсар ХВС':
+        #Добавляем параметры для водосчётчика Пульсар ХВС.
+        #------------Суточные
+        # "Показание Расход воды" Объем, м3
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"209894a8-8d19-4e4d-bad8-1767eec4fedf"))
+        add_param.save()
+
+    
+    elif instance.guid_types_meters.name == u'Пульсар ГВС':
+        #Добавляем параметры для водосчётчика Пульсар ГВС.
+        #------------Суточные
+        # "Показание Расход воды" Объем, м3
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"5fc2ff3b-999e-4154-ba49-84d3971369b0"))
+        add_param.save()
+        
+    elif instance.guid_types_meters.name == u'Карат 307':
+        #print u'Добавляем параметры для счётчика Карат 307'
+        #Суточные 
+        #Объём     
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"3024fd72-d1e8-4476-a876-4bc09553dde9"))
+        add_param.save()
+        #Тепло
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"46a63ef5-5761-4e16-a854-1979ddc9668f"))
+        add_param.save()
+        #Tout
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"6dd6ea63-20dc-46d0-b56e-6890a2b83f48"))
+        add_param.save()
+        #Tin
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"8a5f5921-5b70-410d-83de-8403ec2a4d87"))
+        add_param.save()
+        #Ton наработка в минутах
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"9c86e183-dd53-4c7f-b728-ffe75a55c633"))
+        add_param.save()
+        #Terr время работы в ошибке
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"abd41546-02f6-4e2c-8bd2-a60ab80ffe66"))
+        add_param.save()
+        #Масса 
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"eb617f04-14a3-403c-90e8-286412872232"))
+        add_param.save()
+    elif instance.guid_types_meters.name == u'Danfoss SonoSelect':
+        #print u'Добавляем параметры для счётчика Danfoss SonoSelect'
+        #Суточные 
+        #Объём     
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"83ba885f-1881-45db-9d63-52195e67cf64"))
+        add_param.save()
+        #Энергия  
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"510ba9e6-c18b-4982-9763-2ad86c8a8245"))
+        add_param.save()
+        #Т вход
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"a8940b63-2002-4a28-b671-a455419c1229"))
+        add_param.save()
+        #Т выход    
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"db1ed365-e85e-4547-aef6-89fed020898f"))
+        add_param.save()
+
+        #Месячные
+        #Объём     
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"3c763ebc-6ad4-4193-967f-f352bfae92c5"))
+        add_param.save()
+        #Энергия  
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"7a5d6dd3-3a34-40e4-90af-0c00252b978d"))
+        add_param.save()
+        #Т вход
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"caf11a15-27ff-4c0d-9b18-d55028e4840b"))
+        add_param.save()
+        #Т выход    
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"f76371c9-5ecd-44b2-835e-5fc4cdce7141"))
+        add_param.save()
+
+        #Текущие 
+        #Объём     
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"097122a4-b7d0-4700-add2-bc99a58347d0"))
+        add_param.save()
+        #Энергия  
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"af254ed7-d4ab-4293-8aaf-8bb13c81efb7"))
+        add_param.save()
+        #Т вход
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"caf11a15-27ff-4c0d-9b18-d55028e4840b"))
+        add_param.save()
+        #Т выход    
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"1d246b01-7fd8-441e-af1b-9851acf5f104"))
+        add_param.save()
+
+    else:
+        pass
+        #print u'Тип счётчика не определен'
+    return
+
 #_____________________________________________________________________________________________________________
 #При изменении в админке будут переименовыватсья все линки
-#Не удалять!
-#_____________________________________________________________________________________________________________
-#from general.models import  Meters, TypesMeters, LinkAbonentsTakenParams, TakenParams, Params
 
 def rename_taken_params(sender, instance, **kwargs):
     #print 'rename taken params'
@@ -1737,14 +2589,14 @@ def OnOffSignals():
         #print 'signals ON'
         signals.post_save.connect(add_link_taken_params, sender=TakenParams)
         signals.post_save.connect(add_link_meter, sender=Meters)
-        signals.post_save.connect(add_taken_param, sender=Meters)
+        #signals.post_save.connect(add_taken_param, sender=Meters)
 
         signals.pre_save.disconnect(rename_link_abonents_taken_params, sender=Abonents)
         signals.pre_save.disconnect(rename_taken_params, sender=Meters)
     else:
         #print 'signals Off'
         signals.post_save.disconnect(add_link_meter, sender=Meters)
-        signals.post_save.disconnect(add_taken_param, sender=Meters)
+        #signals.post_save.disconnect(add_taken_param, sender=Meters)
         signals.post_save.disconnect(add_link_taken_params, sender=TakenParams)
 
         signals.pre_save.connect(rename_link_abonents_taken_params, sender=Abonents)
@@ -3882,8 +4734,8 @@ def service_del_meters(request):
     return render_to_response("service/service_del_meters.html", args)
 
 def get_80020_template(request):
-    #return get_file('.xlsx')
-    pass
+    return get_file('80020_template_for_load.xlsx')
+
 
 def load_80020_group(request):
     args={}
