@@ -3,7 +3,7 @@ from AskueViz.models import DiagramMainframe, LinkMainframeAbonents, DiagramDevi
 
 # Register your models here.
 
-admin.site.register(DiagramMainframe)
-admin.site.register(LinkMainframeAbonents)
-admin.site.register(DiagramDevices)
-admin.site.register(LinkTakenParamDiagramDevices)
+# admin.site.register(DiagramMainframe)
+# admin.site.register(LinkMainframeAbonents)
+# admin.site.register(DiagramDevices)
+# admin.site.register(LinkTakenParamDiagramDevices)
