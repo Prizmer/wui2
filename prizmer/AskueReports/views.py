@@ -8357,6 +8357,8 @@ def report_forma_80020(request):
                 guid_params = u'922ad57c-8f5e-4f00-a78d-e3ba89ef859f'
             elif name_of_type_meters[0][0] == u'Меркурий 230':
                 guid_params = u'6af9ddce-437a-4e07-bd70-6cf9dcc10b31'
+            elif name_of_type_meters[0][0] == u'СЭТ-4ТМ.03М':
+                guid_params = u'4f505e17-7d71-4cf8-9880-c6ce33612e6e'
             else:
                 pass
             result = common_sql.get_taken_param_by_guid_meters_and_guid_params(meters_guid_list[x], guid_params)
@@ -8369,6 +8371,8 @@ def report_forma_80020(request):
                  guid_params = u'61101fa3-a96a-4934-9482-e32036c12829'
             elif name_of_type_meters[0][0] == u'Меркурий 230':
                  guid_params = u'66e997c0-8128-40a7-ae65-7e8993fbea61'
+            elif name_of_type_meters[0][0] == u'СЭТ-4ТМ.03М':
+                 guid_params = u'55abd40d-fb3c-4100-88f2-46d79be7733a'
             else:
                 pass
             

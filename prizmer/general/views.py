@@ -12829,8 +12829,8 @@ def makeOneCoords(graphic_data,numField1):
         graphic_data[i]=list(graphic_data[i]) 
         date=graphic_data[i][numField1]   
         #print numField1, date         
-        #print date 
-        if (date==u'Н/Д' or date is None or date==None): 
+        if (date==u'Н/Д' or date is None or date==None or date == '-'): 
+            #print 'append zero'
             labels.append(str(0))
         else:
             #print type(date)
@@ -13243,8 +13243,9 @@ def balance_daily_electric(request):
 def IsEmptyTable(data_table, empty_field):
     isEmpty = True
     for row in data_table:
-        if not(row[empty_field] == None  or row[empty_field] == 'None'):
-
+        #print row[empty_field], row[empty_field] == None, row[empty_field] == 'None'
+        if not(row[empty_field] == None or row[empty_field] == 'None'):
+            
             isEmpty = False
     return isEmpty
 
@@ -13280,8 +13281,10 @@ def balance_period_electric(request):
          guid_type_abon=dt_type_abon[i][0]         
              
          if not(bool(is_abonent_level.search(obj_key))):
-             print guid_type_abon, dt_type_abon[i][1]
+             #print guid_type_abon, dt_type_abon[i][1]
              data_table = common_sql.get_data_table_balance_electric_perid(obj_parent_title, obj_title,electric_data_start, electric_data_end,guid_type_abon)
+             if i == 1:
+                Xcoord = makeOneCoords(data_table,5)
 
              type_abon=translate(dt_type_abon[i][1])
              if IsEmptyTable(data_table, 0):
@@ -13294,11 +13297,9 @@ def balance_period_electric(request):
                  data_table=common_sql.ChangeNull(data_table, None)                 
                  dtAll.append(data_table)
                  AllData.append({str("data"):makeOneCoords(data_table,6), str("label"):str(type_abon), str("backgroundColor"): get_rgba_color(i+2)})
-                 if i==1:
-                     #print data_table[0]
-                     Xcoord=makeOneCoords(data_table,5)
+         
     dt_delta=[]   
-    
+    #print Xcoord
     #print len(dtAll)
     if len(dtAll)>0:
         for j in range(1,len(dtAll[0])):
@@ -13308,6 +13309,7 @@ def balance_period_electric(request):
                 #print i, j
                 #print dtAll[i][j][1], dtAll[i][j][2],  dtAll[i][j][5], dtAll[i][j][6], dtAll[i][j][8]
                 if (dtAll[i][j][6] == 'Н/Д' or dtAll[i][j][6] == None  or dtAll[i][j][6] == 'None'): 
+                    #print 'break'
                     break
                               
                 if dtAll[i][j][1] == True:                   
@@ -13319,8 +13321,7 @@ def balance_period_electric(request):
             percent=0           
             if (vv > decimal.Decimal(0)):
                 percent=sumD*100/vv
-               
-            dt_delta.append([Xcoord[j],sumD, decimal.Decimal(percent)])
+            dt_delta.append([Xcoord[j], sumD, decimal.Decimal(percent)])
 
     #добавляем диаграмму с суммой по всем потребителям
     if len(dtAll)>2:
