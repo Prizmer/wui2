@@ -29,6 +29,8 @@ from django import forms
 from django.core.context_processors import csrf
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.csrf import csrf_exempt
+
+from django.conf import settings
  
 def dictfetchall(cursor):
 #"Returns all rows from a cursor as a dict"
@@ -12185,6 +12187,12 @@ def forma_80020_v2(request):
              #___________________________________________________________________________________________                   
             k=0
             data_table_check_data=[]
+            #Проверяем параметр - если true, то удаляем дубли получасовок на эти даты!
+            CLEAN_DOUBLE_30 = getattr(settings, 'CLEAN_DOUBLE_30', 'False')
+            #print('CLEAN_DOUBLE_30',CLEAN_DOUBLE_30)
+            if CLEAN_DOUBLE_30:
+                common_sql.del_double_30_by_dates(electric_data_start,electric_data_end)
+            #_____
             for row in list_of_taken_params:
                 factory_number_manual = row[0]                
                 name_param = row[1]
@@ -12197,10 +12205,6 @@ def forma_80020_v2(request):
                     if len(temp_dt)>0:
                         temp_dt=common_sql.ChangeNull(temp_dt,None)
                         data_table_check_data=add_1columns_to_dt(data_table_check_data,temp_dt,1)
-                    # print factory_number_manual                    
-                    # print temp_dt
-                    # print k
-                    # print temp_dt
                
             #Заголовок
             #В заголовок добавляем дату чуть позже, чтобы спокойно пройти по номерам и параметрам

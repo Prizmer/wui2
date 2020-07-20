@@ -3057,7 +3057,8 @@ def get_daily_value_by_meter_name(meters_name, electric_data_end, parametr ):
     
 def get_30_min_by_meter_name(meters_name, electric_data_end, electric_data_time, parametr):
     simpleq = connection.cursor()
-    simpleq.execute("""SELECT 
+    print(meters_name, electric_data_end, electric_data_time, parametr)
+    sQuery = """SELECT 
                                   various_values.value 
 
                                 FROM 
@@ -3075,7 +3076,9 @@ def get_30_min_by_meter_name(meters_name, electric_data_end, electric_data_time,
                                   various_values.date = %s AND 
                                   various_values.time = %s AND 
                                   names_params.name = %s
-                                 LIMIT 1;""",[meters_name, electric_data_end, electric_data_time, parametr])
+                                 LIMIT 1;""",[meters_name, electric_data_end, electric_data_time, parametr]
+    simpleq.execute(sQuery)
+    print sQuery
     simpleq = simpleq.fetchall()
     try:
         result = simpleq[0][0]
@@ -9881,6 +9884,49 @@ group by   meters.factory_number_manual,
     cursor.execute(sQuery)  
     data_table = cursor.fetchall()      
     return data_table
+
+def del_double_30_by_dates(electric_data_start,electric_data_end):
+    sQuery = """
+Delete
+from various_values
+where id in
+(
+WITH b as
+(
+SELECT  min(various_values.id) as id,
+meters.factory_number_manual::text||taken_params.name::text||various_values.date::text||' '||various_values."time"::text||' '||various_values.value::text  as key_str
+FROM 
+  public.various_values, 
+  public.taken_params, 
+  public.meters
+WHERE 
+  various_values.id_taken_params = taken_params.id AND
+  taken_params.guid_meters = meters.guid 
+  and various_values.date between '%s' and '%s'
+  GROUP BY key_str HAVING COUNT(*) > 1
+  order by key_str
+)
+SELECT a.id
+from
+b,
+(SELECT  various_values.id,
+meters.factory_number_manual::text||taken_params.name::text||various_values.date::text||' '||various_values."time"::text||' '||various_values.value::text as key_str
+FROM 
+  public.various_values, 
+  public.taken_params, 
+  public.meters
+WHERE 
+  various_values.id_taken_params = taken_params.id AND
+  taken_params.guid_meters = meters.guid 
+  and various_values.date between '%s' and '%s'
+  ) as a
+where b.key_str = a.key_str
+and a.id <> b.id)    """%(electric_data_start,electric_data_end,electric_data_start,electric_data_end)
+    cursor = connection.cursor()
+    cursor.execute(sQuery)
+    connection.commit()
+    cursor.close()
+    return
 
 def get_A_R_energy_by_factory_number_period(factory_number_manual,electric_data_start,electric_data_end, name_param):
     if name_param == 'T0 R+':

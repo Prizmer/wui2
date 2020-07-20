@@ -39,10 +39,10 @@ STATIC_ROOT = os.path.join(BASE_DIR, "prizmer/static")
 STATIC_URL = '/static/'
 STATICFILES_DIRS = (os.path.join(BASE_DIR, "../prizmer/static"),    
                      os.path.join(BASE_DIR, "../prizmer/static/excel"), 
-                      os.path.join(BASE_DIR, "../prizmer/static/account_prizmer_imgs"),					 
-					) 
+                      os.path.join(BASE_DIR, "../prizmer/static/account_prizmer_imgs"),
+                    ) 
 
-					
+
 
 import sys
 #sys.path.append("C:\Work\mitino\prizmer\static\common_sql")
@@ -150,14 +150,15 @@ LOGGING = {
             'class': 'logging.FileHandler',
             'filename': BASE_DIR+'\static\log\service_log.log',
         }},	
-	'loggers': {
+    'loggers': {
         'service_log': {
             'handlers': ['file'],
             'level': os.getenv( 'DJANGO_LOG_LEVEL', 'INFO'),
          },
-	    }
+    }
 }
 
+CLEAN_DOUBLE_30 = False
 #TEMPLATE_LOADERS = (
 #    ('django.template.loaders.cached.Loader', (
 #        'django.template.loaders.filesystem.Loader',
