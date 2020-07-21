@@ -619,6 +619,7 @@ def LoadElectricMeters(sPath, sSheet):
                 add_meter.save()
                 writeToLog(u'Device added' + ' --->   ' + u'Danfoss SonoSelect')
             elif unicode(type_meter) == u'СЭТ-4ТМ.03М':
+                #print('create set')
                 add_meter = Meters(name = unicode(type_meter) + u' ' + unicode(meter), address = unicode(adr), factory_number_manual = unicode(meter), guid_types_meters = TypesMeters.objects.get(guid = u"66b7ce6a-f280-4e54-8c8d-f69f34aabdf9") )
                 add_meter.save()
                 writeToLog(u'Device added' + ' --->   ' + u'СЭТ-4ТМ.03М')
@@ -628,9 +629,10 @@ def LoadElectricMeters(sPath, sSheet):
             
             #Если экземпляр был создан, то добавляем считываемые параметры
             try:
+                #print 'add.taken_param'
                 add_taken_param_no_signals(instance = add_meter, isR = isR, isHalfs = isHalfs)
             except Exception as e:
-                return None
+                return e.message
             
             met+=1
             
@@ -3280,6 +3282,151 @@ def get_electric_progruz(request):
     electric_data_end = now.strftime("%d-%m-%Y %H:%M")
     response = HttpResponse(response.read(), content_type="application/vnd.ms-excel")    
     output_name = u'electric_register-'+electric_data_end
+    file_ext = u'xlsx'    
+    response['Content-Disposition'] = 'attachment;filename="%s.%s"' % (output_name.replace('"', '\"'), file_ext)   
+    return response
+
+def get_electric_progruz_com(request):
+    response = StringIO.StringIO()
+    wb = Workbook()
+    ws = wb.active
+    
+    obj_title         = request.GET.get('obj_title')
+    electric_data_end   = request.GET.get('electric_data_end')
+    electric_data_start   = request.GET.get('electric_data_start')
+    
+#Шапка
+    ws['A1'] = 'Населенный пункт'
+    ws['B1'] = 'Наименование улицы'
+    ws['C1'] = 'Наименование дома'
+    ws['D1'] = 'Квартира'
+    ws['E1'] = 'Идентификатор АСКУЭ'
+    ws['F1'] = 'Номер лицевого счета'
+    ws['G1'] = 'Номер счётчика заводской'
+    ws['H1'] = 'Номер в сети'
+    ws['I1'] = 'Тип счётчика'
+    ws['J1'] = 'ТТ'
+    ws['K1'] = 'Com-port'
+    
+    ws['A1'].style = ali_grey
+    ws['B1'].style = ali_grey
+    ws['C1'].style = ali_grey
+    ws['D1'].style = ali_grey
+    ws['E1'].style = ali_grey
+    ws['F1'].style = ali_grey
+    ws['G1'].style = ali_grey
+    ws['H1'].style = ali_grey
+    ws['I1'].style = ali_grey
+    ws['J1'].style = ali_grey
+    ws['K1'].style = ali_grey
+    ws['L1'].style = ali_grey
+
+#Запрашиваем данные для отчета
+    data_table = common_sql.get_electric_register_com()        
+   
+        
+# Заполняем отчет значениями
+    for row in range(2, len(data_table)+2):
+        try:
+            ws.cell('A%s'%(row)).value = '%s' % (data_table[row-2][0])  
+            ws.cell('A%s'%(row)).style = ali_white
+        except:
+            ws.cell('A%s'%(row)).style = ali_white
+            next
+        
+        try:
+            ws.cell('B%s'%(row)).value = '%s' % (data_table[row-2][1]) 
+            ws.cell('B%s'%(row)).style = ali_white
+        except:
+            ws.cell('B%s'%(row)).style = ali_white
+            next
+            
+        try:
+            ws.cell('C%s'%(row)).value = '%s' % (data_table[row-2][2])  
+            ws.cell('C%s'%(row)).style = ali_white
+        except:
+            ws.cell('C%s'%(row)).style = ali_white
+            next
+            
+        try:
+            ws.cell('d%s'%(row)).value = '%s' % (data_table[row-2][3])  # 
+            ws.cell('d%s'%(row)).style = ali_white
+        except:
+            ws.cell('d%s'%(row)).style = ali_white
+            next
+            
+        try:
+            ws.cell('e%s'%(row)).value = '%s' % data_table[row-2][4]  # 
+            ws.cell('e%s'%(row)).style = ali_white
+        except:
+            ws.cell('e%s'%(row)).style = ali_white
+            next
+            
+        try:
+            ws.cell('f%s'%(row)).value = '%s' % data_table[row-2][5]  # 
+            ws.cell('f%s'%(row)).style = ali_white
+        except:
+            ws.cell('f%s'%(row)).style = ali_white
+            next
+        
+        try:
+            ws.cell('g%s'%(row)).value = '%s' % data_table[row-2][6]  
+            ws.cell('g%s'%(row)).style = ali_white
+        except:
+            ws.cell('g%s'%(row)).style = ali_white
+            next
+        
+        try:
+            ws.cell('h%s'%(row)).value = '%s' % (data_table[row-2][7])  
+            ws.cell('h%s'%(row)).style = ali_white
+        except:
+            ws.cell('h%s'%(row)).style = ali_white
+            next
+        
+        try:
+            ws.cell('i%s'%(row)).value = '%s' % (data_table[row-2][8])  
+            ws.cell('i%s'%(row)).style = ali_white
+        except:
+            ws.cell('i%s'%(row)).style = ali_white
+            next
+
+        try:
+            ws.cell('j%s'%(row)).value = '%s' % (data_table[row-2][9])  
+            ws.cell('j%s'%(row)).style = ali_white
+        except:
+            ws.cell('j%s'%(row)).style = ali_white
+            next
+
+        # try:
+        #     ws.cell('k%s'%(row)).value = '%s' % (data_table[row-2][10])  
+        #     ws.cell('k%s'%(row)).style = ali_white
+        # except:
+        #     ws.cell('k%s'%(row)).style = ali_white
+        #     next
+
+        try:
+            ws.cell('l%s'%(row)).value = '%s' % (data_table[row-2][10])  
+            ws.cell('l%s'%(row)).style = ali_white
+        except:
+            ws.cell('l%s'%(row)).style = ali_white
+            next
+
+    #ws.row_dimensions[5].height = 41
+    ws.column_dimensions['A'].width = 15 
+    ws.column_dimensions['B'].width = 30 
+    ws.column_dimensions['C'].width = 20
+    ws.column_dimensions['D'].width = 30
+    ws.column_dimensions['E'].width = 10
+    ws.column_dimensions['G'].width = 18
+    ws.column_dimensions['K'].width = 18
+    ws.column_dimensions['L'].width = 10
+    
+    wb.save(response)
+    response.seek(0)
+    now = datetime.datetime.now()
+    electric_data_end = now.strftime("%d-%m-%Y %H:%M")
+    response = HttpResponse(response.read(), content_type="application/vnd.ms-excel")    
+    output_name = u'electric_register-'+electric_data_end+'_com'
     file_ext = u'xlsx'    
     response['Content-Disposition'] = 'attachment;filename="%s.%s"' % (output_name.replace('"', '\"'), file_ext)   
     return response

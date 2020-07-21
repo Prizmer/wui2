@@ -8074,7 +8074,7 @@ SELECT
   balance_groups.name as balance_name,
   link_balance_groups_meters.type,
   types_abonents.name as type_abon,
-  sum(daily_values.value * link_abonents_taken_params.coefficient) as sumT,
+  sum(daily_values.value * link_abonents_taken_params.coefficient* link_abonents_taken_params.coefficient_2* link_abonents_taken_params.coefficient_3) as sumT,
   count(daily_values.value) as countAbon,
   names_params.name as param_name,
   resources.name AS res_name,
@@ -8140,7 +8140,7 @@ from
   balance_groups.name as balance_name, 
   link_balance_groups_meters.type, 
  
-  sum(daily_values.value * link_abonents_taken_params.coefficient) as sumT, 
+  sum(daily_values.value * link_abonents_taken_params.coefficient* link_abonents_taken_params.coefficient_2* link_abonents_taken_params.coefficient_3) as sumT, 
   count(daily_values.value) as countAbon,
   names_params.name as param_name, 
   resources.name AS res_name, 
@@ -11865,6 +11865,72 @@ parent_objects_for_progruz.obj_name2,
   parent_objects_for_progruz.obj_name0, 
   tcpip_settings.ip_address, 
   tcpip_settings.ip_port, 
+    meters.address, 
+  parent_objects_for_progruz.ab_name
+    """
+    cursor.execute(sQuery)  
+    data_table = cursor.fetchall()
+    return data_table 
+
+def get_electric_register_com():
+    cursor = connection.cursor()
+    data_table=[] 
+    sQuery = """
+   SELECT 
+  parent_objects_for_progruz.obj_name2, 
+  parent_objects_for_progruz.obj_name1, 
+  parent_objects_for_progruz.obj_name0,  
+  abonents.name, 
+  ''::text as askue,
+  CASE When meters.name like '%М-200%' then  meters.password else ''::text end as lic_num, 
+  meters.factory_number_manual, 
+  meters.address, 
+  replace(types_meters.name, 'Меркурий ','М-'),
+  link_abonents_taken_params.coefficient, 
+  comport_settings.name 
+FROM 
+  public.parent_objects_for_progruz, 
+  public.abonents, 
+  public.link_abonents_taken_params, 
+  public.taken_params, 
+  public.meters, 
+  public.params, 
+  public.resources, 
+  public.names_params, 
+  public.link_meters_comport_settings, 
+  public.comport_settings,
+  types_meters
+WHERE 
+  types_meters.guid = params.guid_types_meters and
+  parent_objects_for_progruz.ab_guid = abonents.guid AND
+  link_abonents_taken_params.guid_abonents = abonents.guid AND
+  link_abonents_taken_params.guid_taken_params = taken_params.guid AND
+  taken_params.guid_meters = meters.guid AND
+  taken_params.guid_params = params.guid AND
+  params.guid_names_params = names_params.guid AND
+  names_params.guid_resources = resources.guid AND
+  link_meters_comport_settings.guid_meters = meters.guid AND
+  link_meters_comport_settings.guid_comport_settings = comport_settings.guid
+  and resources.name = 'Электричество'
+  group by 
+parent_objects_for_progruz.obj_name2, 
+  parent_objects_for_progruz.obj_name1, 
+  parent_objects_for_progruz.obj_name0, 
+  parent_objects_for_progruz.ab_name, 
+  abonents.name, 
+  abonents.account_1, 
+  meters.factory_number_manual, 
+  meters.address, 
+  resources.name, 
+  link_abonents_taken_params.coefficient,
+  comport_settings.name, 
+  meters.password,
+  meters.name,
+  types_meters.name
+  order by parent_objects_for_progruz.obj_name2, 
+  parent_objects_for_progruz.obj_name1, 
+  parent_objects_for_progruz.obj_name0, 
+  comport_settings.name,
     meters.address, 
   parent_objects_for_progruz.ab_name
     """

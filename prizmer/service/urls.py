@@ -30,6 +30,7 @@ urlpatterns = patterns('',
     url(r'^service_replace_electric/$', views.replace_electric_meters_v2), # поменять местами счётчики
     url(r'^service_get_info/$', views.get_info), # 
     url(r'^get_electric_progruz/$', views.get_electric_progruz), # прогрузочная ведомость в эксель
+    url(r'^get_electric_progruz_com/$', views.get_electric_progruz_com), # прогрузочная ведомость в эксель по com-порту
     url(r'^get_water_progruz/$', views.get_water_progruz), # прогрузочная ведомость в эксель
     url(r'^get_water_impulse_progruz/$', views.get_water_impulse_progruz), # прогрузочная ведомость в эксель
     url(r'^get_heat_progruz/$', views.get_heat_progruz), # прогрузочная ведомость в эксель
