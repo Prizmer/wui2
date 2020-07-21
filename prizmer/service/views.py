@@ -536,14 +536,14 @@ def LoadElectricMeters(sPath, sSheet):
         isNewAbon=SimpleCheckIfExist('objects','name', obj_l2,'abonents', 'name', abon)
         isR = False
         isHalfs = False
-        print 'attr1, attr2', meter, attr1, attr2
+        #print 'attr1, attr2', meter, attr1, attr2
         #if ((attr1 == u'да') or (attr1 == u'Да') or (attr1 == u'ДА') or (attr2 == u'1')):
         if (attr1 == u'+'):
             isR = True        
         #if ((attr2 == u'да') or (attr2 == u'Да') or (attr2 == u'ДА') or (attr2 == u'1')):
         if (attr2 == u'+'):
             isHalfs = True
-        print 'attr1, attr2', meter, isR, isHalfs
+        #print 'attr1, attr2', meter, isR, isHalfs
         #writeToLog( u'счётчик существует ', isNewMeter)
         if not (isNewAbon):
             return u"Сначала создайте структуру объектов и абонентов"
@@ -620,7 +620,7 @@ def LoadElectricMeters(sPath, sSheet):
                 writeToLog(u'Device added' + ' --->   ' + u'Danfoss SonoSelect')
             elif unicode(type_meter) == u'СЭТ-4ТМ.03М':
                 #print('create set')
-                add_meter = Meters(name = unicode(type_meter) + u' ' + unicode(meter), address = unicode(adr), factory_number_manual = unicode(meter), guid_types_meters = TypesMeters.objects.get(guid = u"66b7ce6a-f280-4e54-8c8d-f69f34aabdf9") )
+                add_meter = Meters(name = unicode(type_meter) + u' ' + unicode(meter), password = '000000', address = unicode(adr), factory_number_manual = unicode(meter), guid_types_meters = TypesMeters.objects.get(guid = u"66b7ce6a-f280-4e54-8c8d-f69f34aabdf9") )
                 add_meter.save()
                 writeToLog(u'Device added' + ' --->   ' + u'СЭТ-4ТМ.03М')
             else:
@@ -743,13 +743,14 @@ def add_link_meter_port_from_excel_cfg_electric(sender, instance, created, **kwa
         #print u'Обрабатываем строку ' + unicode(dtAll[i][6])+' - '+unicode(dtAll[i][7])
         meter=dtAll[i][6] #счётчик
         #print dtAll[0][11], dtAll[0][12]
-        PortType=unicode(dtAll[0][12]) # com или tcp-ip
+        PortType=unicode(dtAll[0][11]) # com или tcp-ip
         #print 'i=',i,' len=', len(dtAll)
         ip_adr=unicode(dtAll[i][10]).strip()
         ip_port=unicode(dtAll[i][11]).strip()
         # Привязка к tpc порту
         if meter is not None:
             if unicode(meter) == instance.factory_number_manual :
+                #print 'Port type:', PortType
                 if PortType == u'Com-port':
                     #print 'dtAll[i][12]', dtAll[i][12]
                     guid_com_port_from_excel = connection.cursor()
@@ -758,7 +759,7 @@ def add_link_meter_port_from_excel_cfg_electric(sender, instance, created, **kwa
                                                     FROM 
                                                       public.comport_settings
                                                     WHERE 
-                                                      comport_settings.name = '%s';"""%(unicode(dtAll[i][12])))
+                                                      comport_settings.name = '%s';"""%(unicode(dtAll[i][11])))
                     guid_com_port_from_excel = guid_com_port_from_excel.fetchall()
                     #print guid_com_port_from_excel
                     if (len(guid_com_port_from_excel)>0):
@@ -1981,7 +1982,23 @@ def add_taken_param_no_signals(instance, isR, isHalfs): # Добавляем с�
             add_param.save()
             add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"087b785e-5d59-4956-9cd3-57706f9557e6")) # R+ T0 суточные
             add_param.save()
-           
+    
+    # # T1 A+
+    #     add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"")) # A+ T1 месячные
+    #     add_param.save()
+    #     add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"")) # A+ T1 суточные
+    #     add_param.save()
+    # # T2 A+
+    #     add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"")) # A+ T2 месячные
+    #     add_param.save()
+    #     add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"")) # A+ T2 суточные
+    #     add_param.save()
+    # # T3 A+
+    #     add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"")) # A+ T3 месячные
+    #     add_param.save()
+    #     add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"")) # A+ T3 суточные
+    #     add_param.save()
+
     #Получасовки
         if isHalfs:
             add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"4f505e17-7d71-4cf8-9880-c6ce33612e6e")) # A+ 30-мин. срез мощности
