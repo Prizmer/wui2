@@ -3100,8 +3100,8 @@ def get_k_t_n(meter_name):
                           meters.guid = taken_params.guid_meters AND
                           meters.factory_number_manual = %s
                           LIMIT 1;""", [meter_name])
-
     simpleq = simpleq.fetchall()
+    print('ktt',simpleq[0][0] )
     return simpleq[0][0]
     
     
@@ -3139,6 +3139,23 @@ def get_k_t_t_by_factory_number_manual(factory_number_manual):
     simpleq = simpleq.fetchall()
     return simpleq[0][0]
 
+def get_k_t_n_by_factory_number_manual(factory_number_manual):
+    simpleq = connection.cursor()
+    simpleq.execute("""SELECT 
+                          link_abonents_taken_params.coefficient_2
+                        FROM 
+                          public.meters, 
+                          public.link_abonents_taken_params, 
+                          public.taken_params
+                        WHERE 
+                          link_abonents_taken_params.guid_taken_params = taken_params.guid AND
+                          taken_params.guid_meters = meters.guid AND
+                          meters.factory_number_manual = %s
+                        ORDER BY
+                          link_abonents_taken_params.coefficient ASC
+                        LIMIT 1;""", [factory_number_manual])
+    simpleq = simpleq.fetchall()
+    return simpleq[0][0]
     
 def list_of_abonents_heat(parent_guid, object_name): # Отличие в сортировке
     simpleq = connection.cursor()

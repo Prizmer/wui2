@@ -8460,7 +8460,7 @@ def report_forma_80020(request):
                     for time in range(len(time_table)):
                         result_30_min = common_sql.get_30_min_value_by_meters_number_param_names_and_datetime(list_of_taken_params[y][0], list_of_taken_params[y][1], list_of_dates[dates].strftime('%Y-%m-%d'), time_table[time])
                         if result_30_min:
-                            my_dict_of_profil[time]=[my_dict_of_profil[time][0], my_dict_of_profil[time][1], float(result_30_min[0][4])*common_sql.get_k_t_t_by_factory_number_manual(list_of_taken_params[y][0])*common_sql.get_k_t_n(list_of_taken_params[y][0]), 0] #Квт.ч
+                            my_dict_of_profil[time]=[my_dict_of_profil[time][0], my_dict_of_profil[time][1], float(result_30_min[0][4])*common_sql.get_k_t_t_by_factory_number_manual(list_of_taken_params[y][0])*common_sql.get_k_t_n_by_factory_number_manual(list_of_taken_params[y][0]), 0] #Квт.ч
                             #print u'------ Есть значение',list_of_taken_params[y][1] , my_dict_of_profil[time][0], my_dict_of_profil[time][1]
                             
                         else:
@@ -8472,7 +8472,7 @@ def report_forma_80020(request):
                     for time in range(len(time_table)):
                         result_30_min = common_sql.get_30_min_value_by_meters_number_param_names_and_datetime(list_of_taken_params[y][0], list_of_taken_params[y][1], list_of_dates[dates].strftime('%Y-%m-%d'), time_table[time])
                         if result_30_min:
-                            my_dict_of_profil[time]=[my_dict_of_profil[time][0], my_dict_of_profil[time][1], float(result_30_min[0][4])*common_sql.get_k_t_t_by_factory_number_manual(list_of_taken_params[y][0])*common_sql.get_k_t_n(list_of_taken_params[y][0]), 0] # Квар.ч
+                            my_dict_of_profil[time]=[my_dict_of_profil[time][0], my_dict_of_profil[time][1], float(result_30_min[0][4])*common_sql.get_k_t_t_by_factory_number_manual(list_of_taken_params[y][0])*common_sql.get_k_t_n_by_factory_number_manual(list_of_taken_params[y][0]), 0] # Квар.ч
                             #print u'------ Есть значение',list_of_taken_params[y][1], my_dict_of_profil[time][0], my_dict_of_profil[time][1]
                             
                         else:
