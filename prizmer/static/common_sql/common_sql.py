@@ -6228,6 +6228,13 @@ on z1.factory_number_manual=water_pulsar_abons.factory_number_manual
 where 
 water_pulsar_abons.obj_name='%s'and
 water_pulsar_abons.ab_name='%s' 
+group by 
+z1.date,
+water_pulsar_abons.ab_name, 
+water_pulsar_abons.type_meter, 
+water_pulsar_abons.attr1, 
+water_pulsar_abons.factory_number_manual, 
+z1.value
     """%(obj_parent_title, obj_title, electric_data_end, my_params[0],my_params[1],obj_parent_title, obj_title)
     #print sQuery
     return sQuery
@@ -6267,6 +6274,12 @@ ORDER BY
   abonents.name ASC) as z1
 on water_pulsar_abons.factory_number_manual=z1.factory_number_manual
   where water_pulsar_abons.obj_name='%s'
+  group by z1.date, 
+water_pulsar_abons.ab_name, 
+z1.type_meter, 
+z1.attr1, 
+water_pulsar_abons.factory_number_manual, z1.value,
+water_pulsar_abons.ab_guid
   order by water_pulsar_abons.ab_name, z1.type_meter, z1.attr1
     """%(obj_title, electric_data_end, my_params[0],my_params[1],obj_title)
     #print sQuery
@@ -6363,6 +6376,11 @@ where water_pulsar_abons.obj_name='%s'
 and water_pulsar_abons.ab_name='%s'
 ) as z2
 where z1.factory_number_manual=z2.factory_number_manual
+group by z_start.ab_name, 
+z_start.type_meter, 
+z_start.attr1, 
+z_start.factory_number_manual,z_start.value,
+z_end.value
     """%(obj_parent_title, obj_title,electric_data_start, my_params[0], my_params[1],obj_parent_title, obj_title, obj_parent_title, obj_title,  electric_data_end, my_params[0], my_params[1],obj_parent_title, obj_title)
     #print sQuery  
     return sQuery
@@ -6446,7 +6464,13 @@ WHERE
   where water_pulsar_abons.obj_name='%s'
   order by ab_name) as z_start
 where z_end.factory_number_manual=z_start.factory_number_manual
+group by z_start.ab_name, 
+z_start.type_meter, 
+z_start.attr1, 
+z_start.factory_number_manual,z_start.value,
+z_end.value
 order by z_start.ab_name, z_start.attr1, z_start.type_meter 
+
     """%(electric_data_end , my_params[2], my_params[3], obj_title, electric_data_start, my_params[2], my_params[3],obj_title)
     #print sQuery 
     return sQuery

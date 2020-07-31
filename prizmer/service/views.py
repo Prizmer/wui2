@@ -3876,21 +3876,22 @@ def load_balance_group(request):
     sheet    = ""
     balance_status    = ""
     result="Не загружено"
-    if request.is_ajax():
-        if request.method == 'GET':
-            request.session["choice_file"]    = fileName    = request.GET['choice_file']
-            request.session["choice_sheet"]    = sheet    = request.GET.get('choice_sheet')
-            request.session["balance_status"]    = balance_status    = request.GET['balance_status']            
-            directory=os.path.join(BASE_DIR,'static/cfg/')
-            sPath=directory+fileName
-            result=LoadBalance(sPath, sheet)
+    try:
+        if request.is_ajax():
+            if request.method == 'GET':
+                request.session["choice_file"]    = fileName    = request.GET['choice_file']
+                request.session["choice_sheet"]    = sheet    = request.GET.get('choice_sheet')
+                request.session["balance_status"]    = balance_status    = request.GET['balance_status']            
+                directory=os.path.join(BASE_DIR,'static/cfg/')
+                sPath=directory+fileName
+                result=LoadBalance(sPath, sheet)
+    except Exception as e:
+        result = u"Ошибка.load: "+e.message
     
     balance_status=result
-
-    #print fileName
     args["choice_file"]    = fileName
     args["choice_sheet"]    = sheet
-    args["balance_status"]=balance_status
+    args["balance_status"] = balance_status
 
     return render_to_response("service/service_balance_load.html", args)
 
@@ -4060,6 +4061,7 @@ def LoadBalance(sPath, sheet):
                continue
            
             types_abonents_guid=GetSimpleTable('types_abonents','name',type_abonent)[0][0]
+            #print 'types_abonents_guid', types_abonents_guid
             guid_abonent=GetGuidFromFirstTableCrossWithSecondTable('abonents','objects','name',abonent_name,'name',object_name)[0][0]
             isOk=UpdateSimpleTable('abonents', guid_abonent,'guid_types_abonents',types_abonents_guid)
             #print u'type of abonents changed: ', isOk 
