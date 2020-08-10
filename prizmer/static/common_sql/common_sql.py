@@ -1907,10 +1907,10 @@ z3.t0_start, z3.t1_start, z3.t2_start, z3.t3_start, z3.t4_start,
 z4.t0_end, z4.t1_end, z4.t2_end, z4.t3_end, z4.t4_end,  
 z4.t0_end-z3.t0_start as delta_t0, z4.t1_end-z3.t1_start as delta_t1, z4.t2_end-z3.t2_start as delta_t2, z4.t3_end-z3.t3_start as delta_t3, z4.t4_end-z3.t4_start as delta_t4,
 z3.t0R_start, z4.t0R_end,  z4.t0R_end-z3.t0R_start as delta_t0R, z4.ktt,
-z4.ktt*z4.ktn*(z4.t0_end-z3.t0_start), z4.ktt*z4.ktn*(z4.t0R_end-z3.t0R_start), z4.ktn, z4.a
+z4.ktt*z4.ktn*(z4.t0_end-z3.t0_start), z4.ktt*z4.ktn*(z4.t0R_end-z3.t0R_start), z4.ktn, z4.a, z4.lic_num
 from
-(Select z2.ktt, z2.ktn, z2.a,z2.date as date_start, electric_abons.obj_name, electric_abons.ab_name, electric_abons.factory_number_manual, z2.name_res, z2.t0 as t0_end, z2.t1 as t1_end, z2.t2 as t2_end, z2.t3 as t3_end, z2.t4 as t4_end, z2.t0r as t0r_end
-from electric_abons
+(Select electric_abons_2.ktt,electric_abons_2.lic_num, electric_abons_2.ktn, electric_abons_2.a,z2.date as date_start, electric_abons_2.obj_name, electric_abons_2.ab_name, electric_abons_2.factory_number_manual, z2.name_res, z2.t0 as t0_end, z2.t1 as t1_end, z2.t2 as t2_end, z2.t3 as t3_end, z2.t4 as t4_end, z2.t0r as t0r_end
+from electric_abons_2
 Left join
 (SELECT z1.ktt, z1.ktn,z1.a,z1.date, z1.name_objects, z1.name as name_abonent, z1.num_manual, z1.name_res,
 sum(Case when z1.params_name = '%s' then z1.value else null end) as t0,
@@ -1971,11 +1971,11 @@ sum(Case when z1.params_name = '%s' then z1.value else null end) as t0R
                                   ) z1                       
                       group by z1.name, z1.date, z1.name_objects, z1.name, z1.num_manual, z1.name_res, z1.ktt, z1.ktn, z1.a
                       order by z1.name) z2
-on electric_abons.factory_number_manual=z2.num_manual
-where electric_abons.obj_name='%s') z4, 
+on electric_abons_2.factory_number_manual=z2.num_manual
+where electric_abons_2.obj_name='%s') z4, 
 
-(Select z2.date as date_start, electric_abons.obj_name, electric_abons.ab_name, electric_abons.factory_number_manual, z2.name_res, z2.t0 as t0_start, z2.t1 as t1_start, z2.t2 as t2_start, z2.t3 as t3_start, z2.t4 as t4_start, z2.t0r as t0r_start
-from electric_abons
+(Select z2.date as date_start, electric_abons_2.obj_name, electric_abons_2.ab_name, electric_abons_2.factory_number_manual, z2.name_res, z2.t0 as t0_start, z2.t1 as t1_start, z2.t2 as t2_start, z2.t3 as t3_start, z2.t4 as t4_start, z2.t0r as t0r_start
+from electric_abons_2
 Left join
 (SELECT z1.date, z1.name_objects, z1.name as name_abonent, z1.num_manual, z1.name_res,
 sum(Case when z1.params_name = '%s' then z1.value else null end) as t0,
@@ -2034,12 +2034,12 @@ SELECT
                                   ) z1                       
                       group by z1.name, z1.date, z1.name_objects, z1.name, z1.num_manual, z1.name_res
                       order by z1.name) z2
-on electric_abons.factory_number_manual=z2.num_manual
-where electric_abons.obj_name='%s') z3
+on electric_abons_2.factory_number_manual=z2.num_manual
+where electric_abons_2.obj_name='%s') z3
 where z3.ab_name=z4.ab_name and z3.ab_name='%s' and z3.factory_number_manual=z4.factory_number_manual """ % (params[0],params[1],params[2],params[3], params[4], params[5],  obj_parent_title, obj_title, date_end, res, obj_parent_title, 
                             params[0],params[1],params[2],params[3], params[4], params[5],obj_parent_title, obj_title, date_start, res,obj_parent_title, obj_title)
     #
-    # print sQuery
+    #print sQuery
     if dm=='monthly' or dm=='daily' or dm=='current':
         sQuery=sQuery.replace('daily',dm)    
     return sQuery
@@ -2051,10 +2051,10 @@ z3.t0_start, z3.t1_start, z3.t2_start, z3.t3_start, z3.t4_start,
 z4.t0_end, z4.t1_end, z4.t2_end, z4.t3_end, z4.t4_end,  
 z4.t0_end-z3.t0_start as delta_t0, z4.t1_end-z3.t1_start as delta_t1, z4.t2_end-z3.t2_start as delta_t2, z4.t3_end-z3.t3_start as delta_t3, z4.t4_end-z3.t4_start as delta_t4,
 z3.t0R_start, z4.t0R_end,  z4.t0R_end-z3.t0R_start as delta_t0R, z4.ktt,  
-z4.ktt*z4.ktn*(z4.t0_end-z3.t0_start), z4.ktt*z4.ktn*(z4.t0R_end-z3.t0R_start),z4.ktn,z4.a
+z4.ktt*z4.ktn*(z4.t0_end-z3.t0_start), z4.ktt*z4.ktn*(z4.t0R_end-z3.t0R_start),z4.ktn,z4.a, z4.lic_num
 from
-(Select z2.ktt, z2.ktn, z2.a, z2.date as date_end, electric_abons.obj_name, electric_abons.ab_name, electric_abons.factory_number_manual, z2.name_res, z2.t0 as t0_end, z2.t1 as t1_end, z2.t2 as t2_end, z2.t3 as t3_end, z2.t4 as t4_end, z2.t0r as t0r_end
-from electric_abons
+(Select electric_abons_2.ktt, electric_abons_2.lic_num, electric_abons_2.ktn, electric_abons_2.a, z2.date as date_end, electric_abons_2.obj_name, electric_abons_2.ab_name, electric_abons_2.factory_number_manual, z2.name_res, z2.t0 as t0_end, z2.t1 as t1_end, z2.t2 as t2_end, z2.t3 as t3_end, z2.t4 as t4_end, z2.t0r as t0r_end
+from electric_abons_2
 Left join
 (SELECT z1.ktt, z1.ktn, z1.a,z1.date, z1.name_objects, z1.name as name_abonent, z1.num_manual, z1.name_res,
 sum(Case when z1.params_name = '%s' then z1.value else null end) as t0,
@@ -2115,12 +2115,12 @@ SELECT
                                   ) z1                       
                       group by z1.name, z1.date, z1.name_objects, z1.name, z1.num_manual, z1.name_res, z1.ktt, z1.ktn,z1.a
                       order by z1.name) z2
-on electric_abons.factory_number_manual=z2.num_manual
-where electric_abons.obj_name='%s') z4, 
+on electric_abons_2.factory_number_manual=z2.num_manual
+where electric_abons_2.obj_name='%s') z4, 
 
 
-(Select z2.date as date_start, electric_abons.obj_name, electric_abons.ab_name, electric_abons.factory_number_manual, z2.name_res, z2.t0 as t0_start, z2.t1 as t1_start, z2.t2 as t2_start, z2.t3 as t3_start, z2.t4 as t4_start, z2.t0r as t0r_start
-from electric_abons
+(Select z2.date as date_start, electric_abons_2.obj_name, electric_abons_2.ab_name, electric_abons_2.factory_number_manual, z2.name_res, z2.t0 as t0_start, z2.t1 as t1_start, z2.t2 as t2_start, z2.t3 as t3_start, z2.t4 as t4_start, z2.t0r as t0r_start
+from electric_abons_2
 Left join
 (SELECT z1.date, z1.name_objects, z1.name as name_abonent, z1.num_manual, z1.name_res,
 sum(Case when z1.params_name = '%s' then z1.value else null end) as t0,
@@ -2178,56 +2178,49 @@ SELECT
                                   ) z1                       
                       group by z1.name, z1.date, z1.name_objects, z1.name, z1.num_manual, z1.name_res
                       order by z1.name) z2
-on electric_abons.factory_number_manual=z2.num_manual
-where electric_abons.obj_name='%s') z3
+on electric_abons_2.factory_number_manual=z2.num_manual
+where electric_abons_2.obj_name='%s') z3
 where z3.ab_name=z4.ab_name and z3.factory_number_manual=z4.factory_number_manual
 order by z3.ab_name ASC""" % (params[0],params[1],params[2],params[3], params[4], params[5], obj_title, date_end, res, obj_title, 
                             params[0],params[1],params[2],params[3], params[4], params[5],obj_title,  date_start, res,obj_title)
     if dm=='monthly' or dm=='daily' or dm=='current':
         sQuery=sQuery.replace('daily',dm)
     #
-    # print sQuery
+    #print sQuery
     return sQuery
 
-def get_data_table_electric_parametr_by_period_v2(isAbon,obj_title, obj_parent_title, electric_data_start, electric_data_end, params, res, dm):
-    cursor = connection.cursor()
-    #isAbon - запрос для абонента или для корпуса
-    if isAbon:
-        cursor.execute(makeSqlQuery_electric_by_period(obj_title, obj_parent_title, electric_data_start, electric_data_end,params, res, dm))
-    else:
-        cursor.execute(makeSqlQuery_electric_by_period_for_all(obj_title, obj_parent_title, electric_data_start, electric_data_end,params, res, dm))
-    data_table = cursor.fetchall()
-    # 0 - дата, 1 - Имя объекта, 2 - Имя абонента, 3 - заводской номер, 4 - значение
-    return data_table
+#def get_data_table_electric_parametr_by_period_v2(isAbon,obj_title, obj_parent_title, electric_data_start, electric_data_end, params, res, dm):
+    
 
 def makeSqlQuery_electric_by_period_for_group(obj_title, date_start, date_end,params, res):
-    sQuery="""
-    Select  z3.name_abonents, z3.number_manual,
-round(z3.t0_start::numeric,3), 
-round(z3.t1_start::numeric,3), 
-round(z3.t2_start::numeric,3), 
-round(z3.t3_start::numeric,3), 
-round(z3.t4_start::numeric,3), 
-round(z4.t0_end::numeric,3), 
-round(z4.t1_end::numeric,3), 
-round(z4.t2_end::numeric,3), 
-round(z4.t3_end::numeric,3), 
-round(z4.t4_end::numeric,3),  
-round((z4.t0_end-z3.t0_start)::numeric,3) as delta_t0, 
-round((z4.t1_end-z3.t1_start)::numeric,3) as delta_t1, 
-round((z4.t2_end-z3.t2_start)::numeric,3) as delta_t2, 
-round((z4.t3_end-z3.t3_start)::numeric,3) as delta_t3, 
-round((z4.t4_end-z3.t4_start)::numeric,3) as delta_t4,
-round(z3.t0R_start::numeric,3), 
-round(z4.t0R_end::numeric,3),  
-round((z4.t0R_end-z3.t0R_start)::numeric,3) as delta_t0R, z4.ktt, z4.ktn, 
-round((z4.ktt*z4.ktn*(z4.t0_end-z3.t0_start))::numeric,3), 
-round((z4.ktt*z4.ktn*(z4.t0R_end-z3.t0R_start))::numeric,3)
+    sQuery="""  
+  Select  z3.name_abonents, z3.number_manual,
+max(round(z3.t0_start::numeric,3))::text,
+max(round(z3.t1_start::numeric,3))::text,
+max(round(z3.t2_start::numeric,3))::text,
+max(round(z3.t3_start::numeric,3))::text,
+max(round(z3.t4_start::numeric,3))::text,
+max(round(z4.t0_end::numeric,3))::text,
+max(round(z4.t1_end::numeric,3))::text,
+max(round(z4.t2_end::numeric,3))::text,
+max(round(z4.t3_end::numeric,3))::text,
+max(round(z4.t4_end::numeric,3))::text,
+max(round((z4.t0_end-z3.t0_start)::numeric,3))::text as delta_t0,
+max(round((z4.t1_end-z3.t1_start)::numeric,3))::text as delta_t1,
+max(round((z4.t2_end-z3.t2_start)::numeric,3))::text as delta_t2,
+max(round((z4.t3_end-z3.t3_start)::numeric,3))::text as delta_t3,
+max(round((z4.t4_end-z3.t4_start)::numeric,3))::text as delta_t4,
+max(round(z3.t0R_start::numeric,3))::text,
+max(round(z4.t0R_end::numeric,3))::text,
+max(round((z4.t0R_end-z3.t0R_start)::numeric,3))::text as delta_t0R, z4.ktt::text,
+max(round((z4.ktt*z4.ktn*(z4.t0_end-z3.t0_start))::numeric,3))::text,
+max(round((z4.ktt*z4.ktn*(z4.t0R_end-z3.t0R_start))::numeric,3))::text, z4.ktn::text, z4.a::text,
+z4.lic_num::text
 from
-(Select z2.group_name, z2.ktt, z2.ktn, z2.date as date_end, electric_groups.name_group, electric_groups.name_abonents, electric_groups.number_manual, z2.name_res, z2.t0 as t0_end, z2.t1 as t1_end, z2.t2 as t2_end, z2.t3 as t3_end, z2.t4 as t4_end, z2.t0r as t0r_end
+(Select z2.ab_guid, z2.group_name, electric_groups.ktt, electric_groups.lic_num, electric_groups.a, electric_groups.ktn, z2.date as date_end, electric_groups.name_group, electric_groups.name_abonents, electric_groups.number_manual, z2.name_res, z2.t0 as t0_end, z2.t1 as t1_end, z2.t2 as t2_end, z2.t3 as t3_end, z2.t4 as t4_end, z2.t0r as t0r_end
 from electric_groups
 Left join
-(SELECT z1.group_name,z1.ktt, z1.ktn, z1.date, z1.name_objects, z1.name as name_abonent, z1.num_manual, z1.name_res,
+(SELECT z1.group_name,z1.ktt, z1.ktn, z1.date, z1.name_objects, z1.name as name_abonent, z1.num_manual, z1.name_res, z1.ab_guid,
 sum(Case when z1.params_name = '%s' then z1.value else null end) as t0,
 sum(Case when z1.params_name = '%s' then z1.value else null end) as t1,
 sum(Case when z1.params_name = '%s' then z1.value else null end) as t2,
@@ -2237,32 +2230,33 @@ sum(Case when z1.params_name = '%s' then z1.value else null end) as t0R
 
                         FROM
                         (
-SELECT 
+SELECT
                                   link_abonents_taken_params.coefficient_2 as ktt,
                                   link_abonents_taken_params.coefficient as ktn,
-                                  daily_values.date,    
-                                  daily_values.value,                            
-                                  abonents.name, 
-                                  daily_values.id_taken_params, 
+                                  daily_values.date,
+                                  daily_values.value,
+                                  abonents.name,
+                                  abonents.guid as ab_guid,
+                                  daily_values.id_taken_params,
                                   objects.name as name_objects,
                                   names_params.name as params_name,
-                                  meters.factory_number_manual as num_manual, 
+                                  meters.factory_number_manual as num_manual,
                                   resources.name as name_res,
                                   balance_groups.name as group_name
-                                  
-                                FROM 
+
+                                FROM
                                   public.balance_groups,
                                   public.link_balance_groups_meters,
-                                  public.daily_values, 
-                                  public.link_abonents_taken_params, 
-                                  public.taken_params, 
-                                  public.abonents, 
-                                  public.objects, 
-                                  public.names_params, 
-                                  public.params, 
-                                  public.meters, 
+                                  public.daily_values,
+                                  public.link_abonents_taken_params,
+                                  public.taken_params,
+                                  public.abonents,
+                                  public.objects,
+                                  public.names_params,
+                                  public.params,
+                                  public.meters,
                                   public.resources
-                                WHERE 
+                                WHERE
                                   balance_groups.guid= link_balance_groups_meters.guid_balance_groups and
                                   link_balance_groups_meters.guid_meters=meters.guid and
                                   taken_params.guid = link_abonents_taken_params.guid_taken_params AND
@@ -2272,15 +2266,16 @@ SELECT
                                   abonents.guid = link_abonents_taken_params.guid_abonents AND
                                   objects.guid = abonents.guid_objects AND
                                   names_params.guid = params.guid_names_params AND
-                                  resources.guid = names_params.guid_resources AND                                  
-                                  balance_groups.name = '%s' AND 
-                                  daily_values.date = '%s' AND 
+                                  resources.guid = names_params.guid_resources AND
+                                  balance_groups.name = '%s' AND
+                                  daily_values.date = '%s' AND
                                   resources.name = '%s'
-                                  group by 
+                                  group by
                          daily_values.date,
                         daily_values.id_taken_params,
                         objects.name ,
                         abonents.name ,
+                        abonents.guid ,
                         meters.factory_number_manual,
                         daily_values.value ,
                         names_params.name ,
@@ -2289,48 +2284,52 @@ SELECT
                           link_abonents_taken_params.coefficient_3,
                           resources.name,
                            balance_groups.name
-                                  ) z1                       
-                      group by z1.name, z1.date, z1.name_objects, z1.name, z1.num_manual, z1.name_res, z1.ktt, z1.ktn, z1.group_name
+                                  ) z1
+                      group by z1.name, z1.date, z1.name_objects, z1.num_manual, z1.name_res, z1.ktt, z1.ktn, z1.group_name, z1.ab_guid
                       order by z1.name) z2
-on electric_groups.name_abonents=z2.name_abonent
-where z2.group_name= '%s' ) z4, 
+on electric_groups.ab_guid=z2.ab_guid
+where z2.group_name= '%s' ) z4,
 
-
-(Select z2.group_name,  z2.date as date_start, electric_groups.name_group, electric_groups.name_abonents, electric_groups.number_manual, z2.name_res, z2.t0 as t0_start, z2.t1 as t1_start, z2.t2 as t2_start, z2.t3 as t3_start, z2.t4 as t4_start, z2.t0r as t0r_start
+(Select z2.ab_guid, z2.group_name, z2.ktt, z2.ktn, z2.date as date_start, electric_groups.name_group, electric_groups.name_abonents, electric_groups.number_manual, z2.name_res, z2.t0 as t0_start, z2.t1 as t1_start, z2.t2 as t2_start, z2.t3 as t3_start, z2.t4 as t4_start, z2.t0r as t0r_start
 from electric_groups
 Left join
-(SELECT z1.group_name,z1.date, z1.name_objects, z1.name as name_abonent, z1.num_manual, z1.name_res,
+(SELECT z1.group_name,z1.ktt, z1.ktn, z1.date, z1.name_objects, z1.name as name_abonent, z1.num_manual, z1.name_res, z1.ab_guid,
 sum(Case when z1.params_name = '%s' then z1.value else null end) as t0,
 sum(Case when z1.params_name = '%s' then z1.value else null end) as t1,
 sum(Case when z1.params_name = '%s' then z1.value else null end) as t2,
 sum(Case when z1.params_name = '%s' then z1.value else null end) as t3,
 sum(Case when z1.params_name = '%s' then z1.value else null end) as t4,
 sum(Case when z1.params_name = '%s' then z1.value else null end) as t0R
+
                         FROM
                         (
-SELECT 
-                                  daily_values.date,    
-                                  daily_values.value,                            
-                                  abonents.name, 
-                                  daily_values.id_taken_params, 
+SELECT
+                                  link_abonents_taken_params.coefficient_2 as ktt,
+                                  link_abonents_taken_params.coefficient as ktn,
+                                  daily_values.date,
+                                  daily_values.value,
+                                  abonents.name,
+                                  abonents.guid as ab_guid,
+                                  daily_values.id_taken_params,
                                   objects.name as name_objects,
                                   names_params.name as params_name,
-                                  meters.factory_number_manual as num_manual, 
+                                  meters.factory_number_manual as num_manual,
                                   resources.name as name_res,
                                   balance_groups.name as group_name
-                                FROM 
+
+                                FROM
                                   public.balance_groups,
                                   public.link_balance_groups_meters,
-                                  public.daily_values, 
-                                  public.link_abonents_taken_params, 
-                                  public.taken_params, 
-                                  public.abonents, 
-                                  public.objects, 
-                                  public.names_params, 
-                                  public.params, 
-                                  public.meters, 
+                                  public.daily_values,
+                                  public.link_abonents_taken_params,
+                                  public.taken_params,
+                                  public.abonents,
+                                  public.objects,
+                                  public.names_params,
+                                  public.params,
+                                  public.meters,
                                   public.resources
-                                WHERE 
+                                WHERE
                                   balance_groups.guid= link_balance_groups_meters.guid_balance_groups and
                                   link_balance_groups_meters.guid_meters=meters.guid and
                                   taken_params.guid = link_abonents_taken_params.guid_taken_params AND
@@ -2340,15 +2339,16 @@ SELECT
                                   abonents.guid = link_abonents_taken_params.guid_abonents AND
                                   objects.guid = abonents.guid_objects AND
                                   names_params.guid = params.guid_names_params AND
-                                  resources.guid = names_params.guid_resources AND                                  
-                                  balance_groups.name = '%s' AND 
-                                  daily_values.date = '%s' AND 
+                                  resources.guid = names_params.guid_resources AND
+                                  balance_groups.name = '%s' AND
+                                  daily_values.date = '%s' AND
                                   resources.name = '%s'
-                                  group by 
+                                  group by
                          daily_values.date,
                         daily_values.id_taken_params,
                         objects.name ,
                         abonents.name ,
+                        abonents.guid ,
                         meters.factory_number_manual,
                         daily_values.value ,
                         names_params.name ,
@@ -2357,25 +2357,27 @@ SELECT
                           link_abonents_taken_params.coefficient_3,
                           resources.name,
                            balance_groups.name
-                                  ) z1                       
-                      group by z1.name, z1.date, z1.name_objects, z1.name, z1.num_manual, z1.name_res, z1.group_name
+                                  ) z1
+                      group by z1.name, z1.date, z1.name_objects, z1.num_manual, z1.name_res, z1.ktt, z1.ktn, z1.group_name, z1.ab_guid
                       order by z1.name) z2
-on electric_groups.name_abonents=z2.name_abonent
-where z2.group_name = '%s') z3
-where z3.name_abonents=z4.name_abonents
-
+on electric_groups.ab_guid=z2.ab_guid
+where z2.group_name= '%s' ) z3
+where z3.ab_guid=z4.ab_guid
+group by
+z3.name_abonents, 
+z3.number_manual,
+z4.ktt,
+z4.ktn, 
+z4.a,
+z4.lic_num
 order by z3.name_abonents ASC
     """%(params[0],params[1],params[2],params[3], params[4], params[5], obj_title, date_end, res, obj_title, 
                             params[0],params[1],params[2],params[3], params[4], params[5],obj_title,  date_start, res,obj_title)
     #print sQuery
     return sQuery
 
-def get_data_table_electric_parametr_by_period_for_group_v2(obj_title, electric_data_start, electric_data_end, params, res):
-    cursor = connection.cursor()
-    cursor.execute(makeSqlQuery_electric_by_period_for_group(obj_title, electric_data_start, electric_data_end,params, res))
-    data_table = cursor.fetchall()
-    # 0 - дата, 1 - Имя объекта, 2 - Имя абонента, 3 - заводской номер, 4 - значение
-    return data_table
+#def get_data_table_electric_parametr_by_period_for_group_v2(obj_title, electric_data_start, electric_data_end, params, res):
+    
 
 
 def get_data_table_electric_parametr_by_date_monthly(obj_title, obj_parent_title, electric_data, my_parametr ):
@@ -2656,7 +2658,7 @@ def ChangeNull_and_LeaveEmptyCol(data_table, electric_data, numColEmpty):
         data_table[i]=list(data_table[i])
         #if i<10: print data_table[i]
         for j in range(1,len(data_table[i])):            
-            if (data_table[i][j] == None) or (data_table[i][j] is None):
+            if (data_table[i][j] == None) or (data_table[i][j] is None) or (data_table[i][j] == "None"):
                 if j==numColEmpty:
                     data_table[i][j]=u''
                 else:
@@ -2725,6 +2727,210 @@ def get_data_table_by_date_for_object_3_zones_v3(obj_title, electric_data, dm):
     cursor.execute(makeSqlQuery_electric_by_daily_or_monthly_for_object_v3(obj_title, electric_data, params, dm, res))
     data_table = cursor.fetchall()    
     if len(data_table)>0: data_table=ChangeNull_and_LeaveEmptyCol(data_table, electric_data, 11)
+    return data_table
+
+
+def makeSqlQuery_electric_by_date(obj_parent_title, obj_title, electric_data, params, dm, res, isAbon):
+    if isAbon:
+        sLevel = 'electric_abons_2.ab_name'
+        sFormat = (params[0],params[1],params[2],params[3], res, obj_parent_title, electric_data, obj_parent_title, sLevel, obj_title)
+    else:
+        sLevel = 'electric_abons_2.name_parent'
+        sFormat = (params[0],params[1],params[2],params[3], res, obj_title, electric_data, obj_title, sLevel, obj_parent_title)
+
+    sQuery = """
+    Select  z2.monthly_date,
+    electric_abons_2.ab_name, 
+    electric_abons_2.factory_number_manual, 
+    round(z2.t0::numeric,3), 
+    round(z2.t1::numeric,3), 
+    round(z2.t2::numeric,3), 
+    round(z2.t3::numeric,3),
+    electric_abons_2.obj_name, 
+    electric_abons_2.ktt::numeric,
+    electric_abons_2.ktn::numeric,
+    electric_abons_2.a::numeric, 
+    electric_abons_2.comment, 
+    electric_abons_2.date, 
+    electric_abons_2.ab_guid,
+    electric_abons_2.name_parent,
+    electric_abons_2.lic_num
+from electric_abons_2
+LEFT JOIN 
+(SELECT z1.monthly_date, z1.name_objects, z1.name_abonents, z1.number_manual, 
+sum(Case when z1.params_name = '%s' then z1.value_monthly  end) as t0,
+sum(Case when z1.params_name = '%s' then z1.value_monthly  end) as t1,
+sum(Case when z1.params_name = '%s' then z1.value_monthly  end) as t2,
+sum(Case when z1.params_name = '%s' then z1.value_monthly  end) as t3,
+z1.ktt,z1.ktn,z1.a
+
+                        FROM
+                        (SELECT monthly_values.date as monthly_date, 
+                        objects.name as name_objects, 
+                        abonents.name as name_abonents, 
+                        meters.factory_number_manual as number_manual, 
+                        monthly_values.value as value_monthly, 
+                        names_params.name as params_name,
+                        link_abonents_taken_params.coefficient as ktt,
+                         link_abonents_taken_params.coefficient_2 as ktn,
+                         link_abonents_taken_params.coefficient_3 as a
+                        FROM
+                         public.monthly_values, 
+                         public.link_abonents_taken_params, 
+                         public.taken_params, 
+                         public.abonents, 
+                         public.objects, 
+                         public.names_params, 
+                         public.params, 
+                         public.meters,
+                         public.types_meters,
+                         public.resources			
+                        WHERE
+                        taken_params.guid = link_abonents_taken_params.guid_taken_params AND 
+                        taken_params.id = monthly_values.id_taken_params AND 
+                        taken_params.guid_params = params.guid AND 
+                        taken_params.guid_meters = meters.guid AND 
+                        abonents.guid = link_abonents_taken_params.guid_abonents AND 
+                        objects.guid = abonents.guid_objects AND 
+                        names_params.guid = params.guid_names_params AND
+                        params.guid_names_params=names_params.guid and 
+                        types_meters.guid=meters.guid_types_meters and
+                        names_params.guid_resources=resources.guid and
+                        resources.name='%s' and
+                 objects.name = '%s' AND                      
+                        monthly_values.date = '%s' 
+                         group by 
+                        monthly_values.date,
+                        objects.name ,
+                        abonents.name ,
+                        meters.factory_number_manual,
+                        monthly_values.value ,
+                        names_params.name ,
+                        link_abonents_taken_params.coefficient ,
+                         link_abonents_taken_params.coefficient_2 ,
+                          link_abonents_taken_params.coefficient_3
+                        ) z1                  
+group by z1.name_objects, z1.monthly_date, z1.name_objects, z1.name_abonents, z1.number_manual, z1.ktt,z1.ktn,z1.a
+) z2
+on electric_abons_2.factory_number_manual=z2.number_manual
+where electric_abons_2.obj_name='%s' and %s='%s'
+ORDER BY electric_abons_2.ab_name ASC;
+"""%sFormat
+    
+    if dm=='monthly' or dm=='daily' or dm=='current':
+        sQuery=sQuery.replace('monthly',dm)
+        #print sQuery
+        return sQuery    
+    else: return """Select 'Н/Д'"""
+    return sQuery
+
+def get_electric_by_date(obj_parent_title, obj_title, electric_data, dm, isAbon):
+    data_table = []
+    params=[u'T0 A+',u'T1 A+',u'T2 A+',u'T3 A+']
+    res=u'Электричество'
+    cursor = connection.cursor()
+    #dm - строка, содержащая monthly or daily для sql-запроса
+    #isAbon - данные для абонента или объекта
+    #sLevel - запрос один для объектов и абонентов, заменяется только конструкция в where с какой таблицей сравнивать    
+    sQuery = makeSqlQuery_electric_by_date(obj_parent_title, obj_title, electric_data, params, dm, res, isAbon)
+    cursor.execute(sQuery)
+    data_table = cursor.fetchall()    
+    if len(data_table)>0: data_table=ChangeNull_and_LeaveEmptyCol(data_table, electric_data, 11)
+    return data_table
+
+def makeSqlQuery_electric_by_date_balance(obj_parent_title, obj_title, electric_data, params, dm):
+    sQuery = """   
+ Select  z2.date,
+    electric_groups.name_abonents,
+    electric_groups.number_manual,
+    max(CASE when electric_groups.type then round(z2.t0::numeric,3) else (0-round(z2.t0::numeric,3)) end),
+    max(CASE when electric_groups.type then round(z2.t1::numeric,3) else (0-round(z2.t1::numeric,3)) end),
+    max(CASE when electric_groups.type then round(z2.t2::numeric,3) else (0-round(z2.t2::numeric,3)) end),
+    max(CASE when electric_groups.type then round(z2.t3::numeric,3) else (0-round(z2.t3::numeric,3)) end),
+    electric_groups.name_group, electric_groups.ktt,electric_groups.ktn,electric_groups.a,
+    electric_groups.comment, electric_groups.date, electric_groups.ab_guid,
+    electric_groups.type
+from electric_groups
+LEFT JOIN
+
+(SELECT z1.date, z1.balance_guid, z1.meters_name, z1.ab_guid,z1.factory_number_manual, 
+sum(Case when z1.params_name = '%s' then z1.value  end) as t0,
+sum(Case when z1.params_name = '%s' then z1.value end) as t1,
+sum(Case when z1.params_name = '%s' then z1.value  end) as t2,
+sum(Case when z1.params_name = '%s' then z1.value  end) as t3
+from
+(SELECT 
+  link_balance_groups_meters.guid_balance_groups as balance_guid, 
+  balance_groups.name, 
+  link_balance_groups_meters.type, 
+  meters.name as meters_name, 
+  meters.factory_number_manual,
+  resources.name as res, 
+  names_params.name as params_name, 
+  daily_values.value, 
+  daily_values.date, 
+  abonents.guid as ab_guid
+FROM 
+  public.balance_groups, 
+  public.link_balance_groups_meters, 
+  public.abonents, 
+  public.meters, 
+  public.link_abonents_taken_params, 
+  public.taken_params, 
+  public.resources, 
+  public.params, 
+  public.names_params, 
+  public.daily_values
+WHERE 
+  link_balance_groups_meters.guid_balance_groups = balance_groups.guid AND
+  meters.guid = link_balance_groups_meters.guid_meters AND
+  link_abonents_taken_params.guid_taken_params = taken_params.guid AND
+  link_abonents_taken_params.guid_abonents = abonents.guid AND
+  taken_params.guid_meters = meters.guid AND
+  taken_params.guid_params = params.guid AND
+  params.guid_names_params = names_params.guid AND
+  names_params.guid_resources = resources.guid AND
+  daily_values.id_taken_params = taken_params.id AND
+  daily_values.date = '%s'
+  GROUP BY 
+  link_balance_groups_meters.guid_balance_groups, 
+  balance_groups.name, 
+  link_balance_groups_meters.type, 
+  meters.name, 
+  resources.name, 
+  names_params.name, 
+  daily_values.value, 
+  daily_values.date, 
+  abonents.guid,
+  meters.factory_number_manual
+) z1
+Group by z1.date, z1.balance_guid, z1.meters_name, z1.ab_guid, z1.factory_number_manual, res) z2
+ON electric_groups.number_manual=z2.factory_number_manual
+where name_group = '%s'
+group by z2.date,
+    electric_groups.name_abonents,
+    electric_groups.number_manual,
+    electric_groups.name_group, electric_groups.ktt,electric_groups.ktn,electric_groups.a,
+    electric_groups.comment, electric_groups.date, electric_groups.ab_guid,
+    electric_groups.type
+order by electric_groups.type DESC, electric_groups.name_abonents
+"""%(params[0],params[1],params[2],params[3], electric_data, obj_title)
+    #print sQuery
+    if dm=='monthly' or dm=='current' or dm=='daily':
+        sQuery=sQuery.replace('daily',dm)
+        return sQuery    
+    else: return """Select 'Н/Д'"""
+    return sQuery
+
+def get_electric_by_date_balance(obj_parent_title, obj_title, electric_data_end, dm):
+    data_table = []
+    params=[u'T0 A+',u'T1 A+',u'T2 A+',u'T3 A+'] 
+    cursor = connection.cursor()
+    #dm - строка, содержащая monthly or daily для sql-запроса   
+    sQuery = makeSqlQuery_electric_by_date_balance(obj_parent_title, obj_title, electric_data_end, params, dm)
+    cursor.execute(sQuery)
+    data_table = cursor.fetchall()    
+    if len(data_table)>0: data_table=ChangeNull_and_LeaveEmptyCol(data_table, electric_data_end, 11)
     return data_table
 
 def makeSqlQuery_electric_by_daily_or_monthly_for_group(obj_title, electric_data, params, dm):
@@ -3007,14 +3213,26 @@ def get_data_table_by_date_monthly_3_zones_v3(obj_title, obj_parent_title, elect
 def get_data_table_electric_period(isAbon,obj_title,obj_parent_title, electric_data_start, electric_data_end, res, dm):
     data_table = []
     params=[u'T0 A+',u'T1 A+',u'T2 A+',u'T3 A+',u'T4 A+', u'T0 R+']
-    data_table=get_data_table_electric_parametr_by_period_v2(isAbon,obj_title, obj_parent_title, electric_data_start, electric_data_end, params, res, dm)
+    cursor = connection.cursor()
+    #isAbon - запрос для абонента или для корпуса
+    if isAbon:
+        cursor.execute(makeSqlQuery_electric_by_period(obj_title, obj_parent_title, electric_data_start, electric_data_end,params, res, dm))
+    else:
+        cursor.execute(makeSqlQuery_electric_by_period_for_all(obj_title, obj_parent_title, electric_data_start, electric_data_end,params, res, dm))
+    data_table = cursor.fetchall()
+    # 0 - дата, 1 - Имя объекта, 2 - Имя абонента, 3 - заводской номер, 4 - значение
+    
     if len(data_table)>0: data_table=ChangeNull(data_table, None)
     return data_table
 
 def get_data_table_electric_period_for_group(obj_title,obj_parent_title, electric_data_start, electric_data_end, res):
     data_table = []
     params=[u'T0 A+',u'T1 A+',u'T2 A+',u'T3 A+',u'T4 A+', u'T0 R+']
-    data_table=get_data_table_electric_parametr_by_period_for_group_v2(obj_title, electric_data_start, electric_data_end, params, res)
+    cursor = connection.cursor()
+    cursor.execute(makeSqlQuery_electric_by_period_for_group(obj_title, electric_data_start, electric_data_end,params, res))
+    data_table = cursor.fetchall()
+    # 0 - дата, 1 - Имя объекта, 2 - Имя абонента, 3 - заводской номер, 4 - значение    
+    #data_table=get_data_table_electric_parametr_by_period_for_group_v2(obj_title, electric_data_start, electric_data_end, params, res)
     if len(data_table)>0: data_table=ChangeNull(data_table, None)
     return data_table
 
@@ -8115,7 +8333,7 @@ SELECT
   balance_groups.name as balance_name,
   link_balance_groups_meters.type,
   types_abonents.name as type_abon,
-  sum(daily_values.value * link_abonents_taken_params.coefficient* link_abonents_taken_params.coefficient_2* link_abonents_taken_params.coefficient_3) as sumT,
+  sum(daily_values.value * link_abonents_taken_params.coefficient* link_abonents_taken_params.coefficient_2) as sumT,
   count(daily_values.value) as countAbon,
   names_params.name as param_name,
   resources.name AS res_name,
@@ -8181,7 +8399,7 @@ from
   balance_groups.name as balance_name, 
   link_balance_groups_meters.type, 
  
-  sum(daily_values.value * link_abonents_taken_params.coefficient* link_abonents_taken_params.coefficient_2* link_abonents_taken_params.coefficient_3) as sumT, 
+  sum(daily_values.value * link_abonents_taken_params.coefficient* link_abonents_taken_params.coefficient_2) as sumT, 
   count(daily_values.value) as countAbon,
   names_params.name as param_name, 
   resources.name AS res_name, 

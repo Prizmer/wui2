@@ -117,7 +117,6 @@ urlpatterns = patterns('',
     
     url(r'^69/$', views.electric_daily_graphic), #график потребления электроэнергии по дням
     url(r'^71/$', views.forma_80040), # Отчёт по форме 80040
-
    
     url(r'^72/$', views.electric_simple_3_zones_v3), # Показания по электричеству на дату. 3 тарифа
     url(r'^73/$', views.pulsar_water_period_2), # отчёт 57, но с графиком!  Показание за период с водосчётчиков Пульсар
@@ -166,6 +165,12 @@ urlpatterns = patterns('',
     url(r'^addnum/$', views.add_numbers),
 
     url(r'^101/$', views.water_consumption_impuls), # вода, показания за период Импульсные для мантулинской
+
+    #url(r'^103/$', views.water_consumption_impuls), # электрика за период для 1С - Подольск 1 тариф
+
+    url(r'^102/$', views.electric_3_zones), # Показания по электричеству на дату. 3 тарифа с комментарием
+    url(r'^104/$', views.electric_2_zones), # Показания по электричеству на дату. 2 тарифа с комментарием
+    url(r'^106/$', views.electric_1_zones), # Показания по электричеству на дату. 1 тариф с комментарием
     
 
    

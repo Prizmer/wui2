@@ -158,7 +158,9 @@ LOGGING = {
     }
 }
 
-CLEAN_DOUBLE_30 = False
+CLEAN_DOUBLE_30 = False 
+SHOW_LIC_NUM = True
+SEPARATOR = ','
 #TEMPLATE_LOADERS = (
 #    ('django.template.loaders.cached.Loader', (
 #        'django.template.loaders.filesystem.Loader',

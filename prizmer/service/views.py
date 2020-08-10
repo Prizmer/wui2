@@ -534,6 +534,7 @@ def LoadElectricMeters(sPath, sSheet):
         attr2=unicode(dtAll[i][14]).strip() 
         isNewMeter=SimpleCheckIfExist('meters','factory_number_manual',meter,"","","")
         isNewAbon=SimpleCheckIfExist('objects','name', obj_l2,'abonents', 'name', abon)
+
         isR = False
         isHalfs = False
         #print 'attr1, attr2', meter, attr1, attr2
@@ -546,7 +547,8 @@ def LoadElectricMeters(sPath, sSheet):
         #print 'attr1, attr2', meter, isR, isHalfs
         #writeToLog( u'счётчик существует ', isNewMeter)
         if not (isNewAbon):
-            return u"Сначала создайте структуру объектов и абонентов"
+            #print '!!!!!!!!!!!!!!!'
+            return u"Сначала создайте структуру объектов и абонентов: %s - %s"%(obj_l2, abon)
         if not (isNewMeter):
             if unicode(type_meter) == u'М-200':
                 add_meter = Meters(name = unicode(type_meter) + u' ' + unicode(meter), address = unicode(adr), factory_number_manual = unicode(meter), guid_types_meters = TypesMeters.objects.get(guid = u"6224d20b-1781-4c39-8799-b1446b60774d") )

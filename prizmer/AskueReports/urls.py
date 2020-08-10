@@ -133,5 +133,7 @@ urlpatterns = patterns('',
     #---- Test urls
     url(r'^101/$', views.water_consumption_impuls_report), # вода, показания за период Импульсные для мантулинской
 #    url(r'^test/$', views.test_page),
-
+    url(r'^102/$', views.report_electric_3_zones), # Показания по электричеству на дату. 3 тарифа с комментарием
+    url(r'^104/$', views.report_electric_2_zones), # Показания по электричеству на дату. 2 тарифа с комментарием
+    url(r'^106/$', views.report_electric_1_zones), # Показания по электричеству на дату. 1 тариф с комментарием
 )
