@@ -1903,11 +1903,29 @@ ORDER BY electric_abons.ab_name ASC;""" % (params[0],params[1],params[2],params[
 def makeSqlQuery_electric_by_period(obj_title, obj_parent_title, date_start, date_end, params,res, dm):
     sQuery="""
 Select z3.ab_name, z3.factory_number_manual,
-z3.t0_start, z3.t1_start, z3.t2_start, z3.t3_start, z3.t4_start, 
-z4.t0_end, z4.t1_end, z4.t2_end, z4.t3_end, z4.t4_end,  
-z4.t0_end-z3.t0_start as delta_t0, z4.t1_end-z3.t1_start as delta_t1, z4.t2_end-z3.t2_start as delta_t2, z4.t3_end-z3.t3_start as delta_t3, z4.t4_end-z3.t4_start as delta_t4,
-z3.t0R_start, z4.t0R_end,  z4.t0R_end-z3.t0R_start as delta_t0R, z4.ktt,
-z4.ktt*z4.ktn*(z4.t0_end-z3.t0_start), z4.ktt*z4.ktn*(z4.t0R_end-z3.t0R_start), z4.ktn, z4.a, z4.lic_num
+round(z3.t0_start::numeric,3)::text, 
+round(z3.t1_start::numeric,3)::text, 
+round(z3.t2_start::numeric,3)::text, 
+round(z3.t3_start::numeric,3)::text, 
+round(z3.t4_start::numeric,3)::text, 
+round(z4.t0_end::numeric,3)::text, 
+round(z4.t1_end::numeric,3)::text, 
+round(z4.t2_end::numeric,3)::text, 
+round(z4.t3_end::numeric,3)::text, 
+round(z4.t4_end::numeric,3)::text,  
+round((z4.t0_end-z3.t0_start)::numeric,3)::text as delta_t0, 
+round((z4.t1_end-z3.t1_start)::numeric,3)::text as delta_t1, 
+round((z4.t2_end-z3.t2_start)::numeric,3)::text as delta_t2, 
+round((z4.t3_end-z3.t3_start)::numeric,3)::text as delta_t3, 
+round((z4.t4_end-z3.t4_start)::numeric,3)::text as delta_t4,
+round(z3.t0R_start::numeric,3)::text, 
+round(z4.t0R_end::numeric,3)::text,  
+round((z4.t0R_end-z3.t0R_start)::numeric,3)::text as delta_t0R, 
+round(z4.ktt::numeric,1)::text,
+round((z4.ktt*z4.ktn*(z4.t0_end-z3.t0_start))::numeric,3)::text, 
+round((z4.ktt*z4.ktn*(z4.t0R_end-z3.t0R_start))::numeric,3)::text, 
+round(z4.ktn::numeric,1)::text, 
+round(z4.a::numeric,1)::text, z4.lic_num::text
 from
 (Select electric_abons_2.ktt,electric_abons_2.lic_num, electric_abons_2.ktn, electric_abons_2.a,z2.date as date_start, electric_abons_2.obj_name, electric_abons_2.ab_name, electric_abons_2.factory_number_manual, z2.name_res, z2.t0 as t0_end, z2.t1 as t1_end, z2.t2 as t2_end, z2.t3 as t3_end, z2.t4 as t4_end, z2.t0r as t0r_end
 from electric_abons_2
@@ -2047,11 +2065,23 @@ where z3.ab_name=z4.ab_name and z3.ab_name='%s' and z3.factory_number_manual=z4.
 def makeSqlQuery_electric_by_period_for_all(obj_title, obj_parent_title, date_start, date_end,params, res,dm):
     sQuery="""
 Select z3.ab_name, z3.factory_number_manual,
-z3.t0_start, z3.t1_start, z3.t2_start, z3.t3_start, z3.t4_start, 
-z4.t0_end, z4.t1_end, z4.t2_end, z4.t3_end, z4.t4_end,  
-z4.t0_end-z3.t0_start as delta_t0, z4.t1_end-z3.t1_start as delta_t1, z4.t2_end-z3.t2_start as delta_t2, z4.t3_end-z3.t3_start as delta_t3, z4.t4_end-z3.t4_start as delta_t4,
-z3.t0R_start, z4.t0R_end,  z4.t0R_end-z3.t0R_start as delta_t0R, z4.ktt,  
-z4.ktt*z4.ktn*(z4.t0_end-z3.t0_start), z4.ktt*z4.ktn*(z4.t0R_end-z3.t0R_start),z4.ktn,z4.a, z4.lic_num
+round(z3.t0_start::numeric,3)::text, round(z3.t1_start::numeric,3)::text, 
+round(z3.t2_start::numeric,3)::text, 
+round(z3.t3_start::numeric,3)::text, round(z3.t4_start::numeric,3)::text, 
+round(z4.t0_end::numeric,3)::text, round(z4.t1_end::numeric,3)::text, round(z4.t2_end::numeric,3)::text, 
+round(z4.t3_end::numeric,3)::text, round(z4.t4_end::numeric,3)::text,  
+round((z4.t0_end-z3.t0_start)::numeric,3)::text as delta_t0, 
+round((z4.t1_end-z3.t1_start)::numeric,3)::text as delta_t1, 
+round((z4.t2_end-z3.t2_start)::numeric,3)::text as delta_t2, 
+round((z4.t3_end-z3.t3_start)::numeric,3)::text as delta_t3, 
+round((z4.t4_end-z3.t4_start)::numeric,3)::text as delta_t4,
+round(z3.t0R_start::numeric,3)::text, 
+round(z4.t0R_end::numeric,3)::text,  
+round((z4.t0R_end-z3.t0R_start)::numeric,3)::text as delta_t0R, 
+round(z4.ktt::numeric,1)::text,  
+round((z4.ktt*z4.ktn*(z4.t0_end-z3.t0_start))::numeric,3)::text, 
+round((z4.ktt*z4.ktn*(z4.t0R_end-z3.t0R_start))::numeric,3)::text,
+round(z4.ktn::numeric,1)::text, round(z4.a::numeric,1)::text, z4.lic_num
 from
 (Select electric_abons_2.ktt, electric_abons_2.lic_num, electric_abons_2.ktn, electric_abons_2.a, z2.date as date_end, electric_abons_2.obj_name, electric_abons_2.ab_name, electric_abons_2.factory_number_manual, z2.name_res, z2.t0 as t0_end, z2.t1 as t1_end, z2.t2 as t2_end, z2.t3 as t3_end, z2.t4 as t4_end, z2.t0r as t0r_end
 from electric_abons_2
@@ -9912,6 +9942,7 @@ where
 where z_start.factory_number_manual=z_end.factory_number_manual and z_start.type_energo=z_end.type_energo
  order by num, z_start.account_1, z_start.type_energo2
     """%( my_params[0],obj_title ,electric_data_start, obj_title, my_params[0],obj_title ,electric_data_end,obj_title )
+    #print sQuery
     return sQuery
 
 def get_data_table_electric_period_c300(obj_parent_title, obj_title ,electric_data_start, electric_data_end):
@@ -10294,7 +10325,7 @@ and
 
 )z2
 on z2.ab_name=water_abons_report.ab_name
-where water_abons_report.name='%s'
+where water_abons_report.name like '%%%s%%'
 order by account_2, obj_name) z_st,
 (
 Select  obj_name as ab_name, account_2,z2.date, water_abons_report.ab_name as meter_name,type_energo, z2.value,date_install
@@ -10329,7 +10360,7 @@ and
 
 )z2
 on z2.ab_name=water_abons_report.ab_name
-where water_abons_report.name='%s'
+where water_abons_report.name like '%%%s%%'
 order by account_2, obj_name) z_end
 where z_st.meter_name=z_end.meter_name
 and z_st.ab_name like '%%Квартира%%'

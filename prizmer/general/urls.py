@@ -172,6 +172,8 @@ urlpatterns = patterns('',
     url(r'^104/$', views.electric_2_zones), # Показания по электричеству на дату. 2 тарифа с комментарием
     url(r'^106/$', views.electric_1_zones), # Показания по электричеству на дату. 1 тариф с комментарием
     
+    url(r'^103/$', views.electric_consumption_2_zones), 
+    url(r'^105/$', views.electric_consumption_1_zone),
 
    
 
