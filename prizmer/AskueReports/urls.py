@@ -139,4 +139,7 @@ urlpatterns = patterns('',
 
     url(r'^103/$', views.report_electric_consumption_2_zones), #Потребление за период 2 тарифа
     url(r'^105/$', views.report_electric_consumption_1_zone), #Потребление за период 1 тариф
+
+    url(r'^108/$', views.report_electric_podolsk), # Показания по электричеству на дату. Подольск
+    url(r'^107/$', views.report_electric_consumption_podolsk), #Потребление за период 2 тарифа Подольск
 )

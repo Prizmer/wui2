@@ -1543,7 +1543,7 @@ z1.ktt,z1.ktn,z1.a
                          public.params, 
                          public.meters,
                          public.types_meters,
-                         public.resources			
+                         public.resources            
                         WHERE
                         taken_params.guid = link_abonents_taken_params.guid_taken_params AND 
                         taken_params.id = monthly_values.id_taken_params AND 
@@ -1629,7 +1629,7 @@ z1.ktn, z1.ktt, z1.a
                          public.params, 
                          public.meters,
                          public.types_meters,
-                         public.resources			
+                         public.resources            
                         WHERE
                         taken_params.guid = link_abonents_taken_params.guid_taken_params AND 
                         taken_params.id = daily_values.id_taken_params AND 
@@ -1710,7 +1710,7 @@ z1.ktn, z1.ktt, z1.a
                          public.params, 
                          public.meters,
                          public.types_meters,
-                         public.resources			
+                         public.resources            
                         WHERE
                         taken_params.guid = link_abonents_taken_params.guid_taken_params AND 
                         taken_params.id = daily_values.id_taken_params AND 
@@ -2056,7 +2056,6 @@ on electric_abons_2.factory_number_manual=z2.num_manual
 where electric_abons_2.obj_name='%s') z3
 where z3.ab_name=z4.ab_name and z3.ab_name='%s' and z3.factory_number_manual=z4.factory_number_manual """ % (params[0],params[1],params[2],params[3], params[4], params[5],  obj_parent_title, obj_title, date_end, res, obj_parent_title, 
                             params[0],params[1],params[2],params[3], params[4], params[5],obj_parent_title, obj_title, date_start, res,obj_parent_title, obj_title)
-    #
     #print sQuery
     if dm=='monthly' or dm=='daily' or dm=='current':
         sQuery=sQuery.replace('daily',dm)    
@@ -2814,7 +2813,7 @@ z1.ktt,z1.ktn,z1.a
                          public.params, 
                          public.meters,
                          public.types_meters,
-                         public.resources			
+                         public.resources            
                         WHERE
                         taken_params.guid = link_abonents_taken_params.guid_taken_params AND 
                         taken_params.id = monthly_values.id_taken_params AND 
@@ -3146,7 +3145,7 @@ z1.ktt,z1.ktn,z1.a
                          public.params, 
                          public.meters,
                          public.types_meters,
-                         public.resources			
+                         public.resources            
                         WHERE
                         taken_params.guid = link_abonents_taken_params.guid_taken_params AND 
                         taken_params.id = monthly_values.id_taken_params AND 
@@ -3245,6 +3244,7 @@ def get_data_table_electric_period(isAbon,obj_title,obj_parent_title, electric_d
     params=[u'T0 A+',u'T1 A+',u'T2 A+',u'T3 A+',u'T4 A+', u'T0 R+']
     cursor = connection.cursor()
     #isAbon - запрос для абонента или для корпуса
+    #print(isAbon,obj_title,obj_parent_title, electric_data_start, electric_data_end, res, dm)
     if isAbon:
         cursor.execute(makeSqlQuery_electric_by_period(obj_title, obj_parent_title, electric_data_start, electric_data_end,params, res, dm))
     else:
@@ -6094,36 +6094,36 @@ left join
             
                                     FROM
                                     (SELECT 
-            			  daily_values.date as daily_date, 
-            			  objects.name as name_objects, 
-            			  abonents.name as name_abonents, 
-            			  daily_values.value as value_daily, 
-            			  meters.factory_number_manual as number_manual, 
-            			  names_params.name as params_name, 
-            			  types_meters.name as meter_type
-            			FROM 
-            			  public.daily_values, 
-            			  public.taken_params, 
-            			  public.abonents, 
-            			  public.link_abonents_taken_params, 
-            			  public.objects, 
-            			  public.params, 
-            			  public.names_params, 
-            			  public.meters, 
-            			  public.types_meters
-            			WHERE 
-            			  daily_values.id_taken_params = taken_params.id AND
-            			  taken_params.guid_params = params.guid AND
-            			  taken_params.guid_meters = meters.guid AND
-            			  abonents.guid_objects = objects.guid AND
-            			  link_abonents_taken_params.guid_abonents = abonents.guid AND
-            			  link_abonents_taken_params.guid_taken_params = taken_params.guid AND
-            			  params.guid_names_params = names_params.guid AND
-            			  meters.guid_types_meters = types_meters.guid AND
-            			  objects.name = '%s' AND
-                    abonents.name = '%s' AND            			  
-            			  types_meters.name = '%s' AND 
-            			  daily_values.date = '%s' 
+                          daily_values.date as daily_date, 
+                          objects.name as name_objects, 
+                          abonents.name as name_abonents, 
+                          daily_values.value as value_daily, 
+                          meters.factory_number_manual as number_manual, 
+                          names_params.name as params_name, 
+                          types_meters.name as meter_type
+                        FROM 
+                          public.daily_values, 
+                          public.taken_params, 
+                          public.abonents, 
+                          public.link_abonents_taken_params, 
+                          public.objects, 
+                          public.params, 
+                          public.names_params, 
+                          public.meters, 
+                          public.types_meters
+                        WHERE 
+                          daily_values.id_taken_params = taken_params.id AND
+                          taken_params.guid_params = params.guid AND
+                          taken_params.guid_meters = meters.guid AND
+                          abonents.guid_objects = objects.guid AND
+                          link_abonents_taken_params.guid_abonents = abonents.guid AND
+                          link_abonents_taken_params.guid_taken_params = taken_params.guid AND
+                          params.guid_names_params = names_params.guid AND
+                          meters.guid_types_meters = types_meters.guid AND
+                          objects.name = '%s' AND
+                    abonents.name = '%s' AND                          
+                          types_meters.name = '%s' AND 
+                          daily_values.date = '%s' 
                                     ) z1
             group by z1.name_abonents, z1.daily_date, z1.name_objects, z1.number_manual
             order by z1.name_abonents) as z2
@@ -6150,35 +6150,35 @@ left join
             
                                     FROM
                                     (SELECT 
-            			  daily_values.date as daily_date, 
-            			  objects.name as name_objects, 
-            			  abonents.name as name_abonents, 
-            			  daily_values.value as value_daily, 
-            			  meters.factory_number_manual as number_manual, 
-            			  names_params.name as params_name, 
-            			  types_meters.name as meter_type
-            			FROM 
-            			  public.daily_values, 
-            			  public.taken_params, 
-            			  public.abonents, 
-            			  public.link_abonents_taken_params, 
-            			  public.objects, 
-            			  public.params, 
-            			  public.names_params, 
-            			  public.meters, 
-            			  public.types_meters
-            			WHERE 
-            			  daily_values.id_taken_params = taken_params.id AND
-            			  taken_params.guid_params = params.guid AND
-            			  taken_params.guid_meters = meters.guid AND
-            			  abonents.guid_objects = objects.guid AND
-            			  link_abonents_taken_params.guid_abonents = abonents.guid AND
-            			  link_abonents_taken_params.guid_taken_params = taken_params.guid AND
-            			  params.guid_names_params = names_params.guid AND
-            			  meters.guid_types_meters = types_meters.guid AND
-            			  objects.name = '%s' AND            			  
-            			  types_meters.name = '%s' AND 
-            			  daily_values.date = '%s' 
+                          daily_values.date as daily_date, 
+                          objects.name as name_objects, 
+                          abonents.name as name_abonents, 
+                          daily_values.value as value_daily, 
+                          meters.factory_number_manual as number_manual, 
+                          names_params.name as params_name, 
+                          types_meters.name as meter_type
+                        FROM 
+                          public.daily_values, 
+                          public.taken_params, 
+                          public.abonents, 
+                          public.link_abonents_taken_params, 
+                          public.objects, 
+                          public.params, 
+                          public.names_params, 
+                          public.meters, 
+                          public.types_meters
+                        WHERE 
+                          daily_values.id_taken_params = taken_params.id AND
+                          taken_params.guid_params = params.guid AND
+                          taken_params.guid_meters = meters.guid AND
+                          abonents.guid_objects = objects.guid AND
+                          link_abonents_taken_params.guid_abonents = abonents.guid AND
+                          link_abonents_taken_params.guid_taken_params = taken_params.guid AND
+                          params.guid_names_params = names_params.guid AND
+                          meters.guid_types_meters = types_meters.guid AND
+                          objects.name = '%s' AND                          
+                          types_meters.name = '%s' AND 
+                          daily_values.date = '%s' 
                                     ) z1
             group by z1.name_abonents, z1.daily_date, z1.name_objects, z1.number_manual
             order by z1.name_abonents) as z2
@@ -6228,36 +6228,36 @@ left join
             
                                     FROM
                                     (SELECT 
-            			  daily_values.date as daily_date, 
-            			  objects.name as name_objects, 
-            			  abonents.name as name_abonents, 
-            			  daily_values.value as value_daily, 
-            			  meters.factory_number_manual as number_manual, 
-            			  names_params.name as params_name, 
-            			  types_meters.name as meter_type
-            			FROM 
-            			  public.daily_values, 
-            			  public.taken_params, 
-            			  public.abonents, 
-            			  public.link_abonents_taken_params, 
-            			  public.objects, 
-            			  public.params, 
-            			  public.names_params, 
-            			  public.meters, 
-            			  public.types_meters
-            			WHERE 
-            			  daily_values.id_taken_params = taken_params.id AND
-            			  taken_params.guid_params = params.guid AND
-            			  taken_params.guid_meters = meters.guid AND
-            			  abonents.guid_objects = objects.guid AND
-            			  link_abonents_taken_params.guid_abonents = abonents.guid AND
-            			  link_abonents_taken_params.guid_taken_params = taken_params.guid AND
-            			  params.guid_names_params = names_params.guid AND
-            			  meters.guid_types_meters = types_meters.guid AND
-            			  objects.name = '%s' AND
-                    abonents.name = '%s' and            			  
-            			  types_meters.name = '%s' AND 
-            			  daily_values.date = '%s' 
+                          daily_values.date as daily_date, 
+                          objects.name as name_objects, 
+                          abonents.name as name_abonents, 
+                          daily_values.value as value_daily, 
+                          meters.factory_number_manual as number_manual, 
+                          names_params.name as params_name, 
+                          types_meters.name as meter_type
+                        FROM 
+                          public.daily_values, 
+                          public.taken_params, 
+                          public.abonents, 
+                          public.link_abonents_taken_params, 
+                          public.objects, 
+                          public.params, 
+                          public.names_params, 
+                          public.meters, 
+                          public.types_meters
+                        WHERE 
+                          daily_values.id_taken_params = taken_params.id AND
+                          taken_params.guid_params = params.guid AND
+                          taken_params.guid_meters = meters.guid AND
+                          abonents.guid_objects = objects.guid AND
+                          link_abonents_taken_params.guid_abonents = abonents.guid AND
+                          link_abonents_taken_params.guid_taken_params = taken_params.guid AND
+                          params.guid_names_params = names_params.guid AND
+                          meters.guid_types_meters = types_meters.guid AND
+                          objects.name = '%s' AND
+                    abonents.name = '%s' and                          
+                          types_meters.name = '%s' AND 
+                          daily_values.date = '%s' 
                                     ) z1
             group by z1.name_abonents, z1.daily_date, z1.name_objects, z1.number_manual
             order by z1.name_abonents) as z2
@@ -6274,36 +6274,36 @@ left join
             
                                     FROM
                                     (SELECT 
-            			  daily_values.date as daily_date, 
-            			  objects.name as name_objects, 
-            			  abonents.name as name_abonents, 
-            			  daily_values.value as value_daily, 
-            			  meters.factory_number_manual as number_manual, 
-            			  names_params.name as params_name, 
-            			  types_meters.name as meter_type
-            			FROM 
-            			  public.daily_values, 
-            			  public.taken_params, 
-            			  public.abonents, 
-            			  public.link_abonents_taken_params, 
-            			  public.objects, 
-            			  public.params, 
-            			  public.names_params, 
-            			  public.meters, 
-            			  public.types_meters
-            			WHERE 
-            			  daily_values.id_taken_params = taken_params.id AND
-            			  taken_params.guid_params = params.guid AND
-            			  taken_params.guid_meters = meters.guid AND
-            			  abonents.guid_objects = objects.guid AND
-            			  link_abonents_taken_params.guid_abonents = abonents.guid AND
-            			  link_abonents_taken_params.guid_taken_params = taken_params.guid AND
-            			  params.guid_names_params = names_params.guid AND
-            			  meters.guid_types_meters = types_meters.guid AND
-            			  objects.name = '%s' AND 
-                    abonents.name = '%s' and           			  
-            			  types_meters.name = '%s' AND 
-            			  daily_values.date = '%s' 
+                          daily_values.date as daily_date, 
+                          objects.name as name_objects, 
+                          abonents.name as name_abonents, 
+                          daily_values.value as value_daily, 
+                          meters.factory_number_manual as number_manual, 
+                          names_params.name as params_name, 
+                          types_meters.name as meter_type
+                        FROM 
+                          public.daily_values, 
+                          public.taken_params, 
+                          public.abonents, 
+                          public.link_abonents_taken_params, 
+                          public.objects, 
+                          public.params, 
+                          public.names_params, 
+                          public.meters, 
+                          public.types_meters
+                        WHERE 
+                          daily_values.id_taken_params = taken_params.id AND
+                          taken_params.guid_params = params.guid AND
+                          taken_params.guid_meters = meters.guid AND
+                          abonents.guid_objects = objects.guid AND
+                          link_abonents_taken_params.guid_abonents = abonents.guid AND
+                          link_abonents_taken_params.guid_taken_params = taken_params.guid AND
+                          params.guid_names_params = names_params.guid AND
+                          meters.guid_types_meters = types_meters.guid AND
+                          objects.name = '%s' AND 
+                    abonents.name = '%s' and                         
+                          types_meters.name = '%s' AND 
+                          daily_values.date = '%s' 
                                     ) z1
             group by z1.name_abonents, z1.daily_date, z1.name_objects, z1.number_manual
             order by z1.name_abonents) as z2
@@ -6339,35 +6339,35 @@ left join
             
                                     FROM
                                     (SELECT 
-            			  daily_values.date as daily_date, 
-            			  objects.name as name_objects, 
-            			  abonents.name as name_abonents, 
-            			  daily_values.value as value_daily, 
-            			  meters.factory_number_manual as number_manual, 
-            			  names_params.name as params_name, 
-            			  types_meters.name as meter_type
-            			FROM 
-            			  public.daily_values, 
-            			  public.taken_params, 
-            			  public.abonents, 
-            			  public.link_abonents_taken_params, 
-            			  public.objects, 
-            			  public.params, 
-            			  public.names_params, 
-            			  public.meters, 
-            			  public.types_meters
-            			WHERE 
-            			  daily_values.id_taken_params = taken_params.id AND
-            			  taken_params.guid_params = params.guid AND
-            			  taken_params.guid_meters = meters.guid AND
-            			  abonents.guid_objects = objects.guid AND
-            			  link_abonents_taken_params.guid_abonents = abonents.guid AND
-            			  link_abonents_taken_params.guid_taken_params = taken_params.guid AND
-            			  params.guid_names_params = names_params.guid AND
-            			  meters.guid_types_meters = types_meters.guid AND
-            			  objects.name = '%s' AND            			  
-            			  types_meters.name = '%s' AND 
-            			  daily_values.date = '%s' 
+                          daily_values.date as daily_date, 
+                          objects.name as name_objects, 
+                          abonents.name as name_abonents, 
+                          daily_values.value as value_daily, 
+                          meters.factory_number_manual as number_manual, 
+                          names_params.name as params_name, 
+                          types_meters.name as meter_type
+                        FROM 
+                          public.daily_values, 
+                          public.taken_params, 
+                          public.abonents, 
+                          public.link_abonents_taken_params, 
+                          public.objects, 
+                          public.params, 
+                          public.names_params, 
+                          public.meters, 
+                          public.types_meters
+                        WHERE 
+                          daily_values.id_taken_params = taken_params.id AND
+                          taken_params.guid_params = params.guid AND
+                          taken_params.guid_meters = meters.guid AND
+                          abonents.guid_objects = objects.guid AND
+                          link_abonents_taken_params.guid_abonents = abonents.guid AND
+                          link_abonents_taken_params.guid_taken_params = taken_params.guid AND
+                          params.guid_names_params = names_params.guid AND
+                          meters.guid_types_meters = types_meters.guid AND
+                          objects.name = '%s' AND                          
+                          types_meters.name = '%s' AND 
+                          daily_values.date = '%s' 
                                     ) z1
             group by z1.name_abonents, z1.daily_date, z1.name_objects, z1.number_manual
             order by z1.name_abonents) as z2
@@ -6384,35 +6384,35 @@ left join
             
                                     FROM
                                     (SELECT 
-            			  daily_values.date as daily_date, 
-            			  objects.name as name_objects, 
-            			  abonents.name as name_abonents, 
-            			  daily_values.value as value_daily, 
-            			  meters.factory_number_manual as number_manual, 
-            			  names_params.name as params_name, 
-            			  types_meters.name as meter_type
-            			FROM 
-            			  public.daily_values, 
-            			  public.taken_params, 
-            			  public.abonents, 
-            			  public.link_abonents_taken_params, 
-            			  public.objects, 
-            			  public.params, 
-            			  public.names_params, 
-            			  public.meters, 
-            			  public.types_meters
-            			WHERE 
-            			  daily_values.id_taken_params = taken_params.id AND
-            			  taken_params.guid_params = params.guid AND
-            			  taken_params.guid_meters = meters.guid AND
-            			  abonents.guid_objects = objects.guid AND
-            			  link_abonents_taken_params.guid_abonents = abonents.guid AND
-            			  link_abonents_taken_params.guid_taken_params = taken_params.guid AND
-            			  params.guid_names_params = names_params.guid AND
-            			  meters.guid_types_meters = types_meters.guid AND
-            			  objects.name = '%s' AND            			  
-            			  types_meters.name = '%s' AND 
-            			  daily_values.date = '%s' 
+                          daily_values.date as daily_date, 
+                          objects.name as name_objects, 
+                          abonents.name as name_abonents, 
+                          daily_values.value as value_daily, 
+                          meters.factory_number_manual as number_manual, 
+                          names_params.name as params_name, 
+                          types_meters.name as meter_type
+                        FROM 
+                          public.daily_values, 
+                          public.taken_params, 
+                          public.abonents, 
+                          public.link_abonents_taken_params, 
+                          public.objects, 
+                          public.params, 
+                          public.names_params, 
+                          public.meters, 
+                          public.types_meters
+                        WHERE 
+                          daily_values.id_taken_params = taken_params.id AND
+                          taken_params.guid_params = params.guid AND
+                          taken_params.guid_meters = meters.guid AND
+                          abonents.guid_objects = objects.guid AND
+                          link_abonents_taken_params.guid_abonents = abonents.guid AND
+                          link_abonents_taken_params.guid_taken_params = taken_params.guid AND
+                          params.guid_names_params = names_params.guid AND
+                          meters.guid_types_meters = types_meters.guid AND
+                          objects.name = '%s' AND                          
+                          types_meters.name = '%s' AND 
+                          daily_values.date = '%s' 
                                     ) z1
             group by z1.name_abonents, z1.daily_date, z1.name_objects, z1.number_manual
             order by z1.name_abonents) as z2
@@ -8770,36 +8770,36 @@ left join
             
                                     FROM
                                     (SELECT 
-            			  daily_values.date as daily_date, 
-            			  objects.name as name_objects, 
-            			  abonents.name as name_abonents, 
-            			  daily_values.value as value_daily, 
-            			  meters.factory_number_manual as number_manual, 
-            			  names_params.name as params_name, 
-            			  types_meters.name as meter_type
-            			FROM 
-            			  public.daily_values, 
-            			  public.taken_params, 
-            			  public.abonents, 
-            			  public.link_abonents_taken_params, 
-            			  public.objects, 
-            			  public.params, 
-            			  public.names_params, 
-            			  public.meters, 
-            			  public.types_meters
-            			WHERE 
-            			  daily_values.id_taken_params = taken_params.id AND
-            			  taken_params.guid_params = params.guid AND
-            			  taken_params.guid_meters = meters.guid AND
-            			  abonents.guid_objects = objects.guid AND
-            			  link_abonents_taken_params.guid_abonents = abonents.guid AND
-            			  link_abonents_taken_params.guid_taken_params = taken_params.guid AND
-            			  params.guid_names_params = names_params.guid AND
-            			  meters.guid_types_meters = types_meters.guid AND
-            			  objects.name = '%s' AND
-            			  abonents.name = '%s' and 
-            			  types_meters.name = '%s' AND 
-            			  daily_values.date between '%s' and '%s'
+                          daily_values.date as daily_date, 
+                          objects.name as name_objects, 
+                          abonents.name as name_abonents, 
+                          daily_values.value as value_daily, 
+                          meters.factory_number_manual as number_manual, 
+                          names_params.name as params_name, 
+                          types_meters.name as meter_type
+                        FROM 
+                          public.daily_values, 
+                          public.taken_params, 
+                          public.abonents, 
+                          public.link_abonents_taken_params, 
+                          public.objects, 
+                          public.params, 
+                          public.names_params, 
+                          public.meters, 
+                          public.types_meters
+                        WHERE 
+                          daily_values.id_taken_params = taken_params.id AND
+                          taken_params.guid_params = params.guid AND
+                          taken_params.guid_meters = meters.guid AND
+                          abonents.guid_objects = objects.guid AND
+                          link_abonents_taken_params.guid_abonents = abonents.guid AND
+                          link_abonents_taken_params.guid_taken_params = taken_params.guid AND
+                          params.guid_names_params = names_params.guid AND
+                          meters.guid_types_meters = types_meters.guid AND
+                          objects.name = '%s' AND
+                          abonents.name = '%s' and 
+                          types_meters.name = '%s' AND 
+                          daily_values.date between '%s' and '%s'
                                     ) z1                      
 group by z1.name_abonents, z1.daily_date, z1.name_objects, z1.number_manual
 order by z1.name_abonents) z2
@@ -8830,35 +8830,35 @@ left join
             
                                     FROM
                                     (SELECT 
-            			  daily_values.date as daily_date, 
-            			  objects.name as name_objects, 
-            			  
-            			  daily_values.value as value_daily, 
-            			 
-            			  names_params.name as params_name, 
-            			  types_meters.name as meter_type
-            			FROM 
-            			  public.daily_values, 
-            			  public.taken_params, 
-            			  public.abonents, 
-            			  public.link_abonents_taken_params, 
-            			  public.objects, 
-            			  public.params, 
-            			  public.names_params, 
-            			  public.meters, 
-            			  public.types_meters
-            			WHERE 
-            			  daily_values.id_taken_params = taken_params.id AND
-            			  taken_params.guid_params = params.guid AND
-            			  taken_params.guid_meters = meters.guid AND
-            			  abonents.guid_objects = objects.guid AND
-            			  link_abonents_taken_params.guid_abonents = abonents.guid AND
-            			  link_abonents_taken_params.guid_taken_params = taken_params.guid AND
-            			  params.guid_names_params = names_params.guid AND
-            			  meters.guid_types_meters = types_meters.guid AND
-            			  objects.name = '%s' AND            		
-            			  types_meters.name = '%s' AND 
-            			  daily_values.date between '%s' and '%s'
+                          daily_values.date as daily_date, 
+                          objects.name as name_objects, 
+                          
+                          daily_values.value as value_daily, 
+                         
+                          names_params.name as params_name, 
+                          types_meters.name as meter_type
+                        FROM 
+                          public.daily_values, 
+                          public.taken_params, 
+                          public.abonents, 
+                          public.link_abonents_taken_params, 
+                          public.objects, 
+                          public.params, 
+                          public.names_params, 
+                          public.meters, 
+                          public.types_meters
+                        WHERE 
+                          daily_values.id_taken_params = taken_params.id AND
+                          taken_params.guid_params = params.guid AND
+                          taken_params.guid_meters = meters.guid AND
+                          abonents.guid_objects = objects.guid AND
+                          link_abonents_taken_params.guid_abonents = abonents.guid AND
+                          link_abonents_taken_params.guid_taken_params = taken_params.guid AND
+                          params.guid_names_params = names_params.guid AND
+                          meters.guid_types_meters = types_meters.guid AND
+                          objects.name = '%s' AND                    
+                          types_meters.name = '%s' AND 
+                          daily_values.date between '%s' and '%s'
                                     ) z1                      
 group by  z1.daily_date, z1.name_objects) z2
 on z2.daily_date=z_date.c_date
@@ -9364,7 +9364,7 @@ sum(Case when z1.params_name = '%s' then z1.value_daily  end) as t3
                          public.params, 
                          public.meters,
                          public.types_meters,
-                         public.resources			
+                         public.resources            
                         WHERE
                         taken_params.guid = link_abonents_taken_params.guid_taken_params AND 
                         taken_params.id = daily_values.id_taken_params AND 
@@ -9435,7 +9435,7 @@ z1.ktn, z1.ktt, z1.a
                          public.params, 
                          public.meters,
                          public.types_meters,
-                         public.resources			
+                         public.resources            
                         WHERE
                         taken_params.guid = link_abonents_taken_params.guid_taken_params AND 
                         taken_params.id = daily_values.id_taken_params AND 
@@ -9499,38 +9499,38 @@ left join
             
                                     FROM
                                     (SELECT 
-            			  daily_values.date as daily_date, 
-            			  objects.name as name_objects, 
-            			  abonents.name as name_abonents, 
-            			  daily_values.value as value_daily, 
-            			  meters.factory_number_manual as number_manual, 
-            			  names_params.name as params_name, 
-            			  types_meters.name as meter_type,
-            			  resources.name as res
-            			FROM 
-            			  public.daily_values, 
-            			  public.taken_params, 
-            			  public.abonents, 
-            			  public.link_abonents_taken_params, 
-            			  public.objects, 
-            			  public.params, 
-            			  public.names_params, 
-            			  public.meters, 
-            			  public.types_meters,
-            			  resources
-            			WHERE 
-            			  daily_values.id_taken_params = taken_params.id AND
-            			  taken_params.guid_params = params.guid AND
-            			  taken_params.guid_meters = meters.guid AND
-            			  abonents.guid_objects = objects.guid AND
-            			  link_abonents_taken_params.guid_abonents = abonents.guid AND
-            			  link_abonents_taken_params.guid_taken_params = taken_params.guid AND
-            			  params.guid_names_params = names_params.guid AND
-            			  meters.guid_types_meters = types_meters.guid AND
-            			  names_params.guid_resources=resources.guid and
-            			  objects.name = '%s' AND            			  
-            			  resources.name = '%s' AND 
-            			  daily_values.date = '%s' 
+                          daily_values.date as daily_date, 
+                          objects.name as name_objects, 
+                          abonents.name as name_abonents, 
+                          daily_values.value as value_daily, 
+                          meters.factory_number_manual as number_manual, 
+                          names_params.name as params_name, 
+                          types_meters.name as meter_type,
+                          resources.name as res
+                        FROM 
+                          public.daily_values, 
+                          public.taken_params, 
+                          public.abonents, 
+                          public.link_abonents_taken_params, 
+                          public.objects, 
+                          public.params, 
+                          public.names_params, 
+                          public.meters, 
+                          public.types_meters,
+                          resources
+                        WHERE 
+                          daily_values.id_taken_params = taken_params.id AND
+                          taken_params.guid_params = params.guid AND
+                          taken_params.guid_meters = meters.guid AND
+                          abonents.guid_objects = objects.guid AND
+                          link_abonents_taken_params.guid_abonents = abonents.guid AND
+                          link_abonents_taken_params.guid_taken_params = taken_params.guid AND
+                          params.guid_names_params = names_params.guid AND
+                          meters.guid_types_meters = types_meters.guid AND
+                          names_params.guid_resources=resources.guid and
+                          objects.name = '%s' AND                          
+                          resources.name = '%s' AND 
+                          daily_values.date = '%s' 
                                     ) z1
             group by z1.name_abonents, z1.daily_date, z1.name_objects, z1.number_manual, z1.res
             order by z1.name_abonents) as z2
@@ -9568,38 +9568,38 @@ left join
             
                                     FROM
                                     (SELECT 
-            			  daily_values.date as daily_date, 
-            			  objects.name as name_objects, 
-            			  abonents.name as name_abonents, 
-            			  daily_values.value as value_daily, 
-            			  meters.factory_number_manual as number_manual, 
-            			  names_params.name as params_name, 
-            			  types_meters.name as meter_type,
-            			  resources.name as res
-            			FROM 
-            			  public.daily_values, 
-            			  public.taken_params, 
-            			  public.abonents, 
-            			  public.link_abonents_taken_params, 
-            			  public.objects, 
-            			  public.params, 
-            			  public.names_params, 
-            			  public.meters, 
-            			  public.types_meters,
-            			  resources
-            			WHERE 
-            			  daily_values.id_taken_params = taken_params.id AND
-            			  taken_params.guid_params = params.guid AND
-            			  taken_params.guid_meters = meters.guid AND
-            			  abonents.guid_objects = objects.guid AND
-            			  link_abonents_taken_params.guid_abonents = abonents.guid AND
-            			  link_abonents_taken_params.guid_taken_params = taken_params.guid AND
-            			  params.guid_names_params = names_params.guid AND
-            			  meters.guid_types_meters = types_meters.guid AND
-            			  names_params.guid_resources=resources.guid and
-            			  objects.name = '%s' AND            			  
-            			  resources.name = '%s' AND 
-            			  daily_values.date = '%s' 
+                          daily_values.date as daily_date, 
+                          objects.name as name_objects, 
+                          abonents.name as name_abonents, 
+                          daily_values.value as value_daily, 
+                          meters.factory_number_manual as number_manual, 
+                          names_params.name as params_name, 
+                          types_meters.name as meter_type,
+                          resources.name as res
+                        FROM 
+                          public.daily_values, 
+                          public.taken_params, 
+                          public.abonents, 
+                          public.link_abonents_taken_params, 
+                          public.objects, 
+                          public.params, 
+                          public.names_params, 
+                          public.meters, 
+                          public.types_meters,
+                          resources
+                        WHERE 
+                          daily_values.id_taken_params = taken_params.id AND
+                          taken_params.guid_params = params.guid AND
+                          taken_params.guid_meters = meters.guid AND
+                          abonents.guid_objects = objects.guid AND
+                          link_abonents_taken_params.guid_abonents = abonents.guid AND
+                          link_abonents_taken_params.guid_taken_params = taken_params.guid AND
+                          params.guid_names_params = names_params.guid AND
+                          meters.guid_types_meters = types_meters.guid AND
+                          names_params.guid_resources=resources.guid and
+                          objects.name = '%s' AND                          
+                          resources.name = '%s' AND 
+                          daily_values.date = '%s' 
                                     ) z1
             group by z1.name_abonents, z1.daily_date, z1.name_objects, z1.number_manual, z1.res
             order by z1.name_abonents) as z2
@@ -10402,39 +10402,39 @@ left join
             
                                     FROM
                                     (SELECT 
-            			  daily_values.date as daily_date, 
-            			  objects.name as name_objects, 
-            			  abonents.name as name_abonents, 
-            			  daily_values.value as value_daily, 
-            			  meters.factory_number_manual as number_manual, 
-            			  names_params.name as params_name, 
-            			  types_meters.name as meter_type,
-            			  resources.name as res
-            			FROM 
-            			  public.daily_values, 
-            			  public.taken_params, 
-            			  public.abonents, 
-            			  public.link_abonents_taken_params, 
-            			  public.objects, 
-            			  public.params, 
-            			  public.names_params, 
-            			  public.meters, 
-            			  public.types_meters,
-            			  resources
-            			WHERE 
-            			  daily_values.id_taken_params = taken_params.id AND
-            			  taken_params.guid_params = params.guid AND
-            			  taken_params.guid_meters = meters.guid AND
-            			  abonents.guid_objects = objects.guid AND
-            			  link_abonents_taken_params.guid_abonents = abonents.guid AND
-            			  link_abonents_taken_params.guid_taken_params = taken_params.guid AND
-            			  params.guid_names_params = names_params.guid AND
-            			  meters.guid_types_meters = types_meters.guid AND
-            			  names_params.guid_resources=resources.guid and
-            			  objects.name = '%s' AND            			  
-            			  (types_meters.name::text = '%s'::text OR types_meters.name::text = '%s'::text)
-            			  AND
-            			  daily_values.date = '%s' 
+                          daily_values.date as daily_date, 
+                          objects.name as name_objects, 
+                          abonents.name as name_abonents, 
+                          daily_values.value as value_daily, 
+                          meters.factory_number_manual as number_manual, 
+                          names_params.name as params_name, 
+                          types_meters.name as meter_type,
+                          resources.name as res
+                        FROM 
+                          public.daily_values, 
+                          public.taken_params, 
+                          public.abonents, 
+                          public.link_abonents_taken_params, 
+                          public.objects, 
+                          public.params, 
+                          public.names_params, 
+                          public.meters, 
+                          public.types_meters,
+                          resources
+                        WHERE 
+                          daily_values.id_taken_params = taken_params.id AND
+                          taken_params.guid_params = params.guid AND
+                          taken_params.guid_meters = meters.guid AND
+                          abonents.guid_objects = objects.guid AND
+                          link_abonents_taken_params.guid_abonents = abonents.guid AND
+                          link_abonents_taken_params.guid_taken_params = taken_params.guid AND
+                          params.guid_names_params = names_params.guid AND
+                          meters.guid_types_meters = types_meters.guid AND
+                          names_params.guid_resources=resources.guid and
+                          objects.name = '%s' AND                          
+                          (types_meters.name::text = '%s'::text OR types_meters.name::text = '%s'::text)
+                          AND
+                          daily_values.date = '%s' 
                                     ) z1
             group by z1.name_abonents, z1.daily_date, z1.name_objects, z1.number_manual, z1.res, z1.value_daily
             order by z1.name_abonents) as z2
@@ -10463,39 +10463,39 @@ left join
             
                                     FROM
                                     (SELECT 
-            			  daily_values.date as daily_date, 
-            			  objects.name as name_objects, 
-            			  abonents.name as name_abonents, 
-            			  daily_values.value as value_daily, 
-            			  meters.factory_number_manual as number_manual, 
-            			  names_params.name as params_name, 
-            			  types_meters.name as meter_type,
-            			  resources.name as res
-            			FROM 
-            			  public.daily_values, 
-            			  public.taken_params, 
-            			  public.abonents, 
-            			  public.link_abonents_taken_params, 
-            			  public.objects, 
-            			  public.params, 
-            			  public.names_params, 
-            			  public.meters, 
-            			  public.types_meters,
-            			  resources
-            			WHERE 
-            			  daily_values.id_taken_params = taken_params.id AND
-            			  taken_params.guid_params = params.guid AND
-            			  taken_params.guid_meters = meters.guid AND
-            			  abonents.guid_objects = objects.guid AND
-            			  link_abonents_taken_params.guid_abonents = abonents.guid AND
-            			  link_abonents_taken_params.guid_taken_params = taken_params.guid AND
-            			  params.guid_names_params = names_params.guid AND
-            			  meters.guid_types_meters = types_meters.guid AND
-            			  names_params.guid_resources=resources.guid and
-            			  objects.name = '%s' AND            			  
-            			  (types_meters.name::text = '%s'::text OR types_meters.name::text = '%s'::text)
-            			  AND
-            			  daily_values.date = '%s' 
+                          daily_values.date as daily_date, 
+                          objects.name as name_objects, 
+                          abonents.name as name_abonents, 
+                          daily_values.value as value_daily, 
+                          meters.factory_number_manual as number_manual, 
+                          names_params.name as params_name, 
+                          types_meters.name as meter_type,
+                          resources.name as res
+                        FROM 
+                          public.daily_values, 
+                          public.taken_params, 
+                          public.abonents, 
+                          public.link_abonents_taken_params, 
+                          public.objects, 
+                          public.params, 
+                          public.names_params, 
+                          public.meters, 
+                          public.types_meters,
+                          resources
+                        WHERE 
+                          daily_values.id_taken_params = taken_params.id AND
+                          taken_params.guid_params = params.guid AND
+                          taken_params.guid_meters = meters.guid AND
+                          abonents.guid_objects = objects.guid AND
+                          link_abonents_taken_params.guid_abonents = abonents.guid AND
+                          link_abonents_taken_params.guid_taken_params = taken_params.guid AND
+                          params.guid_names_params = names_params.guid AND
+                          meters.guid_types_meters = types_meters.guid AND
+                          names_params.guid_resources=resources.guid and
+                          objects.name = '%s' AND                          
+                          (types_meters.name::text = '%s'::text OR types_meters.name::text = '%s'::text)
+                          AND
+                          daily_values.date = '%s' 
                                     ) z1
             group by z1.name_abonents, z1.daily_date, z1.name_objects, z1.number_manual, z1.res, z1.value_daily
             order by z1.name_abonents) as z2
@@ -10782,7 +10782,7 @@ z1.ktn, z1.ktt, z1.a
                          public.params, 
                          public.meters,
                          public.types_meters,
-                         public.resources			
+                         public.resources            
                         WHERE
                         taken_params.guid = link_abonents_taken_params.guid_taken_params AND 
                         taken_params.id = monthly_values.id_taken_params AND 
@@ -12441,4 +12441,485 @@ def get_80020_group_by_name(group_name):
     """%(group_name)
     cursor.execute(sQuery)  
     data_table = cursor.fetchall()
+    return data_table
+
+
+def makeSqlQuery_electric_by_date_podolsk(obj_parent_title, obj_title, electric_data, params, dm, res, isAbon):
+    if isAbon:
+        sLevel = 'electric_abons_2.ab_name'
+        sFormat = (params[0],params[1],params[2],params[3], res, obj_parent_title, electric_data, obj_parent_title, sLevel, obj_title)
+    else:
+        sLevel = 'electric_abons_2.name_parent'
+        sFormat = (params[0],params[1],params[2],params[3], res, obj_title, electric_data, obj_title, sLevel, obj_parent_title)
+
+    sQuery = """
+    Select  z2.monthly_date,
+    electric_abons_2.ab_name, 
+    electric_abons_2.factory_number_manual, 
+   round(z2.t0::numeric,0)::text,
+    round(z2.t1::numeric,0)::text,
+    CASE
+	when electric_abons_2.ab_name like '%%Квартира%%Т%%' then round(z2.t2::numeric,0)::text
+	when electric_abons_2.obj_name like '%%ВРУ%%' then round(z2.t2::numeric,0)::text
+	else ''
+    END, 
+  
+    round(z2.t3::numeric,0)::text,
+    electric_abons_2.obj_name, 
+    electric_abons_2.ktt::numeric,
+    electric_abons_2.ktn::numeric,
+    electric_abons_2.a::numeric, 
+    electric_abons_2.comment, 
+    electric_abons_2.date, 
+    electric_abons_2.ab_guid,
+    electric_abons_2.name_parent,
+    electric_abons_2.lic_num
+from electric_abons_2
+LEFT JOIN 
+(SELECT z1.monthly_date, z1.name_objects, z1.name_abonents, z1.number_manual, 
+sum(Case when z1.params_name = '%s' then z1.value_monthly  end) as t0,
+sum(Case when z1.params_name = '%s' then z1.value_monthly  end) as t1,
+sum(Case when z1.params_name = '%s' then z1.value_monthly  end) as t2,
+sum(Case when z1.params_name = '%s' then z1.value_monthly  end) as t3,
+z1.ktt,z1.ktn,z1.a
+                        FROM
+                        (SELECT monthly_values.date as monthly_date, 
+                        objects.name as name_objects, 
+                        abonents.name as name_abonents, 
+                        meters.factory_number_manual as number_manual, 
+                        monthly_values.value as value_monthly, 
+                        names_params.name as params_name,
+                        link_abonents_taken_params.coefficient as ktt,
+                         link_abonents_taken_params.coefficient_2 as ktn,
+                         link_abonents_taken_params.coefficient_3 as a
+                        FROM
+                         public.monthly_values, 
+                         public.link_abonents_taken_params, 
+                         public.taken_params, 
+                         public.abonents, 
+                         public.objects, 
+                         public.names_params, 
+                         public.params, 
+                         public.meters,
+                         public.types_meters,
+                         public.resources            
+                        WHERE
+                        taken_params.guid = link_abonents_taken_params.guid_taken_params AND 
+                        taken_params.id = monthly_values.id_taken_params AND 
+                        taken_params.guid_params = params.guid AND 
+                        taken_params.guid_meters = meters.guid AND 
+                        abonents.guid = link_abonents_taken_params.guid_abonents AND 
+                        objects.guid = abonents.guid_objects AND 
+                        names_params.guid = params.guid_names_params AND
+                        params.guid_names_params=names_params.guid and 
+                        types_meters.guid=meters.guid_types_meters and
+                        names_params.guid_resources=resources.guid and
+                        resources.name='%s' and
+                 objects.name = '%s' AND                      
+                        monthly_values.date = '%s' 
+                         group by 
+                        monthly_values.date,
+                        objects.name ,
+                        abonents.name ,
+                        meters.factory_number_manual,
+                        monthly_values.value ,
+                        names_params.name ,
+                        link_abonents_taken_params.coefficient ,
+                         link_abonents_taken_params.coefficient_2 ,
+                          link_abonents_taken_params.coefficient_3
+                        ) z1                  
+group by z1.name_objects, z1.monthly_date, z1.name_objects, z1.name_abonents, z1.number_manual, z1.ktt,z1.ktn,z1.a
+) z2
+on electric_abons_2.factory_number_manual=z2.number_manual
+where electric_abons_2.obj_name='%s' and %s='%s'
+ORDER BY electric_abons_2.ab_name ASC;
+"""%sFormat
+    
+    if dm=='monthly' or dm=='daily' or dm=='current':
+        sQuery=sQuery.replace('monthly',dm)
+        #print sQuery
+        return sQuery    
+    else: return """Select 'Н/Д'"""
+    return sQuery
+
+def get_electric_by_date_podolsk(obj_parent_title, obj_title, electric_data, dm, isAbon):
+    data_table = []
+    params=[u'T0 A+',u'T1 A+',u'T2 A+',u'T3 A+']
+    res=u'Электричество'
+    cursor = connection.cursor()
+    #dm - строка, содержащая monthly or daily для sql-запроса
+    #isAbon - данные для абонента или объекта
+    #sLevel - запрос один для объектов и абонентов, заменяется только конструкция в where с какой таблицей сравнивать    
+    sQuery = makeSqlQuery_electric_by_date_podolsk(obj_parent_title, obj_title, electric_data, params, dm, res, isAbon)
+    cursor.execute(sQuery)
+    data_table = cursor.fetchall()    
+    if len(data_table)>0: data_table=ChangeNull_and_LeaveEmptyCol(data_table, electric_data, 11)
+    return data_table
+
+def makeSqlQuery_electric_by_period_for_korp_podolsk(obj_title, obj_parent_title, date_start, date_end,params, res,dm):
+    sQuery="""
+Select z3.ab_name, z3.factory_number_manual,
+round(z3.t0_start::numeric,0)::text, 
+round(z3.t1_start::numeric,0)::text,
+
+    CASE
+	when z3.ab_name like '%%Квартира%%Т%%' then round(z3.t2_start::numeric,0)::text
+	when z3.obj_name like '%%ВРУ%%' then round(z3.t2_start::numeric,0)::text
+	else ''
+    END,
+'', 
+'',
+round(z4.t0_end::numeric,0)::text, 
+round(z4.t1_end::numeric,0)::text,
+ CASE
+	when z3.ab_name like '%%Квартира%%Т%%' then round(z4.t2_end::numeric,0)::text
+	when z3.obj_name like '%%ВРУ%%' then round(z4.t2_end::numeric,0)::text
+	else ''
+    END, 
+'', 
+'',
+(round(z4.t0_end::numeric,0)-round(z3.t0_start::numeric,0))::text as delta_t0,
+(round(z4.t1_end::numeric,0)-round(z3.t1_start::numeric,0))::text as delta_t1,
+CASE
+	when z3.ab_name like '%%Квартира%%Т%%' then (round(z4.t2_end::numeric,0)-round(z3.t2_start::numeric,0))::text
+	when z3.obj_name like '%%ВРУ%%' then (round(z4.t2_end::numeric,0)-round(z3.t2_start::numeric,0))::text
+	else ''
+    END as delta_t2,
+'' as delta_t3,
+'' as delta_t4,
+'',
+'',
+'' as delta_t0R,
+round(z4.ktt::numeric,1)::text,
+round((z4.ktt*z4.ktn*(round(z4.t0_end::numeric,0)-round(z3.t0_start::numeric,0)))::numeric,0)::text,
+'',
+round(z4.ktn::numeric,1)::text, 
+round(z4.a::numeric,1)::text, 
+z4.lic_num
+from
+(Select electric_abons_2.ktt, electric_abons_2.lic_num, electric_abons_2.ktn, electric_abons_2.a, z2.date as date_end, electric_abons_2.obj_name, electric_abons_2.ab_name, electric_abons_2.factory_number_manual, z2.name_res, z2.t0 as t0_end, z2.t1 as t1_end, z2.t2 as t2_end, z2.t3 as t3_end, z2.t4 as t4_end, z2.t0r as t0r_end
+from electric_abons_2
+Left join
+(SELECT z1.ktt, z1.ktn, z1.a,z1.date, z1.name_objects, z1.name as name_abonent, z1.num_manual, z1.name_res,
+sum(Case when z1.params_name = '%s' then z1.value else null end) as t0,
+sum(Case when z1.params_name = '%s' then z1.value else null end) as t1,
+sum(Case when z1.params_name = '%s' then z1.value else null end) as t2,
+sum(Case when z1.params_name = '%s' then z1.value else null end) as t3,
+sum(Case when z1.params_name = '%s' then z1.value else null end) as t4,
+sum(Case when z1.params_name = '%s' then z1.value else null end) as t0R
+
+                        FROM
+                        (
+SELECT 
+                                  link_abonents_taken_params.coefficient_2 as ktn,
+                                  link_abonents_taken_params.coefficient as ktt,
+                                  link_abonents_taken_params.coefficient_3 as a,
+                                  daily_values.date,    
+                                  daily_values.value,                            
+                                  abonents.name, 
+                                  daily_values.id_taken_params, 
+                                  objects.name as name_objects,
+                                  names_params.name as params_name,
+                                  meters.factory_number_manual as num_manual, 
+                                  resources.name as name_res
+                                FROM 
+                                  public.daily_values, 
+                                  public.link_abonents_taken_params, 
+                                  public.taken_params, 
+                                  public.abonents, 
+                                  public.objects, 
+                                  public.names_params, 
+                                  public.params, 
+                                  public.meters, 
+                                  public.resources
+                                WHERE 
+                                  taken_params.guid = link_abonents_taken_params.guid_taken_params AND
+                                  taken_params.id = daily_values.id_taken_params AND
+                                  taken_params.guid_params = params.guid AND
+                                  taken_params.guid_meters = meters.guid AND
+                                  abonents.guid = link_abonents_taken_params.guid_abonents AND
+                                  objects.guid = abonents.guid_objects AND
+                                  names_params.guid = params.guid_names_params AND
+                                  resources.guid = names_params.guid_resources AND                                  
+                                  objects.name = '%s' AND 
+                                  daily_values.date = '%s' AND 
+                                  resources.name = '%s'
+                                   group by 
+                         daily_values.date,
+                        daily_values.id_taken_params,
+                        objects.name ,
+                        abonents.name ,
+                        meters.factory_number_manual,
+                        daily_values.value ,
+                        names_params.name ,
+                        link_abonents_taken_params.coefficient ,
+                         link_abonents_taken_params.coefficient_2 ,
+                          link_abonents_taken_params.coefficient_3,
+                          resources.name
+                                  ) z1                       
+                      group by z1.name, z1.date, z1.name_objects, z1.name, z1.num_manual, z1.name_res, z1.ktt, z1.ktn,z1.a
+                      order by z1.name) z2
+on electric_abons_2.factory_number_manual=z2.num_manual
+where electric_abons_2.obj_name='%s') z4, 
+
+
+(Select z2.date as date_start, electric_abons_2.obj_name, electric_abons_2.ab_name, electric_abons_2.factory_number_manual, z2.name_res, z2.t0 as t0_start, z2.t1 as t1_start, z2.t2 as t2_start, z2.t3 as t3_start, z2.t4 as t4_start, z2.t0r as t0r_start
+from electric_abons_2
+Left join
+(SELECT z1.date, z1.name_objects, z1.name as name_abonent, z1.num_manual, z1.name_res,
+sum(Case when z1.params_name = '%s' then z1.value else null end) as t0,
+sum(Case when z1.params_name = '%s' then z1.value else null end) as t1,
+sum(Case when z1.params_name = '%s' then z1.value else null end) as t2,
+sum(Case when z1.params_name = '%s' then z1.value else null end) as t3,
+sum(Case when z1.params_name = '%s' then z1.value else null end) as t4,
+sum(Case when z1.params_name = '%s' then z1.value else null end) as t0R
+
+                        FROM
+                        (
+SELECT 
+                                  daily_values.date,    
+                                  daily_values.value,                            
+                                  abonents.name, 
+                                  daily_values.id_taken_params, 
+                                  objects.name as name_objects,
+                                  names_params.name as params_name,
+                                  meters.factory_number_manual as num_manual, 
+                                  resources.name as name_res
+                                FROM 
+                                  public.daily_values, 
+                                  public.link_abonents_taken_params, 
+                                  public.taken_params, 
+                                  public.abonents, 
+                                  public.objects, 
+                                  public.names_params, 
+                                  public.params, 
+                                  public.meters, 
+                                  public.resources
+                                WHERE 
+                                  taken_params.guid = link_abonents_taken_params.guid_taken_params AND
+                                  taken_params.id = daily_values.id_taken_params AND
+                                  taken_params.guid_params = params.guid AND
+                                  taken_params.guid_meters = meters.guid AND
+                                  abonents.guid = link_abonents_taken_params.guid_abonents AND
+                                  objects.guid = abonents.guid_objects AND
+                                  names_params.guid = params.guid_names_params AND
+                                  resources.guid = names_params.guid_resources AND                                  
+                                  objects.name = '%s' AND 
+                                  daily_values.date = '%s' AND 
+                                  resources.name = '%s'
+                                   group by 
+                         daily_values.date,
+                        daily_values.id_taken_params,
+                        objects.name ,
+                        abonents.name ,
+                        meters.factory_number_manual,
+                        daily_values.value ,
+                        names_params.name ,
+                        link_abonents_taken_params.coefficient ,
+                         link_abonents_taken_params.coefficient_2 ,
+                          link_abonents_taken_params.coefficient_3,
+                          resources.name
+                                  ) z1                       
+                      group by z1.name, z1.date, z1.name_objects, z1.name, z1.num_manual, z1.name_res
+                      order by z1.name) z2
+on electric_abons_2.factory_number_manual=z2.num_manual
+where electric_abons_2.obj_name='%s') z3
+where z3.ab_name=z4.ab_name and z3.factory_number_manual=z4.factory_number_manual
+order by z3.ab_name ASC""" % (params[0],params[1],params[2],params[3], params[4], params[5], obj_title, date_end, res, obj_title, 
+                            params[0],params[1],params[2],params[3], params[4], params[5],obj_title,  date_start, res,obj_title)
+    if dm=='monthly' or dm=='daily' or dm=='current':
+        sQuery=sQuery.replace('daily',dm)
+    #
+    #print sQuery
+    return sQuery
+
+def makeSqlQuery_electric_by_period_podolsk(obj_title, obj_parent_title, date_start, date_end, params,res, dm):
+    sQuery="""
+Select z3.ab_name, z3.factory_number_manual,
+round(z3.t0_start::numeric,0)::text, 
+round(z3.t1_start::numeric,0)::text,
+
+    CASE
+	when z3.ab_name like '%%Квартира%%Т%%' then round(z3.t2_start::numeric,0)::text
+	when z3.obj_name like '%%ВРУ%%' then round(z3.t2_start::numeric,0)::text
+	else ''
+    END,
+'', 
+'',
+round(z4.t0_end::numeric,0)::text, 
+round(z4.t1_end::numeric,0)::text,
+ CASE
+	when z3.ab_name like '%%Квартира%%Т%%' then round(z4.t2_end::numeric,0)::text
+	when z3.obj_name like '%%ВРУ%%' then round(z4.t2_end::numeric,0)::text
+	else ''
+    END, 
+'', 
+'',
+(round(z4.t0_end::numeric,0)-round(z3.t0_start::numeric,0))::text as delta_t0,
+(round(z4.t1_end::numeric,0)-round(z3.t1_start::numeric,0))::text as delta_t1,
+CASE
+	when z3.ab_name like '%%Квартира%%Т%%' then (round(z4.t2_end::numeric,0)-round(z3.t2_start::numeric,0))::text
+	when z3.obj_name like '%%ВРУ%%' then (round(z4.t2_end::numeric,0)-round(z3.t2_start::numeric,0))::text
+	else ''
+    END as delta_t2,
+'' as delta_t3,
+'' as delta_t4,
+'',
+'',
+'' as delta_t0R,
+round(z4.ktt::numeric,1)::text,
+round((z4.ktt*z4.ktn*(round(z4.t0_end::numeric,0)-round(z3.t0_start::numeric,0)))::numeric,0)::text,
+'',
+round(z4.ktn::numeric,1)::text, 
+round(z4.a::numeric,1)::text, 
+z4.lic_num
+from
+(Select electric_abons_2.ktt,electric_abons_2.lic_num, electric_abons_2.ktn, electric_abons_2.a,z2.date as date_start, electric_abons_2.obj_name, electric_abons_2.ab_name, electric_abons_2.factory_number_manual, z2.name_res, z2.t0 as t0_end, z2.t1 as t1_end, z2.t2 as t2_end, z2.t3 as t3_end, z2.t4 as t4_end, z2.t0r as t0r_end
+from electric_abons_2
+Left join
+(SELECT z1.ktt, z1.ktn,z1.a,z1.date, z1.name_objects, z1.name as name_abonent, z1.num_manual, z1.name_res,
+sum(Case when z1.params_name = '%s' then z1.value else null end) as t0,
+sum(Case when z1.params_name = '%s' then z1.value else null end) as t1,
+sum(Case when z1.params_name = '%s' then z1.value else null end) as t2,
+sum(Case when z1.params_name = '%s' then z1.value else null end) as t3,
+sum(Case when z1.params_name = '%s' then z1.value else null end) as t4,
+sum(Case when z1.params_name = '%s' then z1.value else null end) as t0R
+                        FROM
+                        (
+                                SELECT 
+                                  link_abonents_taken_params.coefficient_2 as ktn,
+                                  link_abonents_taken_params.coefficient as ktt,
+                                  link_abonents_taken_params.coefficient_3 as a,
+                                  daily_values.date,    
+                                  daily_values.value,                            
+                                  abonents.name, 
+                                  daily_values.id_taken_params, 
+                                  objects.name as name_objects,
+                                  names_params.name as params_name,
+                                  meters.factory_number_manual as num_manual, 
+                                  resources.name as name_res
+                                FROM 
+                                  public.daily_values, 
+                                  public.link_abonents_taken_params, 
+                                  public.taken_params, 
+                                  public.abonents, 
+                                  public.objects, 
+                                  public.names_params, 
+                                  public.params, 
+                                  public.meters, 
+                                  public.resources
+                                WHERE 
+                                  taken_params.guid = link_abonents_taken_params.guid_taken_params AND
+                                  taken_params.id = daily_values.id_taken_params AND
+                                  taken_params.guid_params = params.guid AND
+                                  taken_params.guid_meters = meters.guid AND
+                                  abonents.guid = link_abonents_taken_params.guid_abonents AND
+                                  objects.guid = abonents.guid_objects AND
+                                  names_params.guid = params.guid_names_params AND
+                                  resources.guid = names_params.guid_resources AND                                  
+                                  objects.name = '%s' AND 
+                                  abonents.name='%s' and
+                                  daily_values.date = '%s' AND 
+                                  resources.name = '%s'
+                                   group by 
+                         daily_values.date,
+                        daily_values.id_taken_params,
+                        objects.name ,
+                        abonents.name ,
+                        meters.factory_number_manual,
+                        daily_values.value ,
+                        names_params.name ,
+                        link_abonents_taken_params.coefficient ,
+                         link_abonents_taken_params.coefficient_2 ,
+                          link_abonents_taken_params.coefficient_3,
+                          resources.name
+                                  ) z1                       
+                      group by z1.name, z1.date, z1.name_objects, z1.name, z1.num_manual, z1.name_res, z1.ktt, z1.ktn, z1.a
+                      order by z1.name) z2
+on electric_abons_2.factory_number_manual=z2.num_manual
+where electric_abons_2.obj_name='%s') z4, 
+
+(Select z2.date as date_start, electric_abons_2.obj_name, electric_abons_2.ab_name, electric_abons_2.factory_number_manual, z2.name_res, z2.t0 as t0_start, z2.t1 as t1_start, z2.t2 as t2_start, z2.t3 as t3_start, z2.t4 as t4_start, z2.t0r as t0r_start
+from electric_abons_2
+Left join
+(SELECT z1.date, z1.name_objects, z1.name as name_abonent, z1.num_manual, z1.name_res,
+sum(Case when z1.params_name = '%s' then z1.value else null end) as t0,
+sum(Case when z1.params_name = '%s' then z1.value else null end) as t1,
+sum(Case when z1.params_name = '%s' then z1.value else null end) as t2,
+sum(Case when z1.params_name = '%s' then z1.value else null end) as t3,
+sum(Case when z1.params_name = '%s' then z1.value else null end) as t4,
+sum(Case when z1.params_name = '%s' then z1.value else null end) as t0R
+
+                        FROM
+                        (
+SELECT 
+                                  daily_values.date,    
+                                  daily_values.value,                            
+                                  abonents.name, 
+                                  daily_values.id_taken_params, 
+                                  objects.name as name_objects,
+                                  names_params.name as params_name,
+                                  meters.factory_number_manual as num_manual, 
+                                  resources.name as name_res
+                                FROM 
+                                  public.daily_values, 
+                                  public.link_abonents_taken_params, 
+                                  public.taken_params, 
+                                  public.abonents, 
+                                  public.objects, 
+                                  public.names_params, 
+                                  public.params, 
+                                  public.meters, 
+                                  public.resources
+                                WHERE 
+                                  taken_params.guid = link_abonents_taken_params.guid_taken_params AND
+                                  taken_params.id = daily_values.id_taken_params AND
+                                  taken_params.guid_params = params.guid AND
+                                  taken_params.guid_meters = meters.guid AND
+                                  abonents.guid = link_abonents_taken_params.guid_abonents AND
+                                  objects.guid = abonents.guid_objects AND
+                                  names_params.guid = params.guid_names_params AND
+                                  resources.guid = names_params.guid_resources AND                                  
+                                  objects.name = '%s' AND 
+                                  abonents.name='%s' and
+                                  daily_values.date = '%s' AND 
+                                  resources.name = '%s'
+                                   group by 
+                         daily_values.date,
+                        daily_values.id_taken_params,
+                        objects.name ,
+                        abonents.name ,
+                        meters.factory_number_manual,
+                        daily_values.value ,
+                        names_params.name ,
+                        link_abonents_taken_params.coefficient ,
+                         link_abonents_taken_params.coefficient_2 ,
+                          link_abonents_taken_params.coefficient_3,
+                          resources.name
+                                  ) z1                       
+                      group by z1.name, z1.date, z1.name_objects, z1.name, z1.num_manual, z1.name_res
+                      order by z1.name) z2
+on electric_abons_2.factory_number_manual=z2.num_manual
+where electric_abons_2.obj_name='%s') z3
+where z3.ab_name=z4.ab_name and z3.ab_name='%s' and z3.factory_number_manual=z4.factory_number_manual """ % (params[0],params[1],params[2],params[3], params[4], params[5],  obj_parent_title, obj_title, date_end, res, obj_parent_title, 
+                            params[0],params[1],params[2],params[3], params[4], params[5],obj_parent_title, obj_title, date_start, res,obj_parent_title, obj_title)
+    #print sQuery
+    if dm=='monthly' or dm=='daily' or dm=='current':
+        sQuery=sQuery.replace('daily',dm)    
+    return sQuery
+
+def get_data_table_electric_period_podolsk(isAbon,obj_title,obj_parent_title, electric_data_start, electric_data_end, res, dm):
+    data_table = []
+    params=[u'T0 A+',u'T1 A+',u'T2 A+',u'T3 A+',u'T4 A+', u'T0 R+']
+    cursor = connection.cursor()
+    #isAbon - запрос для абонента или для корпуса
+    #Отличие от стандартногоотчёта: если есть буква Т, то это 2-тарифный прибор, если нет, то 1-тарифный и должно быть пустое поле в колонке со вторым тарифом
+    if isAbon:
+        cursor.execute(makeSqlQuery_electric_by_period_podolsk(obj_title, obj_parent_title, electric_data_start, electric_data_end,params, res, dm))
+    else:
+        cursor.execute(makeSqlQuery_electric_by_period_for_korp_podolsk(obj_title, obj_parent_title, electric_data_start, electric_data_end,params, res, dm))
+    data_table = cursor.fetchall()
+    # 0 - дата, 1 - Имя объекта, 2 - Имя абонента, 3 - заводской номер, 4 - значение
+    
+    if len(data_table)>0: data_table=ChangeNull(data_table, None)
     return data_table
