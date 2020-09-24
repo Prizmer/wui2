@@ -12,7 +12,7 @@ from openpyxl.styles import Style, PatternFill, Border, Side, Alignment, Font
 from openpyxl.cell import get_column_letter
 import common_sql
 import re
-from excel_response import ExcelResponse
+#from excel_response import ExcelResponse
 from django.shortcuts import redirect
 #from datetime import datetime, date, time
 import decimal
@@ -14077,8 +14077,18 @@ def water_consumption_impuls_report(request):
     response['Content-Disposition'] = 'attachment;filename="%s.%s"' % (output_name.replace('"', '\"'), file_ext)   
     return response
 
+def get_val_by_round(val, ROUND_SIZE, separator):
+    #print val
+    new_val = "{val:.{ROUND_SIZE}f}".format(**vars()) #f"{val:.{ROUND_SIZE}f}" <--- для питона старше 3.6
+    # if ROUND_SIZE == 0:
+    #     new_val = str(val)[0:int(str(val).find('.')+1)]  #.replace('.', separator)  # Сумма А+
+    # else:
+    #     new_val = str(val).replace('.', separator)
+    return new_val
+
 def report_electric_3_zones(request):
     SHOW_LIC_NUM = getattr(settings, 'SHOW_LIC_NUM', 'False')
+    ROUND_SIZE = getattr(settings, 'ROUND_SIZE', 3)
     response = StringIO.StringIO()
     wb = Workbook()
     ws = wb.active
@@ -14255,11 +14265,9 @@ def report_electric_3_zones(request):
         except:
             ws.cell('E%s'%(row)).style = ali_white
             next
-                   
+
         try:
-            #ws.cell('F%s'%(row)).number_format = 'Comma'
-            #ws.cell('F%s'%(row)).value = '%s' % str(data_table[row-6][3]).replace('.',',')  # Сумма А+
-            ws.cell('F%s'%(row)).value = '%s' % str(round((data_table[row-6][3]), 3)).replace('.', separator)  # Сумма А+
+            ws.cell('F%s'%(row)).value = '%s' % get_val_by_round(data_table[row-6][3], ROUND_SIZE, separator)  #str(val).replace('.', separator)
             ws.cell('F%s'%(row)).style = ali_white
             
         except:
@@ -14267,44 +14275,43 @@ def report_electric_3_zones(request):
             next
     
         try:            
-            ws.cell('G%s'%(row)).value = '%s' % str(round((data_table[row-6][3]*data_table[row-6][8]*data_table[row-6][9]),3)).replace('.', separator)  # "Энергия Сумма А+
+            ws.cell('G%s'%(row)).value = '%s' % get_val_by_round((data_table[row-6][3]*data_table[row-6][8]*data_table[row-6][9]),ROUND_SIZE, separator)  # "Энергия Сумма А+
             ws.cell('G%s'%(row)).style = ali_yellow
         except:
             ws.cell('G%s'%(row)).style = ali_yellow
             next
             
         try:
-            ws.cell('H%s'%(row)).value = '%s' % str(round((data_table[row-6][4]),3)).replace('.', separator)  # Тариф 1 А+
+            ws.cell('H%s'%(row)).value = '%s' % get_val_by_round((data_table[row-6][4]),ROUND_SIZE, separator)  # Тариф 1 А+
             ws.cell('H%s'%(row)).style = ali_white
         except:
             ws.cell('H%s'%(row)).style = ali_white
             next
             
         try:
-            val = round((data_table[row-6][4]*data_table[row-6][8]*data_table[row-6][9]),3)            
-            ws.cell('I%s'%(row)).value = '%s' % str(val).replace('.', separator)  # "Энергия Тариф 1 А+
+            #val = round((data_table[row-6][4]*data_table[row-6][8]*data_table[row-6][9]),ROUND_SIZE)            
+            ws.cell('I%s'%(row)).value = '%s' % get_val_by_round((data_table[row-6][4]*data_table[row-6][8]*data_table[row-6][9]),ROUND_SIZE, separator)  # "Энергия Тариф 1 А+
             ws.cell('I%s'%(row)).style = ali_yellow
         except:
             ws.cell('I%s'%(row)).style = ali_yellow
             next
             
         try:
-            ws.cell('J%s'%(row)).value = '%s' % str(round((data_table[row-6][5]),3)).replace('.', separator)  # Тариф 2 А+
+            ws.cell('J%s'%(row)).value = '%s' % get_val_by_round(data_table[row-6][5],ROUND_SIZE, separator)  # Тариф 2 А+
             ws.cell('J%s'%(row)).style = ali_white
         except:
             ws.cell('J%s'%(row)).style = ali_white
             next
             
         try:
-            val = round((data_table[row-6][5]*data_table[row-6][8]*data_table[row-6][9]),3)
-            ws.cell('K%s'%(row)).value = '%s' % str(val).replace('.', separator) # "Энергия Тариф 2 А+
+            ws.cell('K%s'%(row)).value = '%s' % get_val_by_round((data_table[row-6][5]*data_table[row-6][8]*data_table[row-6][9]),ROUND_SIZE, separator) # "Энергия Тариф 2 А+
             ws.cell('K%s'%(row)).style = ali_yellow
         except:
             ws.cell('K%s'%(row)).style = ali_yellow
             next
             
         try:
-            ws.cell('L%s'%(row)).value = '%s' % str(round((data_table[row-6][6]),3)).replace('.', separator)  # Тариф 3 А+
+            ws.cell('L%s'%(row)).value = '%s' % get_val_by_round((data_table[row-6][6]),ROUND_SIZE, separator)  # Тариф 3 А+
             ws.cell('L%s'%(row)).style = ali_white
 
         except:
@@ -14312,8 +14319,8 @@ def report_electric_3_zones(request):
             next
             
         try:
-            val = round((data_table[row-6][6]*data_table[row-6][8]*data_table[row-6][9]),3)
-            ws.cell('M%s'%(row)).value = '%s' % str(val).replace('.', separator)  # "Энергия Тариф 3 А+
+            #val = get_val_by_round((data_table[row-6][6]*data_table[row-6][8]*data_table[row-6][9]),ROUND_SIZE)
+            ws.cell('M%s'%(row)).value = '%s' % get_val_by_round((data_table[row-6][6]*data_table[row-6][8]*data_table[row-6][9]),ROUND_SIZE, separator)  # "Энергия Тариф 3 А+
             ws.cell('M%s'%(row)).style = ali_yellow
         except:
             ws.cell('M%s'%(row)).style = ali_yellow
@@ -14341,6 +14348,7 @@ def report_electric_3_zones(request):
 
 def report_electric_2_zones(request):
     SHOW_LIC_NUM = getattr(settings, 'SHOW_LIC_NUM', 'False')
+    ROUND_SIZE = getattr(settings, 'ROUND_SIZE', 3)
     response = StringIO.StringIO()
     wb = Workbook()
     ws = wb.active
@@ -14507,7 +14515,7 @@ def report_electric_2_zones(request):
         try:
             #ws.cell('F%s'%(row)).number_format = 'Comma'
             #ws.cell('F%s'%(row)).value = '%s' % str(data_table[row-6][3]).replace('.',',')  # Сумма А+
-            ws.cell('F%s'%(row)).value = '%s' % str(round((data_table[row-6][3]), 3)).replace('.', separator)  # Сумма А+
+            ws.cell('F%s'%(row)).value = '%s' % get_val_by_round((data_table[row-6][3]), ROUND_SIZE, separator)  # Сумма А+
             ws.cell('F%s'%(row)).style = ali_white
             
         except:
@@ -14515,37 +14523,37 @@ def report_electric_2_zones(request):
             next
     
         try:            
-            ws.cell('G%s'%(row)).value = '%s' % str(round((data_table[row-6][3]*data_table[row-6][8]*data_table[row-6][9]),3)).replace('.', separator)  # "Энергия Сумма А+
+            ws.cell('G%s'%(row)).value = '%s' % get_val_by_round((data_table[row-6][3]*data_table[row-6][8]*data_table[row-6][9]),ROUND_SIZE, separator)  # "Энергия Сумма А+
             ws.cell('G%s'%(row)).style = ali_yellow
         except:
             ws.cell('G%s'%(row)).style = ali_yellow
             next
             
         try:
-            ws.cell('H%s'%(row)).value = '%s' % str(round((data_table[row-6][4]),3)).replace('.', separator)  # Тариф 1 А+
+            ws.cell('H%s'%(row)).value = '%s' % get_val_by_round((data_table[row-6][4]),ROUND_SIZE, separator)  # Тариф 1 А+
             ws.cell('H%s'%(row)).style = ali_white
         except:
             ws.cell('H%s'%(row)).style = ali_white
             next
             
         try:
-            val = round((data_table[row-6][4]*data_table[row-6][8]*data_table[row-6][9]),3)            
-            ws.cell('I%s'%(row)).value = '%s' % str(val).replace('.', separator)  # "Энергия Тариф 1 А+
+            #val = round((data_table[row-6][4]*data_table[row-6][8]*data_table[row-6][9]),ROUND_SIZE)            
+            ws.cell('I%s'%(row)).value = '%s' % get_val_by_round((data_table[row-6][4]*data_table[row-6][8]*data_table[row-6][9]),ROUND_SIZE, separator)  # "Энергия Тариф 1 А+
             ws.cell('I%s'%(row)).style = ali_yellow
         except:
             ws.cell('I%s'%(row)).style = ali_yellow
             next
             
         try:
-            ws.cell('J%s'%(row)).value = '%s' % str(round((data_table[row-6][5]),3)).replace('.', separator)  # Тариф 2 А+
+            ws.cell('J%s'%(row)).value = '%s' % get_val_by_round((data_table[row-6][5]),ROUND_SIZE, separator)  # Тариф 2 А+
             ws.cell('J%s'%(row)).style = ali_white
         except:
             ws.cell('J%s'%(row)).style = ali_white
             next
             
         try:
-            val = round((data_table[row-6][5]*data_table[row-6][8]*data_table[row-6][9]),3)
-            ws.cell('K%s'%(row)).value = '%s' % str(val).replace('.', separator) # "Энергия Тариф 2 А+
+            #val = round((data_table[row-6][5]*data_table[row-6][8]*data_table[row-6][9]),ROUND_SIZE)
+            ws.cell('K%s'%(row)).value = '%s' % get_val_by_round((data_table[row-6][5]*data_table[row-6][8]*data_table[row-6][9]),ROUND_SIZE, separator) # "Энергия Тариф 2 А+
             ws.cell('K%s'%(row)).style = ali_yellow
         except:
             ws.cell('K%s'%(row)).style = ali_yellow
@@ -14573,6 +14581,7 @@ def report_electric_2_zones(request):
 
 def report_electric_1_zones(request):
     SHOW_LIC_NUM = getattr(settings, 'SHOW_LIC_NUM', 'False')
+    ROUND_SIZE = getattr(settings, 'ROUND_SIZE', 'False')
     response = StringIO.StringIO()
     wb = Workbook()
     ws = wb.active
@@ -14709,7 +14718,7 @@ def report_electric_1_zones(request):
             next
                    
         try:
-            ws.cell('F%s'%(row)).value = '%s' % str(round((data_table[row-6][3]), 3)).replace('.', separator)  # Сумма А+
+            ws.cell('F%s'%(row)).value = '%s' % get_val_by_round((data_table[row-6][3]), ROUND_SIZE, separator)  # Сумма А+
             ws.cell('F%s'%(row)).style = ali_white
             
         except:
@@ -14717,7 +14726,7 @@ def report_electric_1_zones(request):
             next
     
         try:            
-            ws.cell('G%s'%(row)).value = '%s' % str(round((data_table[row-6][3]*data_table[row-6][8]*data_table[row-6][9]),3)).replace('.', separator)  # "Энергия Сумма А+
+            ws.cell('G%s'%(row)).value = '%s' % get_val_by_round(data_table[row-6][3]*data_table[row-6][8]*data_table[row-6][9],ROUND_SIZE, separator)  # "Энергия Сумма А+
             ws.cell('G%s'%(row)).style = ali_yellow
         except:
             ws.cell('G%s'%(row)).style = ali_yellow
@@ -14744,6 +14753,8 @@ def report_electric_1_zones(request):
     return response
 
 def report_electric_consumption_2_zones(request):
+    SHOW_LIC_NUM = getattr(settings, 'SHOW_LIC_NUM', 'False')
+    ROUND_SIZE = getattr(settings, 'ROUND_SIZE', 'False')
     response = StringIO.StringIO()
     wb = Workbook()
     ws = wb.active
@@ -14886,9 +14897,6 @@ def report_electric_consumption_2_zones(request):
     ws['w5'] = 'Энергия'
     ws['w5'].style = ali_yellow
 
-    
-    SHOW_LIC_NUM = getattr(settings, 'SHOW_LIC_NUM', 'False')
-
     if SHOW_LIC_NUM:
             ws.merge_cells('X4:X5')
             ws['X4'] = 'Лицевой номер абонента'
@@ -14972,7 +14980,7 @@ def report_electric_consumption_2_zones(request):
             next
                    
         try:            
-            ws.cell('H%s'%(row)).value = '%s' % str(round(float(data_table[row-6][7]), 3)).replace('.', separator)  # Сумма А+ на конец интервала
+            ws.cell('H%s'%(row)).value = '%s' % get_val_by_round(float(data_table[row-6][7]), ROUND_SIZE, separator)  # Сумма А+ на конец интервала
             ws.cell('H%s'%(row)).style = ali_white
         except:
             ws.cell('H%s'%(row)).style = ali_white
@@ -14980,7 +14988,7 @@ def report_electric_consumption_2_zones(request):
             
         try:
             #val = float(data_table[row-6][23])*float(data_table[row-6][24])*float(data_table[row-6][7])
-            ws.cell('I%s'%(row)).value = '%s' % str(round(float(data_table[row-6][23])*float(data_table[row-6][20])*float(data_table[row-6][7]), 3)).replace('.', separator)  # Энергия Сумма А+ на конец интервала
+            ws.cell('I%s'%(row)).value = '%s' % get_val_by_round(float(data_table[row-6][23])*float(data_table[row-6][20])*float(data_table[row-6][7]), ROUND_SIZE, separator)  # Энергия Сумма А+ на конец интервала
             ws.cell('I%s'%(row)).style = ali_yellow
         except:
             ws.cell('I%s'%(row)).style = ali_yellow
@@ -14988,7 +14996,7 @@ def report_electric_consumption_2_zones(request):
             
         try:
             #val = format(data_table[row-6][2], '.3f')
-            ws.cell('F%s'%(row)).value = '%s ' % str(round(float(data_table[row-6][2]), 3)).replace('.', separator)  # '%s' % (data_table[row-6][2])  # Сумма А+ на начало интервала
+            ws.cell('F%s'%(row)).value = '%s ' % get_val_by_round(float(data_table[row-6][2]), ROUND_SIZE, separator)  # '%s' % (data_table[row-6][2])  # Сумма А+ на начало интервала
             ws.cell('F%s'%(row)).style = ali_white
             #ws.cell('F%s'%(row)).number_format = '0.000'
         except:
@@ -14997,7 +15005,7 @@ def report_electric_consumption_2_zones(request):
             
         try:
             #val = format(data_table[row-6][2]*data_table[row-6][20]*data_table[row-6][23],'.3f')
-            ws.cell('G%s'%(row)).value = '%s' % str(round(float(data_table[row-6][23])*float(data_table[row-6][20])*float(data_table[row-6][2]), 3)).replace('.', separator)  # Энергия Сумма А+ на начало интервала
+            ws.cell('G%s'%(row)).value = '%s' % get_val_by_round(float(data_table[row-6][23])*float(data_table[row-6][20])*float(data_table[row-6][2]), ROUND_SIZE, separator)  # Энергия Сумма А+ на начало интервала
             ws.cell('G%s'%(row)).style = ali_yellow
         except:
             ws.cell('G%s'%(row)).style = ali_yellow
@@ -15005,7 +15013,7 @@ def report_electric_consumption_2_zones(request):
             
         try:
             #val = format(data_table[row-6][8],'.3f')
-            ws.cell('L%s'%(row)).value = '%s' % str(round(float(data_table[row-6][8]), 3)).replace('.', separator)   # Тариф 1 А+ на конец интервала
+            ws.cell('L%s'%(row)).value = '%s' % get_val_by_round(float(data_table[row-6][8]), ROUND_SIZE, separator)   # Тариф 1 А+ на конец интервала
             ws.cell('L%s'%(row)).style = ali_white
         except:
             ws.cell('L%s'%(row)).style = ali_white
@@ -15013,7 +15021,7 @@ def report_electric_consumption_2_zones(request):
             
         try:
             #val = format(data_table[row-6][8]*data_table[row-6][20]*data_table[row-6][23],'.3f')
-            ws.cell('M%s'%(row)).value = '%s' % str(round(float(data_table[row-6][23])*float(data_table[row-6][20])*float(data_table[row-6][8]), 3)).replace('.', separator)  # Энергия Тариф 1 А+ на конец интервала
+            ws.cell('M%s'%(row)).value = '%s' % get_val_by_round(float(data_table[row-6][23])*float(data_table[row-6][20])*float(data_table[row-6][8]), ROUND_SIZE, separator)  # Энергия Тариф 1 А+ на конец интервала
             ws.cell('M%s'%(row)).style = ali_yellow
         except:
             ws.cell('M%s'%(row)).style = ali_yellow
@@ -15021,7 +15029,7 @@ def report_electric_consumption_2_zones(request):
             
         try:
             #val = format(data_table[row-6][3],'.3f')
-            ws.cell('J%s'%(row)).value = '%s' % str(round(float(data_table[row-6][3]), 3)).replace('.', separator)  # Тариф 1 А+ на начало интервала
+            ws.cell('J%s'%(row)).value = '%s' % get_val_by_round(float(data_table[row-6][3]), ROUND_SIZE, separator)  # Тариф 1 А+ на начало интервала
             ws.cell('J%s'%(row)).style = ali_white
         except:
             ws.cell('J%s'%(row)).style = ali_white
@@ -15029,7 +15037,7 @@ def report_electric_consumption_2_zones(request):
             
         try:
             #val = format(data_table[row-6][3]*data_table[row-6][20]*data_table[row-6][23],'.3f')
-            ws.cell('K%s'%(row)).value = '%s' % str(round(float(data_table[row-6][23])*float(data_table[row-6][20])*float(data_table[row-6][3]), 3)).replace('.', separator)  # Энергия Тариф 1 А+ на начало интервала
+            ws.cell('K%s'%(row)).value = '%s' % get_val_by_round(float(data_table[row-6][23])*float(data_table[row-6][20])*float(data_table[row-6][3]), ROUND_SIZE, separator)  # Энергия Тариф 1 А+ на начало интервала
             ws.cell('K%s'%(row)).style = ali_yellow
         except:
             ws.cell('K%s'%(row)).style = ali_yellow
@@ -15037,7 +15045,7 @@ def report_electric_consumption_2_zones(request):
             
         try:
             #val = format(data_table[row-6][9],'.3f')
-            ws.cell('P%s'%(row)).value = '%s' % str(round(float(data_table[row-6][9]), 3)).replace('.', separator)   # Тариф 2 А+ на конец интервала
+            ws.cell('P%s'%(row)).value = '%s' % get_val_by_round(float(data_table[row-6][9]), ROUND_SIZE, separator)   # Тариф 2 А+ на конец интервала
             ws.cell('P%s'%(row)).style = ali_white
         except:
             ws.cell('P%s'%(row)).style = ali_white
@@ -15045,7 +15053,7 @@ def report_electric_consumption_2_zones(request):
             
         try:
             #val = format(data_table[row-6][9]*data_table[row-6][20]*data_table[row-6][23],'.3f')
-            ws.cell('Q%s'%(row)).value = '%s' % str(round(float(data_table[row-6][23])*float(data_table[row-6][20])*float(data_table[row-6][9]), 3)).replace('.', separator)  # Энергия Тариф 2 А+ на конец интервала
+            ws.cell('Q%s'%(row)).value = '%s' % get_val_by_round(float(data_table[row-6][23])*float(data_table[row-6][20])*float(data_table[row-6][9]), ROUND_SIZE, separator)  # Энергия Тариф 2 А+ на конец интервала
             ws.cell('Q%s'%(row)).style = ali_yellow
         except:
             ws.cell('Q%s'%(row)).style = ali_yellow
@@ -15053,7 +15061,7 @@ def report_electric_consumption_2_zones(request):
 
         try:
             #val = format(data_table[row-6][4],'.3f')
-            ws.cell('N%s'%(row)).value = '%s' % str(round(float(data_table[row-6][4]), 3)).replace('.', separator)  # Тариф 2 А+ на начало интервала
+            ws.cell('N%s'%(row)).value = '%s' % get_val_by_round(float(data_table[row-6][4]), ROUND_SIZE, separator)  # Тариф 2 А+ на начало интервала
             ws.cell('N%s'%(row)).style = ali_white
         except:
             ws.cell('N%s'%(row)).style = ali_white
@@ -15061,7 +15069,7 @@ def report_electric_consumption_2_zones(request):
             
         try:
             #val = format(data_table[row-6][4]*data_table[row-6][20]*data_table[row-6][23],'.3f')
-            ws.cell('O%s'%(row)).value = '%s' % str(round(float(data_table[row-6][23])*float(data_table[row-6][20])*float(data_table[row-6][4]), 3)).replace('.', separator)  # Энергия Тариф 2 А+ на начало интервала
+            ws.cell('O%s'%(row)).value = '%s' % get_val_by_round(float(data_table[row-6][23])*float(data_table[row-6][20])*float(data_table[row-6][4]), ROUND_SIZE, separator)  # Энергия Тариф 2 А+ на начало интервала
             ws.cell('O%s'%(row)).style = ali_yellow
         except:
             ws.cell('O%s'%(row)).style = ali_yellow
@@ -15070,7 +15078,7 @@ def report_electric_consumption_2_zones(request):
         # Расход
         try:
             #val = format(data_table[row-6][12],'.3f')
-            ws.cell('R%s'%(row)).value = '%s' % str(round(float(data_table[row-6][12]), 3)).replace('.', separator)  # Расход Сумма А+
+            ws.cell('R%s'%(row)).value = '%s' % get_val_by_round(float(data_table[row-6][12]), ROUND_SIZE, separator)  # Расход Сумма А+
             ws.cell('R%s'%(row)).style = ali_white
             #ws.cell('V%s'%(row)).number_format = '0.000'
         except:
@@ -15078,21 +15086,21 @@ def report_electric_consumption_2_zones(request):
             next
             
         try:            
-            ws.cell('S%s'%(row)).value = '%s' % str(round(float(data_table[row-6][23])*float(data_table[row-6][20])*float(data_table[row-6][12]), 3)).replace('.', separator)  # Расход Сумма Энергия А+
+            ws.cell('S%s'%(row)).value = '%s' % get_val_by_round(float(data_table[row-6][23])*float(data_table[row-6][20])*float(data_table[row-6][12]), ROUND_SIZE, separator)  # Расход Сумма Энергия А+
             ws.cell('S%s'%(row)).style = ali_yellow            
         except:
             ws.cell('S%s'%(row)).style = ali_yellow
             next
             
         try:
-            ws.cell('T%s'%(row)).value = '%s' % str(round(float(data_table[row-6][13]), 3)).replace('.', separator)    # Расход Тариф 1 А+
+            ws.cell('T%s'%(row)).value = '%s' % get_val_by_round(float(data_table[row-6][13]), ROUND_SIZE, separator)    # Расход Тариф 1 А+
             ws.cell('T%s'%(row)).style = ali_white
         except:
             ws.cell('T%s'%(row)).style = ali_white
             next
             
         try:
-            ws.cell('U%s'%(row)).value = '%s' % str(round(float(data_table[row-6][23])*float(data_table[row-6][20])*float(data_table[row-6][13]), 3)).replace('.', separator)    # Расход Тариф 1 Энергия А+
+            ws.cell('U%s'%(row)).value = '%s' % str(round(float(data_table[row-6][23])*float(data_table[row-6][20])*float(data_table[row-6][13]), ROUND_SIZE)).replace('.', separator)    # Расход Тариф 1 Энергия А+
             ws.cell('U%s'%(row)).style = ali_yellow
         except:
             ws.cell('U%s'%(row)).style = ali_yellow
@@ -15100,7 +15108,7 @@ def report_electric_consumption_2_zones(request):
             
         try:
             #val = format(data_table[row-6][14],'.3f')
-            ws.cell('V%s'%(row)).value = '%s' % str(round(float(data_table[row-6][14]), 3)).replace('.', separator)  # Расход Тариф 2 А+
+            ws.cell('V%s'%(row)).value = '%s' % str(round(float(data_table[row-6][14]), ROUND_SIZE)).replace('.', separator)  # Расход Тариф 2 А+
             ws.cell('V%s'%(row)).style = ali_white
         except:
             ws.cell('V%s'%(row)).style = ali_white
@@ -15108,7 +15116,7 @@ def report_electric_consumption_2_zones(request):
             
         try:
             #val = format(data_table[row-6][14]*data_table[row-6][20]*data_table[row-6][23],'.3f')
-            ws.cell('w%s'%(row)).value = '%s' % str(round(float(data_table[row-6][23])*float(data_table[row-6][20])*float(data_table[row-6][14]), 3)).replace('.', separator)  # Расход Тариф 2 Энергия А+
+            ws.cell('w%s'%(row)).value = '%s' % str(round(float(data_table[row-6][23])*float(data_table[row-6][20])*float(data_table[row-6][14]), ROUND_SIZE)).replace('.', separator)  # Расход Тариф 2 Энергия А+
             ws.cell('w%s'%(row)).style = ali_yellow
         except:
             ws.cell('w%s'%(row)).style = ali_yellow
@@ -15136,6 +15144,8 @@ def report_electric_consumption_2_zones(request):
     return response
 
 def report_electric_consumption_1_zone(request):
+    SHOW_LIC_NUM = getattr(settings, 'SHOW_LIC_NUM', 'False')
+    ROUND_SIZE = getattr(settings, 'ROUND_SIZE', 'False')
     response = StringIO.StringIO()
     wb = Workbook()
     ws = wb.active
@@ -15211,7 +15221,6 @@ def report_electric_consumption_1_zone(request):
     ws['k5'] = 'Энергия'
     ws['k5'].style = ali_yellow
 
-    SHOW_LIC_NUM = getattr(settings, 'SHOW_LIC_NUM', 'False')
     if SHOW_LIC_NUM:
             ws.merge_cells('L4:L5')
             ws['l4'] = 'Лицевой номер абонента'
@@ -15295,7 +15304,7 @@ def report_electric_consumption_1_zone(request):
             next
                    
         try:            
-            ws.cell('H%s'%(row)).value = '%s' % str(round(float(data_table[row-6][7]), 3)).replace('.', separator)  # Сумма А+ на конец интервала
+            ws.cell('H%s'%(row)).value = '%s' % get_val_by_round(float(data_table[row-6][7]), ROUND_SIZE, separator)  # Сумма А+ на конец интервала
             ws.cell('H%s'%(row)).style = ali_white
         except:
             ws.cell('H%s'%(row)).style = ali_white
@@ -15303,34 +15312,30 @@ def report_electric_consumption_1_zone(request):
             
         try:
             #val = float(data_table[row-6][23])*float(data_table[row-6][24])*float(data_table[row-6][7])
-            ws.cell('I%s'%(row)).value = '%s' % str(round(float(data_table[row-6][23])*float(data_table[row-6][20])*float(data_table[row-6][7]), 3)).replace('.', separator)  # Энергия Сумма А+ на конец интервала
+            ws.cell('I%s'%(row)).value = '%s' % get_val_by_round(float(data_table[row-6][23])*float(data_table[row-6][20])*float(data_table[row-6][7]), ROUND_SIZE, separator)  # Энергия Сумма А+ на конец интервала
             ws.cell('I%s'%(row)).style = ali_yellow
         except:
             ws.cell('I%s'%(row)).style = ali_yellow
             next
             
         try:
-            #val = format(data_table[row-6][2], '.3f')
-            ws.cell('F%s'%(row)).value = '%s ' % str(round(float(data_table[row-6][2]), 3)).replace('.', separator)  # '%s' % (data_table[row-6][2])  # Сумма А+ на начало интервала
+            ws.cell('F%s'%(row)).value = '%s ' % get_val_by_round(float(data_table[row-6][2]), ROUND_SIZE, separator)  # '%s' % (data_table[row-6][2])  # Сумма А+ на начало интервала
             ws.cell('F%s'%(row)).style = ali_white
-            #ws.cell('F%s'%(row)).number_format = '0.000'
         except:
             ws.cell('F%s'%(row)).style = ali_white
             next
             
         try:
-            #val = format(data_table[row-6][2]*data_table[row-6][20]*data_table[row-6][23],'.3f')
-            ws.cell('G%s'%(row)).value = '%s' % str(round(float(data_table[row-6][23])*float(data_table[row-6][20])*float(data_table[row-6][2]), 3)).replace('.', separator)  # Энергия Сумма А+ на начало интервала
+            ws.cell('G%s'%(row)).value = '%s' % get_val_by_round(float(data_table[row-6][23])*float(data_table[row-6][20])*float(data_table[row-6][2]), ROUND_SIZE, separator)  # Энергия Сумма А+ на начало интервала
             ws.cell('G%s'%(row)).style = ali_yellow
         except:
             ws.cell('G%s'%(row)).style = ali_yellow
             next
-            
-        
+
         # Расход
         try:
             #val = format(data_table[row-6][12],'.3f')
-            ws.cell('j%s'%(row)).value = '%s' % str(round(float(data_table[row-6][12]), 3)).replace('.', separator)  # Расход Сумма А+
+            ws.cell('j%s'%(row)).value = '%s' % get_val_by_round(float(data_table[row-6][12]), ROUND_SIZE, separator)  # Расход Сумма А+
             ws.cell('j%s'%(row)).style = ali_white
             #ws.cell('V%s'%(row)).number_format = '0.000'
         except:
@@ -15338,7 +15343,7 @@ def report_electric_consumption_1_zone(request):
             next
             
         try:            
-            ws.cell('k%s'%(row)).value = '%s' % str(round(float(data_table[row-6][23])*float(data_table[row-6][20])*float(data_table[row-6][12]), 3)).replace('.', separator)  # Расход Сумма Энергия А+
+            ws.cell('k%s'%(row)).value = '%s' % get_val_by_round(float(data_table[row-6][23])*float(data_table[row-6][20])*float(data_table[row-6][12]), ROUND_SIZE, separator)  # Расход Сумма Энергия А+
             ws.cell('k%s'%(row)).style = ali_yellow            
         except:
             ws.cell('k%s'%(row)).style = ali_yellow
@@ -15365,6 +15370,7 @@ def report_electric_consumption_1_zone(request):
 
 def report_electric_podolsk(request):
     SHOW_LIC_NUM = getattr(settings, 'SHOW_LIC_NUM', 'False')
+    ROUND_SIZE = getattr(settings, 'ROUND_SIZE', 3)
     response = StringIO.StringIO()
     wb = Workbook()
     ws = wb.active
@@ -15522,49 +15528,46 @@ def report_electric_podolsk(request):
             next
                    
         try:
-            #ws.cell('F%s'%(row)).number_format = 'Comma'
-            #ws.cell('F%s'%(row)).value = '%s' % str(data_table[row-6][3]).replace('.',',')  # Сумма А+
-            ws.cell('F%s'%(row)).value = '%s' % str(data_table[row-6][3]).replace('.', separator)  # Сумма А+
+            ws.cell('F%s'%(row)).value = '%s' % get_val_by_round(float(data_table[row-6][3]),ROUND_SIZE, separator)  # Сумма А+
             ws.cell('F%s'%(row)).style = ali_white
             
         except:
             ws.cell('F%s'%(row)).style = ali_white
             next
-        #print data_table[row-6][3], data_table[row-6][8],data_table[row-6][9]
-        #print 'val = ', str(int(data_table[row-6][3])*int(data_table[row-6][8])*int(data_table[row-6][9]))
+
         try:
-            val = int(data_table[row-6][3])*int(data_table[row-6][8])*int(data_table[row-6][9])
-            ws.cell('G%s'%(row)).value = '%s' % str(val).replace('.', separator)  # "Энергия Сумма А+
+            val = float(data_table[row-6][3])*float(data_table[row-6][8])*float(data_table[row-6][9])
+            ws.cell('G%s'%(row)).value = '%s' % get_val_by_round(val,ROUND_SIZE, separator)  # "Энергия Сумма А+
             ws.cell('G%s'%(row)).style = ali_yellow
         except:
             ws.cell('G%s'%(row)).style = ali_yellow
             next
             
         try:
-            ws.cell('H%s'%(row)).value = '%s' % str(round(int(data_table[row-6][4]),0)).replace('.', separator)  # Тариф 1 А+
+            ws.cell('H%s'%(row)).value = '%s' % get_val_by_round(float(data_table[row-6][4]),ROUND_SIZE, separator)  # Тариф 1 А+
             ws.cell('H%s'%(row)).style = ali_white
         except:
             ws.cell('H%s'%(row)).style = ali_white
             next
             
         try:
-            val = round((int(data_table[row-6][4])*int(data_table[row-6][8])*int(data_table[row-6][9])),0)            
-            ws.cell('I%s'%(row)).value = '%s' % str(val).replace('.', separator)  # "Энергия Тариф 1 А+
+            val = round((float(data_table[row-6][4])*float(data_table[row-6][8])*float(data_table[row-6][9])),ROUND_SIZE)            
+            ws.cell('I%s'%(row)).value = '%s' % get_val_by_round(val,ROUND_SIZE, separator)  # "Энергия Тариф 1 А+
             ws.cell('I%s'%(row)).style = ali_yellow
         except:
             ws.cell('I%s'%(row)).style = ali_yellow
             next
             
         try:
-            ws.cell('J%s'%(row)).value = '%s' % str(round(int(data_table[row-6][5]),0)).replace('.', separator)  # Тариф 2 А+
+            ws.cell('J%s'%(row)).value = '%s' % get_val_by_round(float(data_table[row-6][5]),ROUND_SIZE, separator)  # Тариф 2 А+
             ws.cell('J%s'%(row)).style = ali_white
         except:
             ws.cell('J%s'%(row)).style = ali_white
             next
             
         try:
-            val = round((int(data_table[row-6][5])*int(data_table[row-6][8])*int(data_table[row-6][9])),0)
-            ws.cell('K%s'%(row)).value = '%s' % str(val).replace('.', separator) # "Энергия Тариф 2 А+
+            #val = round((float(data_table[row-6][5])*float(data_table[row-6][8])*float(data_table[row-6][9])),ROUND_SIZE)
+            ws.cell('K%s'%(row)).value = '%s' % get_val_by_round(float(data_table[row-6][5])*float(data_table[row-6][8])*float(data_table[row-6][9]),ROUND_SIZE, separator) # "Энергия Тариф 2 А+
             ws.cell('K%s'%(row)).style = ali_yellow
         except:
             ws.cell('K%s'%(row)).style = ali_yellow
@@ -15591,6 +15594,8 @@ def report_electric_podolsk(request):
     return response
 
 def report_electric_consumption_podolsk(request):
+    SHOW_LIC_NUM = getattr(settings, 'SHOW_LIC_NUM', 'False')
+    ROUND_SIZE = getattr(settings, 'ROUND_SIZE', 3)
     response = StringIO.StringIO()
     wb = Workbook()
     ws = wb.active
@@ -15732,9 +15737,6 @@ def report_electric_consumption_podolsk(request):
     ws['v5'].style = ali_grey
     ws['w5'] = 'Энергия'
     ws['w5'].style = ali_yellow
-
-    
-    SHOW_LIC_NUM = getattr(settings, 'SHOW_LIC_NUM', 'False')
 
     if SHOW_LIC_NUM:
             ws.merge_cells('X4:X5')

@@ -625,6 +625,10 @@ def LoadElectricMeters(sPath, sSheet):
                 add_meter = Meters(name = unicode(type_meter) + u' ' + unicode(meter), password = '000000', address = unicode(adr), factory_number_manual = unicode(meter), guid_types_meters = TypesMeters.objects.get(guid = u"66b7ce6a-f280-4e54-8c8d-f69f34aabdf9") )
                 add_meter.save()
                 writeToLog(u'Device added' + ' --->   ' + u'СЭТ-4ТМ.03М')
+            elif unicode(type_meter) == u'ТЭМ-104':
+                add_meter = Meters(name = unicode(type_meter) + u' ' + unicode(meter), password = '000000', address = unicode(adr), factory_number_manual = unicode(meter), guid_types_meters = TypesMeters.objects.get(guid = u"9a4f2233-204d-4ff2-98d7-9d84f34008ee") )
+                add_meter.save()
+                writeToLog(u'Device added' + ' --->   ' + u'СЭТ-4ТМ.03М')
             else:
                 writeToLog(u'Не найдено совпадение с существующим типом прибора')
                 met-=1
@@ -1114,8 +1118,63 @@ def add_taken_param(sender, instance, created, **kwargs): # Добавляем �
         #Добавляем параметры для ПСЧ-3ТА.04
         pass
     elif instance.guid_types_meters.name == u'ТЭМ-104':
-        #Добавляем параметры для ТЭМ-104
-        pass
+        #Добавляем параметры для Тепла ТЭМ-104
+        # Q1, Гкал
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"22f82630-25e1-4808-ad60-b74a55ee822d"))
+        add_param.save()
+
+        # Q2, Гкал
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"2bf501c0-7eef-457d-93b4-35352982b862"))
+        add_param.save()
+
+        # Объем Система1 Суточный
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"a430c9b2-5551-4c03-a579-40d110fb1c9d")) 
+        add_param.save()
+
+        # Объем Система2 Суточный
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"ed951b75-7bbc-493e-b548-e2e12a848760")) 
+        add_param.save()
+
+        # Т наработки Система1 Суточный
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"add47ed5-7cda-4bf3-8576-92dbc4328a07")) 
+        add_param.save()
+
+        # Т наработки Система2 Суточный
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"2eab4412-951d-4370-aa87-3d2817259085")) 
+        add_param.save()
+
+        # Т in Система1 Суточный
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"ee8a6246-36d0-43c8-94e9-471a27a93c38")) 
+        add_param.save()
+
+        # Т out Система1 Суточный
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"ef87b6c3-e38e-4198-a16e-564c28ac556c")) 
+        add_param.save()
+
+        # Т in Система2 Суточный
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"aa8a6246-36d0-43c8-94e9-471a27a93c38")) 
+        add_param.save()
+
+        # Т out Система2 Суточный
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"bb87b6c3-e38e-4198-a16e-564c28ac556c")) 
+        add_param.save()
+
+        # P in Система1 Суточный
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"47fcbafc-c101-43f9-b147-b0423e7809ca")) 
+        add_param.save()
+
+        # P out Система1 Суточный
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"86012e83-2293-4cb0-ad0e-0331a26dc877")) 
+        add_param.save()
+
+        # P in Система2 Суточный
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"aafcbafc-c101-43f9-b147-b0423e7809ca")) 
+        add_param.save()
+
+        # P out Система2 Суточный
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"bb012e83-2293-4cb0-ad0e-0331a26dc877")) 
+        add_param.save()
+
     elif instance.guid_types_meters.name == u'СЭТ-4ТМ.03М':
         #Добавляем параметры для СЭТ-4ТМ.03М
        
@@ -1967,8 +2026,63 @@ def add_taken_param_no_signals(instance, isR, isHalfs): # Добавляем с�
         #Добавляем параметры для ПСЧ-3ТА.04
         pass
     elif instance.guid_types_meters.name == u'ТЭМ-104':
-        #Добавляем параметры для ТЭМ-104
-        pass
+         #Добавляем параметры для Тепла ТЭМ-104
+        # Q1, Гкал
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"22f82630-25e1-4808-ad60-b74a55ee822d"))
+        add_param.save()
+
+        # Q2, Гкал
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"2bf501c0-7eef-457d-93b4-35352982b862"))
+        add_param.save()
+
+        # Объем Система1 Суточный
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"a430c9b2-5551-4c03-a579-40d110fb1c9d")) 
+        add_param.save()
+
+        # Объем Система2 Суточный
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"ed951b75-7bbc-493e-b548-e2e12a848760")) 
+        add_param.save()
+
+        # Т наработки Система1 Суточный
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"add47ed5-7cda-4bf3-8576-92dbc4328a07")) 
+        add_param.save()
+
+        # Т наработки Система2 Суточный
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"2eab4412-951d-4370-aa87-3d2817259085")) 
+        add_param.save()
+
+        # Т in Система1 Суточный
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"ee8a6246-36d0-43c8-94e9-471a27a93c38")) 
+        add_param.save()
+
+        # Т out Система1 Суточный
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"ef87b6c3-e38e-4198-a16e-564c28ac556c")) 
+        add_param.save()
+
+        # Т in Система2 Суточный
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"aa8a6246-36d0-43c8-94e9-471a27a93c38")) 
+        add_param.save()
+
+        # Т out Система2 Суточный
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"bb87b6c3-e38e-4198-a16e-564c28ac556c")) 
+        add_param.save()
+
+        # P in Система1 Суточный
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"47fcbafc-c101-43f9-b147-b0423e7809ca")) 
+        add_param.save()
+
+        # P out Система1 Суточный
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"86012e83-2293-4cb0-ad0e-0331a26dc877")) 
+        add_param.save()
+
+        # P in Система2 Суточный
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"aafcbafc-c101-43f9-b147-b0423e7809ca")) 
+        add_param.save()
+
+        # P out Система2 Суточный
+        add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"bb012e83-2293-4cb0-ad0e-0331a26dc877")) 
+        add_param.save()
+
     elif instance.guid_types_meters.name == u'СЭТ-4ТМ.03М':
         #Добавляем параметры для СЭТ-4ТМ.03М
        
@@ -4540,7 +4654,7 @@ def get_users_account_template(request):
 #_____________________________________________________________________________________
 #Прогрузка получасовок
 #________________________________________________________
-con=psycopg2.connect(host='127.0.0.1', port=5432,dbname='prizmer', user='postgres', password='1')
+con = connection #psycopg2.connect(host='127.0.0.1', port=5432,dbname='prizmer', user='postgres', password='1')
 setev = 0
 zavod = 0
 col=0

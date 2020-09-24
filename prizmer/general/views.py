@@ -8,7 +8,7 @@ import simplejson as json
 from django.db.models import Max
 from django.db import connection
 import re
-from excel_response import ExcelResponse
+#from excel_response import ExcelResponse
 import datetime
 import decimal
 
@@ -3020,10 +3020,11 @@ def get_data_table(request):
 
     return render_to_response("data_table.html", args)
 
+"""
 def export_excel_electric(request):
     data_table = request.session["data_table_export"]
     return ExcelResponse(data_table, 'report')
-    
+"""
 
 
 @login_required(login_url='/auth/login/')  
@@ -15276,9 +15277,7 @@ def electric_consumption_podolsk(request):
             is_electric_daily = 0 
             is_electric_current = 0
             is_electric_delta = 0
-    
-
-    
+        
     #print AllData
     args['data_table'] = data_table
     args['obj_title'] = obj_title

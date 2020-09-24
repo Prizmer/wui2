@@ -162,6 +162,7 @@ LOGGING = {
 CLEAN_DOUBLE_30 = False #Удаление получасовок перед формированием отчёта, актулаьно для СЭТов
 SHOW_LIC_NUM = False #Показывать лицевой номер в отчёте, актуально для 91, 102, 104, 106 и старше отчётов
 SEPARATOR = ',' # Какой разделитель использовать при экспорте в excel '.' or ','
+ROUND_SIZE = 3 #Сколько знаков после запятой будет выводится в отчёт excel
 #TEMPLATE_LOADERS = (
 #    ('django.template.loaders.cached.Loader', (
 #        'django.template.loaders.filesystem.Loader',
