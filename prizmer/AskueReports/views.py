@@ -4337,8 +4337,6 @@ def report_electric_potreblenie_3_zones_v2(request):
             next
             
         try:
-            #val = format(data_table[row-6][2], '.3f')
-            #print ROUND_SIZE
             ws.cell('F%s'%(row)).value = '%s ' % get_val_by_round(float(data_table[row-6][2]), ROUND_SIZE, separator)  # '%s' % (data_table[row-6][2])  # Сумма А+ на начало интервала
             ws.cell('F%s'%(row)).style = ali_white
             #ws.cell('F%s'%(row)).number_format = '0.000'
@@ -5639,6 +5637,8 @@ def report_heat_potreblenie_sayany(request):
     return response
 
 def report_water_potreblenie_pulsar(request):
+    SHOW_LIC_NUM = getattr(settings, 'SHOW_LIC_NUM', 'False')
+    ROUND_SIZE = getattr(settings, 'ROUND_SIZE', 3)
     response = StringIO.StringIO()
     wb = Workbook()
     ws = wb.active
@@ -5670,37 +5670,42 @@ def report_water_potreblenie_pulsar(request):
     ws['f5'] = 'Потребление, м3'
     ws['f5'].style = ali_grey
     
-    ws['g5'] = 'Лицевой номер '
-    ws['g5'].style = ali_grey    
-  
+    if SHOW_LIC_NUM:
+        ws['g5'] = 'Лицевой номер '
+        ws['g5'].style = ali_grey    
+
     
 #Запрашиваем данные для отчета
     is_abonent_level = re.compile(r'level2')
 #    is_object_level = re.compile(r'level')
 #    is_object_level_1 = re.compile(r'level1')
     is_object_level_2 = re.compile(r'level1')
-
+    #meters_name         = request.GET.get('obj_title')
     parent_name         = request.GET.get('obj_parent_title')
     obj_key             = request.GET.get('obj_key')
-    data_table=[]
+    data_table = []
     
+    #print (meters_name, parent_name,electric_data_start, electric_data_end)
     if (bool(is_abonent_level.search(obj_key))): 
         data_table = common_sql.get_data_table_water_period_pulsar(meters_name, parent_name,electric_data_start, electric_data_end, True)
+       
     elif (bool(is_object_level_2.search(obj_key))):
         data_table = common_sql.get_data_table_water_period_pulsar(meters_name, parent_name,electric_data_start, electric_data_end, False)
+    #print data_table
 
     #zamenyem None na N/D vezde
     if len(data_table)>0: 
         data_table=common_sql.ChangeNull(data_table, None)
         
-    # for i in range(len(data_table)):
-    #     data_table[i]=list(data_table[i])
-    #     num=data_table[i][3]
-    #     if ('ХВС, №' in num) or ('ГВС, №' in num):
-    #         num=num.replace(u'ХВС, №', ' ')
-    #         num=num.replace(u'ГВС, №', ' ')
-    #         data_table[i][3]=num
-    #     data_table[i]=tuple(data_table[i])
+    for i in range(len(data_table)):
+        data_table[i]=list(data_table[i])
+        num=data_table[i][3]
+        if ('ХВС, №' in num) or ('ГВС, №' in num):
+            num=num.replace(u'ХВС, №', ' ')
+            num=num.replace(u'ГВС, №', ' ')
+            data_table[i][3]=num
+            #print num
+        data_table[i]=tuple(data_table[i])
 
         
 # Заполняем отчет значениями
@@ -5727,32 +5732,32 @@ def report_water_potreblenie_pulsar(request):
             next
             
         try:
-            ws.cell('d%s'%(row)).value = '%s' % get_val(data_table[row-6][5])  # Показания на начало
+            ws.cell('d%s'%(row)).value = '%s' % get_val_by_round(data_table[row-6][5], ROUND_SIZE, separator) #% get_val(data_table[row-6][5])  # Показания на начало
             ws.cell('d%s'%(row)).style = ali_white
         except:
             ws.cell('d%s'%(row)).style = ali_white
             next
             
         try:
-            ws.cell('e%s'%(row)).value = '%s' % get_val(data_table[row-6][6])  # Показания  на конец
+            ws.cell('e%s'%(row)).value = '%s' % get_val_by_round(data_table[row-6][6], ROUND_SIZE, separator)#get_val(data_table[row-6][6])  # Показания  на конец
             ws.cell('e%s'%(row)).style = ali_white
         except:
             ws.cell('e%s'%(row)).style = ali_white
             next
             
         try:
-            ws.cell('f%s'%(row)).value = '%s' % get_val(data_table[row-6][7])  # Потребление
+            ws.cell('f%s'%(row)).value = '%s' % get_val_by_round(data_table[row-6][7], ROUND_SIZE, separator)#get_val(data_table[row-6][7])  # Потребление
             ws.cell('f%s'%(row)).style = ali_white
         except:
             ws.cell('f%s'%(row)).style = ali_white
             next
-        
-        try:
-            ws.cell('g%s'%(row)).value = '%s' % (data_table[row-6][1])  # Лицевой номер
-            ws.cell('g%s'%(row)).style = ali_white
-        except:
-            ws.cell('g%s'%(row)).style = ali_white
-            next
+        if SHOW_LIC_NUM:
+            try:
+                ws.cell('g%s'%(row)).value = '%s' % (data_table[row-6][1])  # Лицевой номер
+                ws.cell('g%s'%(row)).style = ali_white
+            except:
+                ws.cell('g%s'%(row)).style = ali_white
+                next
 
 
     ws.row_dimensions[5].height = 41
@@ -8195,6 +8200,8 @@ def report_potreblenie_heat(request):
     return response
     
 def report_water_by_date(request):
+    SHOW_LIC_NUM = getattr(settings, 'SHOW_LIC_NUM', 'False')
+    ROUND_SIZE = getattr(settings, 'ROUND_SIZE', 3)
     response = StringIO.StringIO()
     wb = Workbook()
     ws = wb.active
@@ -8225,20 +8232,21 @@ def report_water_by_date(request):
     is_object_level_2 = re.compile(r'level1')
     
     parent_name         = request.GET.get('obj_parent_title')
-    #meters_name         = request.session['obj_title']
+    meters_name         = request.session['obj_title']
     electric_data_end   = request.GET.get('electric_data_end')           
     obj_key             = request.GET.get('obj_key')
+    # dc - daily or current
     dc=u'daily'
     data_table = []
     if (bool(is_abonent_level.search(obj_key))): 
-        data_table = common_sql.get_data_table_water_by_date(meters_name, parent_name, electric_data_end, True, dc)
+        data_table = common_sql.get_data_table_water_by_date(meters_name, parent_name, electric_data_end, True,dc)
     elif (bool(is_object_level_2.search(obj_key))):
-        data_table = common_sql.get_data_table_water_by_date(meters_name, parent_name, electric_data_end, False, dc)
+        data_table = common_sql.get_data_table_water_by_date(meters_name, parent_name, electric_data_end, False,dc)
 
     #zamenyem None na N/D vezde
     if len(data_table)>0: 
         data_table=common_sql.ChangeNull(data_table, None)
-
+    #print data_table
 # Заполняем отчет значениями
     for row in range(6, len(data_table)+6):
         try:
@@ -8269,7 +8277,8 @@ def report_water_by_date(request):
             ws.cell('D%s'%(row)).style = ali_white
             next
         try:
-            ws.cell('E%s'%(row)).value = '%s' % get_val(data_table[row-6][5])  # Показания
+
+            ws.cell('E%s'%(row)).value = '%s' % get_val_by_round(data_table[row-6][5], ROUND_SIZE, separator)    # Показания
             ws.cell('E%s'%(row)).style = ali_white
         except:
             ws.cell('E%s'%(row)).style = ali_white
@@ -8286,9 +8295,9 @@ def report_water_by_date(request):
     response = HttpResponse(response.read(), content_type="application/vnd.ms-excel")
     #response['Content-Disposition'] = "attachment; filename=profil.xlsx"
     
-    output_name = u'water_'+translate(parent_name)+'_'+translate(meters_name)+'_'+electric_data_end
+    output_name = u'water_'+translate(parent_name).replace('\n','')+'_'+translate(meters_name).replace('\n','')+'_'+electric_data_end
     file_ext = u'xlsx'
-    
+    #print translate(meters_name), output_name
     response['Content-Disposition'] = 'attachment;filename="%s.%s"' % (output_name.replace('"', '\"'), file_ext)   
     return response
 
@@ -8946,6 +8955,8 @@ def report_elf_gvs_by_date(request):
     return response
     
 def report_pulsar_water_period(request):
+    SHOW_LIC_NUM = getattr(settings, 'SHOW_LIC_NUM', 'False')
+    ROUND_SIZE = getattr(settings, 'ROUND_SIZE', 3)
     response = StringIO.StringIO()
     wb = Workbook()
     ws = wb.active
@@ -9028,21 +9039,21 @@ def report_pulsar_water_period(request):
             next
             
         try:
-            ws.cell('E%s'%(row)).value = '%s' % (data_table[row-6][4])  # значения на начало
+            ws.cell('E%s'%(row)).value = '%s' % get_val_by_round(data_table[row-6][4], ROUND_SIZE, separator) #(data_table[row-6][4])  # значения на начало
             ws.cell('E%s'%(row)).style = ali_white
         except:
             ws.cell('E%s'%(row)).style = ali_white
             next
             
         try:
-            ws.cell('F%s'%(row)).value = '%s' % (data_table[row-6][5])  # значения на конец
+            ws.cell('F%s'%(row)).value = '%s' % get_val_by_round(data_table[row-6][5], ROUND_SIZE, separator)# (data_table[row-6][5])  # значения на конец
             ws.cell('F%s'%(row)).style = ali_white
         except:
             ws.cell('F%s'%(row)).style = ali_white
             next
             
         try:
-            ws.cell('G%s'%(row)).value = '%s' % (data_table[row-6][6])  # дельта
+            ws.cell('G%s'%(row)).value = '%s' % get_val_by_round(data_table[row-6][6], ROUND_SIZE, separator) #(data_table[row-6][6])  # дельта
             ws.cell('G%s'%(row)).style = ali_white
         except:
             ws.cell('G%s'%(row)).style = ali_white
@@ -9387,6 +9398,8 @@ def report_pulsar_water_daily_row(request):
     return response
     
 def report_pulsar_heat_daily(request):
+    SHOW_LIC_NUM = getattr(settings, 'SHOW_LIC_NUM', 'False')
+    ROUND_SIZE = getattr(settings, 'ROUND_SIZE', 3)
     response = StringIO.StringIO()
     wb = Workbook()
     ws = wb.active
@@ -9448,14 +9461,14 @@ def report_pulsar_heat_daily(request):
             next
             
         try:
-            ws.cell('C%s'%(row)).value = '%s' % get_val(data_table[row-6][3])  # стояк
+            ws.cell('C%s'%(row)).value = '%s' % get_val_by_round(data_table[row-6][3], ROUND_SIZE, separator) #get_val(data_table[row-6][3])  # стояк
             ws.cell('C%s'%(row)).style = ali_white
         except:
             ws.cell('C%s'%(row)).style = ali_white
             next
             
         try:
-            ws.cell('D%s'%(row)).value =  '%s' % get_val(data_table[row-6][4])  # счётчик
+            ws.cell('D%s'%(row)).value =  '%s' % get_val_by_round(data_table[row-6][4], ROUND_SIZE, separator) #get_val(data_table[row-6][4])  # счётчик
             ws.cell('D%s'%(row)).style = ali_white
         except:
             ws.cell('D%s'%(row)).style = ali_white
@@ -9495,6 +9508,8 @@ def report_pulsar_heat_daily(request):
     return response
     
 def report_pulsar_heat_period(request):
+    SHOW_LIC_NUM = getattr(settings, 'SHOW_LIC_NUM', 'False')
+    ROUND_SIZE = getattr(settings, 'ROUND_SIZE', 3)
     response = StringIO.StringIO()
     wb = Workbook()
     ws = wb.active
@@ -9531,7 +9546,7 @@ def report_pulsar_heat_period(request):
     ws['H5'].style = ali_grey
 #Запрашиваем данные для отчета
 
-    
+    data_table = []
     is_abonent_level = re.compile(r'abonent')
     is_object_level_2 = re.compile(r'level2')
     
@@ -9567,42 +9582,42 @@ def report_pulsar_heat_period(request):
             next
             
         try:
-            ws.cell('C%s'%(row)).value = '%s' % get_val(round(float(data_table[row-6][2]),7)) # '%s' % (data_table[row-6][2])  # Показания по теплу на начало
+            ws.cell('C%s'%(row)).value = '%s' % get_val_by_round(data_table[row-6][2], ROUND_SIZE, separator) #get_val(round(float(data_table[row-6][2]),7)) # '%s' % (data_table[row-6][2])  # Показания по теплу на начало
             ws.cell('C%s'%(row)).style = ali_white
         except:
             ws.cell('C%s'%(row)).style = ali_white
             next
             
         try:
-            ws.cell('D%s'%(row)).value = '%s' % get_val(round(float(data_table[row-6][3]),7)) # '%s' % (data_table[row-6][3])  # Показания по теплу на конец
+            ws.cell('D%s'%(row)).value = '%s' %get_val_by_round(data_table[row-6][3], ROUND_SIZE, separator) # get_val(round(float(data_table[row-6][3]),7)) # '%s' % (data_table[row-6][3])  # Показания по теплу на конец
             ws.cell('D%s'%(row)).style = ali_white
         except:
             ws.cell('D%s'%(row)).style = ali_white
             next
             
         try:
-            ws.cell('E%s'%(row)).value =  '%s' % get_val(round(float(data_table[row-6][4]),7))  # '%s' % (data_table[row-6][4])  # Потребление
+            ws.cell('E%s'%(row)).value =  '%s' % get_val_by_round(data_table[row-6][4], ROUND_SIZE, separator) #get_val(round(float(data_table[row-6][4]),7))  # '%s' % (data_table[row-6][4])  # Потребление
             ws.cell('E%s'%(row)).style = ali_white
         except:
             ws.cell('E%s'%(row)).style = ali_white
             next
         
         try:
-            ws.cell('F%s'%(row)).value =  '%s' % get_val(round(float(data_table[row-6][5]),7)) # '%s' % (data_table[row-6][5])  # Время работы
+            ws.cell('F%s'%(row)).value =  '%s' % get_val_by_round(data_table[row-6][5], ROUND_SIZE, separator) #get_val(round(float(data_table[row-6][5]),7)) # '%s' % (data_table[row-6][5])  # Время работы
             ws.cell('F%s'%(row)).style = ali_white
         except:
             ws.cell('F%s'%(row)).style = ali_white
             next
             
         try:
-            ws.cell('G%s'%(row)).value = '%s' % get_val(round(float(data_table[row-6][6]),7)) # '%s' % (data_table[row-6][6])  # Время работы
+            ws.cell('G%s'%(row)).value = '%s' % get_val_by_round(data_table[row-6][6], ROUND_SIZE, separator) #get_val(round(float(data_table[row-6][6]),7)) # '%s' % (data_table[row-6][6])  # Время работы
             ws.cell('G%s'%(row)).style = ali_white
         except:
             ws.cell('G%s'%(row)).style = ali_white
             next
             
         try:
-            ws.cell('H%s'%(row)).value =  '%s' % get_val(round(float(data_table[row-6][7]),7))  #'%s' % (data_table[row-6][7])  # Время работы
+            ws.cell('H%s'%(row)).value =  '%s' % get_val_by_round(data_table[row-6][7], ROUND_SIZE, separator) #get_val(round(float(data_table[row-6][7]),7))  #'%s' % (data_table[row-6][7])  # Время работы
             ws.cell('H%s'%(row)).style = ali_white
         except:
             ws.cell('H%s'%(row)).style = ali_white
@@ -9726,6 +9741,8 @@ def report_pulsar_heat_period_2(request):
     return response
 
 def report_pulsar_heat_daily_2(request):
+    SHOW_LIC_NUM = getattr(settings, 'SHOW_LIC_NUM', 'False')
+    ROUND_SIZE = getattr(settings, 'ROUND_SIZE', 3)
     response = StringIO.StringIO()
     wb = Workbook()
     ws = wb.active
@@ -14085,6 +14102,7 @@ def get_val_by_round(val, ROUND_SIZE, separator):
     #     new_val = str(val)[0:int(str(val).find('.')+1)]  #.replace('.', separator)  # Сумма А+
     # else:
     #     new_val = str(val).replace('.', separator)
+    new_val = new_val.replace('.', separator)
     return new_val
 
 def report_electric_3_zones(request):
@@ -14268,6 +14286,7 @@ def report_electric_3_zones(request):
             next
 
         try:
+            #print(get_val_by_round(data_table[row-6][3], ROUND_SIZE, separator), separator)
             ws.cell('F%s'%(row)).value = '%s' % get_val_by_round(data_table[row-6][3], ROUND_SIZE, separator)  #str(val).replace('.', separator)
             ws.cell('F%s'%(row)).style = ali_white
             

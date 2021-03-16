@@ -5546,6 +5546,7 @@ where water_abons_report.name='%s' and water_abons_report.obj_name='%s'
 order by account_2, obj_name) z_end
 where z_st.meter_name=z_end.meter_name
     """%(my_param[0], electric_data_start, parent_name, meters_name,   my_param[0], electric_data_end,parent_name, meters_name )
+    #print sQuery
     return sQuery
 def get_data_table_water_period_pulsar(meters_name, parent_name, electric_data_start, electric_data_end, isAbon):
     cursor = connection.cursor()
@@ -6549,7 +6550,7 @@ def MakeSqlQuery_water_pulsar_period_for_abonent(obj_parent_title, obj_title,ele
     #print obj_parent_title, obj_title,electric_data_start, my_params[0], my_params[1]
     #print obj_parent_title, obj_title,  electric_data_end, my_params[0], my_params[1]    
     sQuery="""
-    Select z1.ab_name, z1.type_meter, z1.attr1, z1.factory_number_manual,round(z1.value_start::numeric,3),round(z2.value_end::numeric,3), round((z2.value_end-z1.value_start)::numeric,3) as delta
+     Select z_start.ab_name, z_start.type_meter, z_start.attr1, z_start.factory_number_manual,round(z_start.value_start::numeric,3),round(z_end.value_end::numeric,3), round((z_end.value_end-z_start.value_start)::numeric,3) as delta
 from
 (select water_pulsar_abons.ab_name, water_pulsar_abons.type_meter, water_pulsar_abons.attr1, water_pulsar_abons.factory_number_manual, z0.value as value_start
 from water_pulsar_abons
@@ -6586,7 +6587,7 @@ WHERE
 on z0.factory_number_manual=water_pulsar_abons.factory_number_manual
 where water_pulsar_abons.obj_name='%s' 
 and water_pulsar_abons.ab_name='%s'
-) as z1,
+) as z_start,
 (select water_pulsar_abons.ab_name, water_pulsar_abons.type_meter, water_pulsar_abons.attr1, water_pulsar_abons.factory_number_manual, z1.value as value_end
 from water_pulsar_abons
 left join
@@ -6622,13 +6623,14 @@ WHERE
 on z1.factory_number_manual=water_pulsar_abons.factory_number_manual
 where water_pulsar_abons.obj_name='%s' 
 and water_pulsar_abons.ab_name='%s'
-) as z2
-where z1.factory_number_manual=z2.factory_number_manual
-group by z_start.ab_name, 
-z_start.type_meter, 
-z_start.attr1, 
-z_start.factory_number_manual,z_start.value,
-z_end.value
+) as z_end
+where z_end.factory_number_manual=z_start.factory_number_manual
+group by z_start.ab_name,
+z_start.type_meter,
+z_start.attr1,
+z_start.factory_number_manual,
+z_start.value_start,
+z_end.value_end
     """%(obj_parent_title, obj_title,electric_data_start, my_params[0], my_params[1],obj_parent_title, obj_title, obj_parent_title, obj_title,  electric_data_end, my_params[0], my_params[1],obj_parent_title, obj_title)
     #print sQuery  
     return sQuery

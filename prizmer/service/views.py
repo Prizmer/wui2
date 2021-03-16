@@ -912,7 +912,7 @@ def add_taken_param(sender, instance, created, **kwargs): # Добавляем �
         #Добавляем параметры для Пульсар10
         pass
     elif instance.guid_types_meters.name == u'Пульсар 16M':
-    
+        #print('puls16')
     # Суточные
       # Канал 1
         add_param = TakenParams(id = TakenParams.objects.aggregate(Max('id'))['id__max']+1, guid_meters = instance, guid_params = Params.objects.get(guid = u"fc4a9568-4674-4a80-b497-e4f34399acd5"))
@@ -1755,7 +1755,7 @@ def add_taken_param(sender, instance, created, **kwargs): # Добавляем �
         pass
         #print u'Тип счётчика не определен'
         
-#signals.post_save.disconnect(add_taken_param, sender=Meters)
+signals.post_save.disconnect(add_taken_param, sender=Meters)
 signals.post_save.disconnect(add_link_meter, sender=Meters) 
 signals.post_save.disconnect(add_link_taken_params, sender=TakenParams)  
         
@@ -1763,10 +1763,10 @@ if (isService):
     #print 'signals ON'
     signals.post_save.connect(add_link_taken_params, sender=TakenParams)
     signals.post_save.connect(add_link_meter, sender=Meters)
-    #signals.post_save.connect(add_taken_param, sender=Meters)
+    signals.post_save.connect(add_taken_param, sender=Meters)
 else:
     signals.post_save.disconnect(add_link_meter, sender=Meters)
-    #signals.post_save.disconnect(add_taken_param, sender=Meters)
+    signals.post_save.disconnect(add_taken_param, sender=Meters)
     signals.post_save.disconnect(add_link_taken_params, sender=TakenParams)
 
 
@@ -2724,14 +2724,14 @@ def OnOffSignals():
         #print 'signals ON'
         signals.post_save.connect(add_link_taken_params, sender=TakenParams)
         signals.post_save.connect(add_link_meter, sender=Meters)
-        #signals.post_save.connect(add_taken_param, sender=Meters)
+        signals.post_save.connect(add_taken_param, sender=Meters)
 
         signals.pre_save.disconnect(rename_link_abonents_taken_params, sender=Abonents)
         signals.pre_save.disconnect(rename_taken_params, sender=Meters)
     else:
         #print 'signals Off'
         signals.post_save.disconnect(add_link_meter, sender=Meters)
-        #signals.post_save.disconnect(add_taken_param, sender=Meters)
+        signals.post_save.disconnect(add_taken_param, sender=Meters)
         signals.post_save.disconnect(add_link_taken_params, sender=TakenParams)
 
         signals.pre_save.connect(rename_link_abonents_taken_params, sender=Abonents)
@@ -2782,6 +2782,8 @@ def add_link_abonents_taken_params(sender, instance, created, **kwargs):
 def add_link_abonents_taken_params2(sender, instance, created, **kwargs):
     writeToLog(instance.name)
     isExistTakenParam=SimpleCheckIfExist('taken_params','name',instance.name,"","","")
+    print 'add link abonents- taken params'
+    #print isExistTakenParam
     if not isExistTakenParam:
         print(u'ERR: Param not exist!')
         return None
@@ -2801,9 +2803,10 @@ def add_link_abonents_taken_params2(sender, instance, created, **kwargs):
                 #guidAbon=GetSimpleTable('abonents','name',abon)[0][0]
                 t = Abonents.objects.filter(name = abon)
                 guidAbon = t[0].guid
-                print guidAbon
+                #print '!!!',guidAbon
                 linkName=abon+u' Канал '+channel+' Суточный'
                 writeToLog(linkName)
+                #common_sql.InsertInLinkAbonentsTakenParams(name = linkName,coefficient=1, coefficient_2 = 1,coefficient_3 = 1, guid_abonents = Abonents.objects.get(guid=guidAbon) , guid_taken_params = instance.guid )
                 try:
                     common_sql.InsertInLinkAbonentsTakenParams(name = linkName,coefficient=1, coefficient_2 = 1,coefficient_3 = 1, guid_abonents = Abonents.objects.get(guid=guidAbon) , guid_taken_params = instance.guid )
                     add_link_abonents_taken_param.save()
@@ -3115,6 +3118,7 @@ def LoadWaterPulsar(sPath, sSheet):
         #print(taken_param)
         #Sravnenie(taken_param)
         dtTakenParam=GetSimpleTable('taken_params','name',taken_param)
+        #print 'dtTakenParam', dtTakenParam
         #writeToLog(bool(dtTakenParam))
         if dtTakenParam:                
             #print(u'taken param найден')
@@ -5038,7 +5042,7 @@ def load_80020_group(request):
                 result = make_80020_report(sPath, sheet)
     except Exception as e:
         result.append( u"Ошибка "+e.message)
-    print result
+    #print result
     args["choice_file"]  = fileName
     args["choice_sheet"] = sheet
     args["80020_status"] = result
