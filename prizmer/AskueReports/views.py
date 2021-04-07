@@ -9082,6 +9082,8 @@ def report_pulsar_water_period(request):
     return response
     
 def report_pulsar_water_daily(request):
+    SHOW_LIC_NUM = getattr(settings, 'SHOW_LIC_NUM', 'False')
+    ROUND_SIZE = getattr(settings, 'ROUND_SIZE', 3)
     response = StringIO.StringIO()
     wb = Workbook()
     ws = wb.active
@@ -9159,7 +9161,7 @@ def report_pulsar_water_daily(request):
             next
             
         try:
-            ws.cell('E%s'%(row)).value = '%s' % (data_table[row-6][5])  # показаня
+            ws.cell('E%s'%(row)).value = '%s' % get_val_by_round(data_table[row-6][5], ROUND_SIZE, separator) #(data_table[row-6][5])  # показаня
             ws.cell('E%s'%(row)).style = ali_white
         except:
             ws.cell('E%s'%(row)).style = ali_white

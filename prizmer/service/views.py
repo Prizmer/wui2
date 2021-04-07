@@ -33,6 +33,8 @@ import psycopg2
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 
+from django.core.exceptions import ObjectDoesNotExist
+
 cfg_excel_name=""
 cfg_sheet_name=""
 
@@ -500,7 +502,7 @@ def load_electric_objects(request):
                             
                 result=LoadObjectsAndAbons(sPath, sheet)
     except Exception as e:
-        result = u"Ошибка "+e.message
+        result = u"err: "+e.message
     
     args["choice_file"]    = fileName
     args["choice_sheet"]    = sheet
@@ -556,8 +558,11 @@ def LoadElectricMeters(sPath, sSheet):
                 writeToLog(u'Device added' + ' --->   ' + u'М-200')
             elif unicode(type_meter) == u'М-230':
                 writeToLog('m-230')
+                #print(type_meter, meter, adr)
                 add_meter = Meters(name = unicode(type_meter) + u' ' + unicode(meter), address = unicode(adr), password = 111111 , factory_number_manual = unicode(meter), guid_types_meters = TypesMeters.objects.get(guid = u"423b33a7-2d68-47b6-b4f6-5b470aedc4f4") )
+                #print(add_meter)
                 add_meter.save()
+                #print('meter saved')
                 writeToLog(u'Device added' + ' --->   ' + u'М-230')
                 
             elif unicode(type_meter) == u'М-230-УМ':
@@ -670,7 +675,8 @@ def load_electric_counters(request):
                 sPath=directory+fileName
                 result=LoadElectricMeters(sPath, sheet)                
     except Exception as e:
-        result = u"Ошибка "+e.message
+        print(e.message)
+        result = u"err: "+e.message
         
     #print fileName
     args["choice_file"]    = fileName
@@ -5105,4 +5111,66 @@ def make_80020_report(sPath, sSheet):
         else:
             result.append( u' Строка %s: Прибора с номером %s не существует в БД, он не был добавлен к группе.'%(unicode(i),meter_number) )
             
+    return result
+
+def del_meters(request):
+    args={}
+    fileName=""
+    sheet    = ""
+    result = []
+    #writeToLog('test1') 
+    try:    
+        if request.is_ajax():
+            if request.method == 'GET':            
+                request.session["choice_file"]     = fileName    = request.GET['choice_file']
+                request.session["choice_sheet"]    = sheet    = request.GET['choice_sheet']
+
+                directory=os.path.join(BASE_DIR,'static/cfg/')
+                sPath=directory+fileName
+                result = delete_meters_by_excel(sPath, sheet)
+    except Exception as e:
+        result.append( u"Ошибка "+e.message)
+
+    #print(result)
+    args["choice_file"]  = fileName
+    args["choice_sheet"] = sheet
+    args["del_status"] = result
+    return  render_to_response("service/service_del_meters.html", args)
+
+def delete_meters_by_excel(sPath, sheet):
+    global cfg_excel_name
+    cfg_excel_name=sPath
+    global cfg_sheet_name
+    cfg_sheet_name = sheet
+    result = []
+    dtAll = GetTableFromExcel(sPath,sheet) #получили из excel все строки до первой пустой строки (проверка по колонке А)
+
+    isImpulse = False
+    #выясняем какая ведомость импульсная или цифровая, в зависимости от этого - из какой колонки брать номера счётчиков
+    if dtAll[0][0] == 'Населенный пункт':
+        isImpulse = False
+        result.append('Удаление цифровых ПУ')
+        m_col = 6
+        c = 1
+    if dtAll[1][0] == 'Наименование дома':
+        isImpulse = True
+        result.append('Удаление импульсных ПУ')
+        m_col = 5
+        c = 2
+    i = 0
+    for row in dtAll:
+        if i<c: 
+            i+=1
+            continue
+        meter = row[m_col]
+        print(meter, type(meter))
+        try:
+            del_meter = Meters.objects.get(factory_number_manual = unicode(meter))
+            del_meter.delete()
+            print('del - good')
+            result.append('Удалён ПУ: {}'.format(meter))
+        except ObjectDoesNotExist:
+            result.append('НЕ найден: {}'.format(meter))
+        i+=1
+    
     return result
