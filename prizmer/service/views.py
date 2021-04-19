@@ -5162,12 +5162,12 @@ def delete_meters_by_excel(sPath, sheet):
         if i<c: 
             i+=1
             continue
-        meter = row[m_col]
-        print(meter, type(meter))
+        meter = unicode.strip(unicode(row[m_col]))
+        #print(meter, type(meter))
         try:
             del_meter = Meters.objects.get(factory_number_manual = unicode(meter))
             del_meter.delete()
-            print('del - good')
+            #print('del - good')
             result.append('Удалён ПУ: {}'.format(meter))
         except ObjectDoesNotExist:
             result.append('НЕ найден: {}'.format(meter))

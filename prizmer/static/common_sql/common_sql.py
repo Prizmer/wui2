@@ -1578,8 +1578,9 @@ ORDER BY electric_abons_2.ab_name ASC;
     #print sQuery
     if dm=='monthly' or dm=='daily' or dm=='current':
         sQuery=sQuery.replace('monthly',dm)
-        
+        #print sQuery
         return sQuery    
+    
     else: return """Select 'Н/Д'"""
     
 

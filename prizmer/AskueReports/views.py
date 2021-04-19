@@ -2293,6 +2293,7 @@ def report_electric_simple_3_zones(request):
     return response
 
 def report_electric_simple_3_zones_v2(request):
+    #print('test!!!!!!!!!!!!!!!!!!!!!')
     response = StringIO.StringIO()
     wb = Workbook()
     ws = wb.active
@@ -2401,28 +2402,20 @@ def report_electric_simple_3_zones_v2(request):
         if True:            
             if (is_electric_monthly == '1') & (bool(is_abonent_level.search(obj_key))):   # monthly for abonents
                 data_table = common_sql.get_data_table_by_date_monthly_3_zones_v2(obj_title, obj_parent_title, electric_data_end, 'monthly')
+
                 
             elif (is_electric_daily == '1') & (is_electric_period == "0") & (bool(is_abonent_level.search(obj_key))):   # daily for abonents
                 data_table = common_sql.get_data_table_by_date_monthly_3_zones_v2(obj_title, obj_parent_title, electric_data_end, 'daily')
 
 #*********************************************************************************************************************************************************************      
             elif (is_electric_monthly == '1') & (bool(is_object_level.search(obj_key))): # показания на начало месяца для объекта
-                    data_table= common_sql.get_data_table_by_date_for_object_3_zones_v2(obj_title, electric_data_end, 'monthly')
+                    data_table= common_sql.get_data_table_by_date_for_object_3_zones_v3(obj_title, electric_data_end, 'monthly')
                     if not data_table:
                         data_table = [[electric_data_end, obj_title, u'Н/Д', u'Н/Д', u'Н/Д', u'Н/Д', u'Н/Д']]        
 
 #*********************************************************************************************************************************************************************
             elif (is_electric_daily == '1') & (bool(is_object_level.search(obj_key))): # daily for abonents group
-                    data_table= common_sql.get_data_table_by_date_for_object_3_zones_v2(obj_title, electric_data_end, 'daily')
-                    if not data_table:
-                        data_table = [[electric_data_end, obj_title, u'Н/Д', u'Н/Д', u'Н/Д', u'Н/Д', u'Н/Д']]
-            elif (is_electric_daily == '1') & (bool(is_group_level.search(obj_key))): # поиск по баланскной группе
-                    data_table= common_sql.get_data_table_by_date_for_group_3_zones_v2(obj_title, electric_data_end, 'daily')
-                    if not data_table:
-                        data_table = [[electric_data_end, obj_title, u'Н/Д', u'Н/Д', u'Н/Д', u'Н/Д', u'Н/Д']]
-              
-            elif (is_electric_monthly == '1') & (bool(is_group_level.search(obj_key))): # поиск по баланскной группе
-                    data_table= common_sql.get_data_table_by_date_for_group_3_zones_v2(obj_title, electric_data_end, 'monthly')
+                    data_table= common_sql.get_data_table_by_date_for_object_3_zones_v3(obj_title, electric_data_end, 'daily')
                     if not data_table:
                         data_table = [[electric_data_end, obj_title, u'Н/Д', u'Н/Д', u'Н/Д', u'Н/Д', u'Н/Д']]
 
@@ -2472,9 +2465,11 @@ def report_electric_simple_3_zones_v2(request):
         except:
             ws.cell('F%s'%(row)).style = ali_white
             next
-            
+        
         try:
-            ws.cell('G%s'%(row)).value = '%s' % str(round((data_table[row-6][3]*data_table[row-6][8]*data_table[row-6][9]),3)).replace('.', separator)  # "Энергия Сумма А+
+            #print('!!!!!!!')
+            val = round((float(data_table[row-6][3])*float(data_table[row-6][8])*float(data_table[row-6][9])),3)
+            ws.cell('G%s'%(row)).value = '%s' % str(val).replace('.', separator)  # "Энергия Сумма А+
             ws.cell('G%s'%(row)).style = ali_yellow
         except:
             ws.cell('G%s'%(row)).style = ali_yellow
@@ -2488,7 +2483,7 @@ def report_electric_simple_3_zones_v2(request):
             next
             
         try:
-            val = round((data_table[row-6][4]*data_table[row-6][8]*data_table[row-6][9]),3)            
+            val = round((float(data_table[row-6][4])*float(data_table[row-6][8])*float(data_table[row-6][9])),3)            
             ws.cell('I%s'%(row)).value = '%s' % str(val).replace('.', separator)  # "Энергия Тариф 1 А+
             ws.cell('I%s'%(row)).style = ali_yellow
         except:
@@ -2503,7 +2498,7 @@ def report_electric_simple_3_zones_v2(request):
             next
             
         try:
-            val = round((data_table[row-6][5]*data_table[row-6][8]*data_table[row-6][9]),3)
+            val = round((float(data_table[row-6][5])*float(data_table[row-6][8])*float(data_table[row-6][9])),3)
             ws.cell('K%s'%(row)).value = '%s' % str(val).replace('.', separator) # "Энергия Тариф 2 А+
             ws.cell('K%s'%(row)).style = ali_yellow
         except:
@@ -2519,7 +2514,7 @@ def report_electric_simple_3_zones_v2(request):
             next
             
         try:
-            val = round((data_table[row-6][6]*data_table[row-6][8]*data_table[row-6][9]),3)
+            val = round((float(data_table[row-6][6])*float(data_table[row-6][8])*float(data_table[row-6][9])),3)
             ws.cell('M%s'%(row)).value = '%s' % str(val).replace('.', separator)  # "Энергия Тариф 3 А+
             ws.cell('M%s'%(row)).style = ali_yellow
         except:
