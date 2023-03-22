@@ -142,4 +142,6 @@ urlpatterns = patterns('',
 
     url(r'^108/$', views.report_electric_podolsk), # Показания по электричеству на дату. Подольск
     url(r'^107/$', views.report_electric_consumption_podolsk), #Потребление за период 2 тарифа Подольск
+
+    url(r'^110/$', views.report_water_by_date_pulsar), #для Среды, выгрузка данных на дату по воде Импульсные
 )

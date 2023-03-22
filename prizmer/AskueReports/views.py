@@ -8295,6 +8295,119 @@ def report_water_by_date(request):
     #print translate(meters_name), output_name
     response['Content-Disposition'] = 'attachment;filename="%s.%s"' % (output_name.replace('"', '\"'), file_ext)   
     return response
+def report_water_by_date_pulsar(request):
+    SHOW_LIC_NUM = getattr(settings, 'SHOW_LIC_NUM', 'False')
+    ROUND_SIZE = getattr(settings, 'ROUND_SIZE', 3)
+    response = StringIO.StringIO()
+    wb = Workbook()
+    ws = wb.active
+    meters_name         = request.GET.get('obj_title')
+    electric_data_end   = request.GET.get('electric_data_end')
+#Шапка
+    ws.merge_cells('A2:E2')
+    ws['A2'] = meters_name+'. Показания по воде на ' + electric_data_end
+    
+    ws['A5'] = 'Абонент'
+    ws['A5'].style = ali_grey
+    
+    ws['B5'] = 'Номер счётчика'
+    ws['B5'].style = ali_grey
+    
+    ws['c5'] = 'Тип'
+    ws['c5'].style = ali_grey
+
+    ws['d5'] = 'Пульсар'
+    ws['d5'].style = ali_grey
+    
+    ws['e5'] = 'Канал'
+    ws['e5'].style = ali_grey
+    
+    ws['f5'] = 'Показания'
+    ws['f5'].style = ali_grey
+    
+
+    
+#Запрашиваем данные для отчета
+
+    is_abonent_level = re.compile(r'level2')
+    is_object_level_2 = re.compile(r'level1')
+    
+    parent_name         = request.GET.get('obj_parent_title')
+    meters_name         = request.session['obj_title']
+    electric_data_end   = request.GET.get('electric_data_end')           
+    obj_key             = request.GET.get('obj_key')
+    # dc - daily or current
+    dc=u'daily'
+    data_table = []
+    if (bool(is_abonent_level.search(obj_key))): 
+        data_table = common_sql.get_data_table_water_by_date_pulsar(meters_name, parent_name, electric_data_end, True,dc)
+    elif (bool(is_object_level_2.search(obj_key))):
+        data_table = common_sql.get_data_table_water_by_date_pulsar(meters_name, parent_name, electric_data_end, False,dc)
+
+    #zamenyem None na N/D vezde
+    if len(data_table)>0: 
+        data_table=common_sql.ChangeNull(data_table, None)
+    #print data_table
+# Заполняем отчет значениями
+    for row in range(6, len(data_table)+6):
+        try:
+            ws.cell('A%s'%(row)).value = '%s' % (data_table[row-6][1])  # Абонент
+            ws.cell('A%s'%(row)).style = ali_white
+        except:
+            ws.cell('A%s'%(row)).style = ali_white
+            next
+        
+        try:
+            ws.cell('B%s'%(row)).value = '%s' % (data_table[row-6][2])  # заводской номер
+            ws.cell('B%s'%(row)).style = ali_white
+        except:
+            ws.cell('B%s'%(row)).style = ali_white
+            next
+            
+        try:
+            ws.cell('c%s'%(row)).value = '%s' % (data_table[row-6][3])  # type hv ili gv
+            ws.cell('c%s'%(row)).style = ali_white
+        except:
+            ws.cell('c%s'%(row)).style = ali_white
+            next
+
+        try:
+            ws.cell('d%s'%(row)).value = '%s' % (data_table[row-6][4])  # пульсар
+            ws.cell('d%s'%(row)).style = ali_white
+        except:
+            ws.cell('d%s'%(row)).style = ali_white
+            next
+            
+        try:
+            ws.cell('e%s'%(row)).value = '%s' % (data_table[row-6][5])  # канал
+            ws.cell('e%s'%(row)).style = ali_white
+        except:
+            ws.cell('e%s'%(row)).style = ali_white
+            next
+        try:
+
+            ws.cell('f%s'%(row)).value = '%s' % get_val_by_round(data_table[row-6][6], ROUND_SIZE, separator)    # Показания
+            ws.cell('f%s'%(row)).style = ali_white
+        except:
+            ws.cell('f%s'%(row)).style = ali_white
+            next
+            
+    ws.row_dimensions[5].height = 41
+    ws.column_dimensions['A'].width = 17
+    ws.column_dimensions['B'].width = 25
+    ws.column_dimensions['d'].width = 25
+                    
+    
+    wb.save(response)
+    response.seek(0)
+    response = HttpResponse(response.read(), content_type="application/vnd.ms-excel")
+    #response['Content-Disposition'] = "attachment; filename=profil.xlsx"
+    
+    output_name = u'water_'+translate(parent_name).replace('\n','')+'_'+translate(meters_name).replace('\n','')+'_'+electric_data_end
+    file_ext = u'xlsx'
+    #print translate(meters_name), output_name
+    response['Content-Disposition'] = 'attachment;filename="%s.%s"' % (output_name.replace('"', '\"'), file_ext)   
+    return response
 
     
 def report_forma_80020(request):

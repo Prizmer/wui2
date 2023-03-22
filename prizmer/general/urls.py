@@ -178,5 +178,6 @@ urlpatterns = patterns('',
     url(r'^108/$', views.electric_by_date_podolsk), #отчёт для Подольска по электрике на дату
     url(r'^107/$', views.electric_consumption_podolsk),#отчёт для Подольска по электрике за период
    
+    url(r'^110/$', views.water_by_date_pulsar), # вода, показания на дату, измененный отчёт
 
 )
