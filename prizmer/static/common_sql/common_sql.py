@@ -1947,7 +1947,7 @@ sum(Case when z1.params_name = '%s' then z1.value else null end) as t0R
                                   daily_values.date,    
                                   daily_values.value,                            
                                   abonents.name, 
-                                  daily_values.id_taken_params, 
+                                  
                                   objects.name as name_objects,
                                   names_params.name as params_name,
                                   meters.factory_number_manual as num_manual, 
@@ -1977,7 +1977,7 @@ sum(Case when z1.params_name = '%s' then z1.value else null end) as t0R
                                   resources.name = '%s'
                                    group by 
                          daily_values.date,
-                        daily_values.id_taken_params,
+                        
                         objects.name ,
                         abonents.name ,
                         meters.factory_number_manual,
@@ -2010,7 +2010,7 @@ SELECT
                                   daily_values.date,    
                                   daily_values.value,                            
                                   abonents.name, 
-                                  daily_values.id_taken_params, 
+                                  
                                   objects.name as name_objects,
                                   names_params.name as params_name,
                                   meters.factory_number_manual as num_manual, 
@@ -2040,7 +2040,7 @@ SELECT
                                   resources.name = '%s'
                                    group by 
                          daily_values.date,
-                        daily_values.id_taken_params,
+                        
                         objects.name ,
                         abonents.name ,
                         meters.factory_number_manual,
@@ -2103,7 +2103,7 @@ SELECT
                                   daily_values.date,    
                                   daily_values.value,                            
                                   abonents.name, 
-                                  daily_values.id_taken_params, 
+                                  
                                   objects.name as name_objects,
                                   names_params.name as params_name,
                                   meters.factory_number_manual as num_manual, 
@@ -2132,7 +2132,7 @@ SELECT
                                   resources.name = '%s'
                                    group by 
                          daily_values.date,
-                        daily_values.id_taken_params,
+                        
                         objects.name ,
                         abonents.name ,
                         meters.factory_number_manual,
@@ -2166,7 +2166,7 @@ SELECT
                                   daily_values.date,    
                                   daily_values.value,                            
                                   abonents.name, 
-                                  daily_values.id_taken_params, 
+                                  
                                   objects.name as name_objects,
                                   names_params.name as params_name,
                                   meters.factory_number_manual as num_manual, 
@@ -2195,7 +2195,7 @@ SELECT
                                   resources.name = '%s'
                                    group by 
                          daily_values.date,
-                        daily_values.id_taken_params,
+                        
                         objects.name ,
                         abonents.name ,
                         meters.factory_number_manual,
@@ -2267,7 +2267,7 @@ SELECT
                                   daily_values.value,
                                   abonents.name,
                                   abonents.guid as ab_guid,
-                                  daily_values.id_taken_params,
+                                  
                                   objects.name as name_objects,
                                   names_params.name as params_name,
                                   meters.factory_number_manual as num_manual,
@@ -2302,7 +2302,7 @@ SELECT
                                   resources.name = '%s'
                                   group by
                          daily_values.date,
-                        daily_values.id_taken_params,
+                        
                         objects.name ,
                         abonents.name ,
                         abonents.guid ,
@@ -2340,7 +2340,7 @@ SELECT
                                   daily_values.value,
                                   abonents.name,
                                   abonents.guid as ab_guid,
-                                  daily_values.id_taken_params,
+                                  
                                   objects.name as name_objects,
                                   names_params.name as params_name,
                                   meters.factory_number_manual as num_manual,
@@ -2375,7 +2375,7 @@ SELECT
                                   resources.name = '%s'
                                   group by
                          daily_values.date,
-                        daily_values.id_taken_params,
+                        
                         objects.name ,
                         abonents.name ,
                         abonents.guid ,
@@ -11718,6 +11718,7 @@ WHERE
   and ab_name = '%s'
   order by ab_name
     """%(params[0], params[1], params[2], params[3], electric_data_end,obj_parent_title, obj_title )
+    print(sQuery)
     return sQuery
 
 def MakeHeatDanfosQueryDaily_for_obj(obj_parent_title, obj_title, electric_data_end, params):

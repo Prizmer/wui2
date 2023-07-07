@@ -352,7 +352,7 @@ def report_3_tarifa_k(request): # Отчет по А+ и R+ с коэффици�
                       objects.name ASC;""",[abonents_list[x][0], obj_title, electric_data_start])
         data_table_t0_aplus_delta_start_temp = cursor_t0_aplus_delta_start_temp.fetchall()
     
-	# delta for groups abonents 'end date' A+
+    # delta for groups abonents 'end date' A+
         cursor_t0_aplus_delta_end_temp = connection.cursor()
         cursor_t0_aplus_delta_end_temp.execute("""
                     SELECT 
@@ -438,7 +438,7 @@ def report_3_tarifa_k(request): # Отчет по А+ и R+ с коэффици�
                       objects.name ASC;""",[abonents_list[x][0], obj_title, electric_data_start])
         data_table_t0_rplus_delta_start_temp = cursor_t0_rplus_delta_start_temp.fetchall()
     
-	# delta for groups abonents 'end date' R+
+    # delta for groups abonents 'end date' R+
         cursor_t0_rplus_delta_end_temp = connection.cursor()
         cursor_t0_rplus_delta_end_temp.execute("""
                     SELECT 
@@ -702,7 +702,7 @@ def pokazania(request): # Показания по общему тарифу по
         obj_title = u"Завод"
 
     for x in range(len(abonents_list)):    
-	# delta A+ for groups abonents 'end date'
+    # delta A+ for groups abonents 'end date'
         cursor_t0_aplus_delta_end_temp = connection.cursor()
         cursor_t0_aplus_delta_end_temp.execute("""
                     SELECT 
@@ -745,7 +745,7 @@ def pokazania(request): # Показания по общему тарифу по
                       objects.name ASC;""",[abonents_list[x][0], obj_title, electric_data_end])
         data_table_t0_aplus_delta_end_temp = cursor_t0_aplus_delta_end_temp.fetchall()
         
-        	# delta R+ for groups abonents 'end date'
+            # delta R+ for groups abonents 'end date'
         cursor_t0_rplus_delta_end_temp = connection.cursor()
         cursor_t0_rplus_delta_end_temp.execute("""
                     SELECT 
@@ -1466,12 +1466,12 @@ def report_economic_electric(request):
             try:
                 delta_a_plus = common_sql.delta_sum_a_plus(dates[x+1])-common_sql.delta_sum_a_plus(dates[x])
                 if delta_a_plus > 0:
-				    delta_a_plus = delta_a_plus
+                    delta_a_plus = delta_a_plus
                 else:
-				    delta_a_plus = u'Н/Д'
+                    delta_a_plus = u'Н/Д'
                 delta_r_plus = common_sql.delta_sum_r_plus(dates[x+1])-common_sql.delta_sum_r_plus(dates[x])
                 if delta_r_plus > 0:
-				    delta_r_plus = delta_r_plus
+                    delta_r_plus = delta_r_plus
                 else:
                     delta_r_plus = u'Н/Д'
 
@@ -8295,6 +8295,8 @@ def report_water_by_date(request):
     #print translate(meters_name), output_name
     response['Content-Disposition'] = 'attachment;filename="%s.%s"' % (output_name.replace('"', '\"'), file_ext)   
     return response
+#def new_func(separator, ali_grey, ali_white, translate):
+
 def report_water_by_date_pulsar(request):
     SHOW_LIC_NUM = getattr(settings, 'SHOW_LIC_NUM', 'False')
     ROUND_SIZE = getattr(settings, 'ROUND_SIZE', 3)
@@ -8306,37 +8308,37 @@ def report_water_by_date_pulsar(request):
 #Шапка
     ws.merge_cells('A2:E2')
     ws['A2'] = meters_name+'. Показания по воде на ' + electric_data_end
-    
+
     ws['A5'] = 'Абонент'
     ws['A5'].style = ali_grey
-    
+
     ws['B5'] = 'Номер счётчика'
     ws['B5'].style = ali_grey
-    
+
     ws['c5'] = 'Тип'
     ws['c5'].style = ali_grey
 
     ws['d5'] = 'Пульсар'
     ws['d5'].style = ali_grey
-    
+
     ws['e5'] = 'Канал'
     ws['e5'].style = ali_grey
-    
+
     ws['f5'] = 'Показания'
     ws['f5'].style = ali_grey
-    
 
-    
+
+
 #Запрашиваем данные для отчета
 
     is_abonent_level = re.compile(r'level2')
     is_object_level_2 = re.compile(r'level1')
-    
+
     parent_name         = request.GET.get('obj_parent_title')
     meters_name         = request.session['obj_title']
     electric_data_end   = request.GET.get('electric_data_end')           
     obj_key             = request.GET.get('obj_key')
-    # dc - daily or current
+# dc - daily or current
     dc=u'daily'
     data_table = []
     if (bool(is_abonent_level.search(obj_key))): 
@@ -8344,10 +8346,10 @@ def report_water_by_date_pulsar(request):
     elif (bool(is_object_level_2.search(obj_key))):
         data_table = common_sql.get_data_table_water_by_date_pulsar(meters_name, parent_name, electric_data_end, False,dc)
 
-    #zamenyem None na N/D vezde
+#zamenyem None na N/D vezde
     if len(data_table)>0: 
         data_table=common_sql.ChangeNull(data_table, None)
-    #print data_table
+#print data_table
 # Заполняем отчет значениями
     for row in range(6, len(data_table)+6):
         try:
@@ -8356,14 +8358,14 @@ def report_water_by_date_pulsar(request):
         except:
             ws.cell('A%s'%(row)).style = ali_white
             next
-        
+    
         try:
             ws.cell('B%s'%(row)).value = '%s' % (data_table[row-6][2])  # заводской номер
             ws.cell('B%s'%(row)).style = ali_white
         except:
             ws.cell('B%s'%(row)).style = ali_white
             next
-            
+        
         try:
             ws.cell('c%s'%(row)).value = '%s' % (data_table[row-6][3])  # type hv ili gv
             ws.cell('c%s'%(row)).style = ali_white
@@ -8377,7 +8379,7 @@ def report_water_by_date_pulsar(request):
         except:
             ws.cell('d%s'%(row)).style = ali_white
             next
-            
+        
         try:
             ws.cell('e%s'%(row)).value = '%s' % (data_table[row-6][5])  # канал
             ws.cell('e%s'%(row)).style = ali_white
@@ -8385,29 +8387,30 @@ def report_water_by_date_pulsar(request):
             ws.cell('e%s'%(row)).style = ali_white
             next
         try:
-
             ws.cell('f%s'%(row)).value = '%s' % get_val_by_round(data_table[row-6][6], ROUND_SIZE, separator)    # Показания
             ws.cell('f%s'%(row)).style = ali_white
         except:
             ws.cell('f%s'%(row)).style = ali_white
             next
-            
+        
     ws.row_dimensions[5].height = 41
     ws.column_dimensions['A'].width = 17
     ws.column_dimensions['B'].width = 25
     ws.column_dimensions['d'].width = 25
-                    
-    
+                
+
     wb.save(response)
     response.seek(0)
     response = HttpResponse(response.read(), content_type="application/vnd.ms-excel")
-    #response['Content-Disposition'] = "attachment; filename=profil.xlsx"
-    
+#response['Content-Disposition'] = "attachment; filename=profil.xlsx"
+
     output_name = u'water_'+translate(parent_name).replace('\n','')+'_'+translate(meters_name).replace('\n','')+'_'+electric_data_end
     file_ext = u'xlsx'
-    #print translate(meters_name), output_name
+#print translate(meters_name), output_name
     response['Content-Disposition'] = 'attachment;filename="%s.%s"' % (output_name.replace('"', '\"'), file_ext)   
     return response
+
+#return new_func(separator, ali_grey, ali_white, translate)
 
     
 def report_forma_80020(request):
@@ -11273,7 +11276,7 @@ def report_water_elf_potreblenie_monthly_with_delta(request):
         #val_num= len(data_table[0]) - 6   
         
     #count_month=range(1,len(dt_date)-1)
-    if len(data_table)>03:
+    if len(data_table)>3:
         double_dates.pop()
         double_dates.pop()
         double_dates.pop()
@@ -11314,7 +11317,7 @@ def report_water_elf_potreblenie_monthly_with_delta(request):
                 bukva_next= 'A'+chr(chrNum+1)
             if not bool(i % 3): 
                 ws.merge_cells(bukva+'4:'+bukva_next+'4')
-            print bukva, chrNum
+            #print bukva, chrNum
             ws[bukva+'4'] = dt_row4[i]               
             ws[bukva+'4'].style = ali_grey
             
@@ -11489,7 +11492,7 @@ def report_water_elf_daily(request):
     #response['Content-Disposition'] = "attachment; filename=profil.xlsx"
     
     output_name = u'elf_'+translate(obj_parent_title)+'_'+translate(obj_title)+'_'+electric_data_end
-    print output_name
+    #print output_name
     file_ext = u'xlsx'
     
     response['Content-Disposition'] = 'attachment;filename="%s.%s"' % (output_name.replace('"', '\"'), file_ext)   
